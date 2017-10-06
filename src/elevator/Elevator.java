@@ -1,60 +1,38 @@
 package elevator;
 import java.util.ArrayList;
 
-public class Elevator1 implements Elevator_Interface{
-	private int ID;
-	private Elevator_Impl delegate;
-	private String direction;
-	private int curr_floor;
-	//make persons class for persons[]
-	private ArrayList<Integer> pick_ups;
-	private ArrayList<Integer> drop_offs;
-	private boolean doorOpen;
+public class Elevator implements ElevatorInterface{
+	
+	private ElevatorInterface delegate;
+	
 	
 	//////
 	//Constructor
 	///////
 	
-	public Elevator1(int ID){
-		setID(ID);
-		setDel();
-		//not sure about hard code
-		direction = "IDLE";
-		curr_floor = 1;
-		// capacity of elevator = 10?
-		pick_ups = new ArrayList<Integer>();
-		drop_offs = new ArrayList<Integer>();
-		doorOpen = false;
+	public Elevator(String id, int capacity){
+		this.setDelegate(id, capacity);
 	}
 	
 	///////
 	// Interface Methods
 	///////
 
-	/// should be called step?
 	
 	public void moveUp() {
-		delegate.moveUp();
-		this.setDirection(delegate.getDirection());
-		this.setFloor(delegate.getFloor());
+		this.delegate.moveUp();
 	}
 	
 	public void moveDown() {
-		delegate.moveDown();
-		this.setDirection(delegate.getDirection());
-		this.setFloor(delegate.getFloor());
+		this.delegate.moveDown();
 	}
 	
 	public void openDoors() {
-		//This is delegate work
-		// Thread.sleep()
-		doorOpen = true;
+		this.delegate.openDoors();
 	}
 	
 	public void closeDoors() {
-		//This is delegate work
-		// Thread.sleep()
-		doorOpen = false;
+		this.delegate.closeDoors();
 	}
 	
 	
@@ -62,43 +40,33 @@ public class Elevator1 implements Elevator_Interface{
 	// All other methods
 	//////
 	
-	private void setID(int makeID) {
-		ID = makeID;
+	
+	private void setDelegate(String id, int capacity) {
+		this.delegate = ElevatorFactory.build(id, capacity);
 	}
 	
-	private void setDel() {
-		delegate = (Elevator_Impl) Elevator_Factory1.build(this.getCurrFloor());
+	public String getId() {
+		this.delegate.getId();
 	}
 	
-	public int getID() {
-	// This "get" accessor is public - Strings and primitive types are 
-	// safe to publically return.
-		return ID;
-	}
-	
-	private void setFloor(int new_floor) {
-		curr_floor = new_floor;
-	}
-	
-	private void setDirection(String dir) {
-		direction = dir;
-	}
-	
-	public int getCurrFloor() {
-		return curr_floor;
+	public int getCurrentFloor() {
+		this.delegate.getCurrentFloor();
 	}
 	
 	public String getDirection() {
-		return direction;
+		this.delegate.getDirection();
+	}
+
+	public String[] getRiderIds() {
+		this.delegate.getRiderIds();
 	}
 	
 	public ArrayList<Integer> getPickUps() {
-		return pick_ups;
+		//TODO
 	}
 		
-
 	public ArrayList<Integer> getDropOffs() {
-		return drop_offs;
+		//TODO
 	}
 	
 	
@@ -108,9 +76,9 @@ public class Elevator1 implements Elevator_Interface{
 	public static void main(String[] args) {
 		System.out.println("Start:\n");
 		
-		Elevator1 e1 = new Elevator1(1);
-		Elevator1 e2 = new Elevator1(2);
-		Elevator1 e3 = new Elevator1(3);
+		Elevator e1 = new Elevator(1);
+		Elevator e2 = new Elevator(2);
+		Elevator e3 = new Elevator(3);
 		System.out.printf("Elevator 1 Start floor: %s \n",e1.getCurrFloor());
 		System.out.printf("Elevator 2 Start floor: %s \n",e2.getCurrFloor());
 		System.out.printf("Elevator 3 Start floor: %s \n",e3.getCurrFloor());

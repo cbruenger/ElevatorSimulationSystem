@@ -1,6 +1,6 @@
 package elevator;
 
-public interface Elevator_Interface {
+public interface ElevatorInterface {
 	public void moveUp();
 	public void moveDown();
 	public void openDoors();
