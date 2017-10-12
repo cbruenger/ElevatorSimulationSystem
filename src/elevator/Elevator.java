@@ -62,11 +62,11 @@ public class Elevator implements ElevatorInterface{
 	}
 	
 	public ArrayList<Integer> getPickUps() {
-		//TODO
+		this.delegate.getPickUps();
 	}
 		
 	public ArrayList<Integer> getDropOffs() {
-		//TODO
+		this.delegate.getDropOffs();
 	}
 	
 	

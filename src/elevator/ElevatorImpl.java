@@ -32,6 +32,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.createPickUpsArrayList();
 		this.createDropOffsArrayList();
 		
+		
 		//Set initial variable values
 		this.setId(id);
 		this.setDirection("IDLE");
