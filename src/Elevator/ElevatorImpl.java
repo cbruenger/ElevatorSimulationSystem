@@ -1,7 +1,10 @@
-package elevator;
+package Elevator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import Interfaces.ElevatorInterface;
+import Rider.Rider;
 
 /*////////////////////////////////////////
  * 										*

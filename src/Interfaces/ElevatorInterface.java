@@ -1,4 +1,4 @@
-package elevator;
+package Interfaces;
 
 import java.util.ArrayList;
 

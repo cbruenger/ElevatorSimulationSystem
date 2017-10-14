@@ -1,4 +1,4 @@
-package elevator;
+package Interfaces;
 
 public interface RiderInterface {
 	

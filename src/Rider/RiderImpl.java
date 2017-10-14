@@ -1,10 +1,12 @@
-package elevator;
+package Rider;
+
+import Interfaces.RiderInterface;
 
 public class RiderImpl implements RiderInterface {
 
 	private String id;
 	private int startFloor;
-	private int destinationFloor;
+	private int currentFloor;
 	private long requestTime;
 	private long enterTime;
 	private long exitTime;
@@ -16,7 +18,7 @@ public class RiderImpl implements RiderInterface {
 		this.setId(id);
 		this.setStartFloor(numFloors);
 		this.setDestinationFloor(numFloors);
-		this.setRequest();
+		this.requestElevator();
 		
 	}
 	
@@ -26,6 +28,20 @@ public class RiderImpl implements RiderInterface {
 	
 	private void setStartFloor(int numFloors) {
 		// TODO
+	}
+	
+	private void setDestinationFloor(int numFloors) {
+		// TODO
+	}
+	
+	private void requestElevator() {
+		this.setRequestTime();
+		//ElevatorController.riderRequest(this.currentFloor);
+		
+	}
+	
+	private void setRequestTime() {
+		
 	}
 	
 	@Override

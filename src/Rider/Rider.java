@@ -1,4 +1,7 @@
-package elevator;
+package Rider;
+
+import Factories.RiderFactory;
+import Interfaces.RiderInterface;
 
 public class Rider implements RiderInterface {
 

@@ -1,4 +1,7 @@
-package elevator;
+package Factories;
+
+import Elevator.ElevatorImpl;
+import Interfaces.ElevatorInterface;
 
 public class ElevatorFactory{
 	
