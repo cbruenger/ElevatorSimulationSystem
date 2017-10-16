@@ -8,12 +8,16 @@ public class Rider implements RiderInterface {
 	private RiderInterface delegate;
 	
 	//Maybe remove numFloors param and use static building data
-	public Rider(String id, int numFloors) {
-		this.setDelegate(id, numFloors);
+	public Rider(String id) {
+		this.setDelegate(id);
 	}
 	
-	private void setDelegate(String id, int numFloors) {
-		this.delegate = RiderFactory.build(id, numFloors);
+	private void setDelegate(String id) {
+		this.delegate = RiderFactory.build(id);
+	}
+	
+	public String getId() {
+		return this.delegate.getId();
 	}
 	
 	@Override

@@ -13,11 +13,11 @@ public class RiderImpl implements RiderInterface {
 	private long waitTime;
 	private long rideTime;
 	
-	public RiderImpl(String id, int numFloors) {
+	public RiderImpl(String id) {
 		
 		this.setId(id);
-		this.setStartFloor(numFloors);
-		this.setDestinationFloor(numFloors);
+		this.setStartFloor();
+		this.setDestinationFloor();
 		this.requestElevator();
 		
 	}
@@ -26,11 +26,11 @@ public class RiderImpl implements RiderInterface {
 		// TODO
 	}
 	
-	private void setStartFloor(int numFloors) {
+	private void setStartFloor() {
 		// TODO
 	}
 	
-	private void setDestinationFloor(int numFloors) {
+	private void setDestinationFloor() {
 		// TODO
 	}
 	
@@ -42,6 +42,10 @@ public class RiderImpl implements RiderInterface {
 	
 	private void setRequestTime() {
 		
+	}
+	
+	public String getId() {
+		return this.id;
 	}
 	
 	@Override

@@ -20,15 +20,14 @@ public class ElevatorImpl implements ElevatorInterface{
 	private String id;
 	private String direction;
 	private int current_floor;
-	private int capacity;
 	private boolean door_open;
 	
 	private HashSet<Rider> riders;
-	private ArrayList<Integer> pick_ups;
-	private ArrayList<Integer> drop_offs;
+	private ArrayList<Integer> pickUps;
+	private ArrayList<Integer> dropOffs;
 	
 	//Constructor
-	public ElevatorImpl(String id, int capacity) {
+	public ElevatorImpl(String id) {
 		
 		//Create necessary data structures
 		this.createRidersHashSet();
@@ -40,7 +39,6 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.setId(id);
 		this.setDirection("IDLE");
 		this.setCurrentFloor(1);
-		this.setCapacity(capacity);
 		this.setDoorStatus(false);
 		
 	}
@@ -56,19 +54,15 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	private void createPickUpsArrayList() {
-		this.pick_ups = new ArrayList<Integer>();
+		this.pickUps = new ArrayList<Integer>();
 	}
 	
 	private void createDropOffsArrayList() {
-		this.drop_offs = new ArrayList<Integer>();
+		this.dropOffs = new ArrayList<Integer>();
 	}
 	
 	private void setId(String id) {
 		this.id = id;
-	}
-	
-	private void setCapacity(int capacity) {
-		this.capacity = capacity;
 	}
 	
 	
@@ -122,23 +116,22 @@ public class ElevatorImpl implements ElevatorInterface{
 		return this.id;
 	}
 	
-	public int getCapacity() {
-		return this.capacity;
-	}
 	
-	public String[] getRiderIds() {
-		//TODO
-		return new String[] {};
+	public ArrayList<String> getRiderIds() {
+		ArrayList<String> riderIds = new ArrayList<String>();
+		for (Rider i : this.riders) {
+			riderIds.add(i.getId());
+		}
+		return riderIds;
 	}
 	
 	public ArrayList<Integer> getPickUps() {
-		//TODO
-		return new ArrayList<Integer>() {};
+		return this.pickUps;
 	}
 	
 	public ArrayList<Integer> getDropOffs() {
 		//TODO
-		return new ArrayList<Integer>() {};
+		return this.dropOffs;
 	}
 	
 	

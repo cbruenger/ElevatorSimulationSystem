@@ -5,8 +5,8 @@ import Rider.RiderImpl;
 
 public class RiderFactory {
 	
-	public static RiderInterface build(String id, int numFloors) {
-		return new RiderImpl(id, numFloors);
+	public static RiderInterface build(String id) {
+		return new RiderImpl(id);
 	}
 
 }

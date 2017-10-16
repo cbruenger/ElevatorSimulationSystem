@@ -12,8 +12,8 @@ public class Elevator implements ElevatorInterface{
 	//Constructor
 	///////
 	
-	public Elevator(String id, int capacity){
-		this.setDelegate(id, capacity);
+	public Elevator(String id){
+		this.setDelegate(id);
 	}
 	
 	///////
@@ -43,8 +43,8 @@ public class Elevator implements ElevatorInterface{
 	//////
 	
 	
-	private void setDelegate(String id, int capacity) {
-		this.delegate = ElevatorFactory.build(id, capacity);
+	private void setDelegate(String id) {
+		this.delegate = ElevatorFactory.build(id);
 	}
 	
 	public String getId() {
@@ -59,7 +59,7 @@ public class Elevator implements ElevatorInterface{
 		return this.delegate.getDirection();
 	}
 
-	public String[] getRiderIds() {
+	public ArrayList<String> getRiderIds() {
 		return this.delegate.getRiderIds();
 	}
 	

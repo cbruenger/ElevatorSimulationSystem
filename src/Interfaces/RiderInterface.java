@@ -2,6 +2,7 @@ package Interfaces;
 
 public interface RiderInterface {
 	
+	public String getId();
 	public void enterElevator();
 		// in impl...
 		// ElevatorFacade.getInstance.addRider(el_ID, riderID)

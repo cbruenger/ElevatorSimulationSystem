@@ -10,7 +10,7 @@ public interface ElevatorInterface {
 	public String getId();
 	public int getCurrentFloor();
 	public String getDirection();
-	public String[] getRiderIds();
+	public ArrayList<String> getRiderIds();
 	public ArrayList<Integer> getPickUps();
 	public ArrayList<Integer> getDropOffs();
 }
