@@ -8,17 +8,21 @@ public class Elevator implements ElevatorInterface{
 	
 	private ElevatorInterface delegate;
 	
-	//////
-	//Constructor
-	///////
+	////////////////////////
+	//				      //
+	//    Constructor     //
+	//				      //
+	////////////////////////
 	
 	public Elevator(String id){
 		this.setDelegate(id);
 	}
 	
-	///////
-	// Interface Methods
-	///////
+	/////////////////////////////
+	//				           //
+	//    Interface Methods    //
+	//				           //
+	/////////////////////////////
 
 	
 	public void moveUp() {
@@ -35,6 +39,14 @@ public class Elevator implements ElevatorInterface{
 	
 	public void closeDoors() {
 		this.delegate.closeDoors();
+	}
+	
+	public void addRider(String riderId) {
+		this.delegate.addRider(riderId);
+	}
+	
+	public void removeRider(String riderId) {
+		this.delegate.removeRider(riderId);
 	}
 	
 	

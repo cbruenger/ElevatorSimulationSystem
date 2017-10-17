@@ -1,6 +1,7 @@
 package Facades;
 
 import Elevator.Elevator;
+import Interfaces.ElevatorInterface;
 import UserInputData.UserInputData;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,14 +10,19 @@ import java.util.Map;
 
 public final class ElevatorFacade {
 
-	//Class variables
+	//Class attributes
 	private static ElevatorFacade instance;
 	private int elevatorSpeed;
 	private int doorsOpenTime;
 	private int idleTime;
-	private HashMap<String,Elevator> elevators;
+	private HashMap<String,ElevatorInterface> elevators;
 	
-	//Constructors
+	////////////////////////
+	//				      //
+	//    Constructor     //
+	//				      //
+	////////////////////////
+	
 	private ElevatorFacade() {
 		this.initialize();
 	}
@@ -44,12 +50,12 @@ public final class ElevatorFacade {
 	
 	//A function to initialize the hash map for elevators to be stored
 	private void createElevatorsHashMap() {
-		this.elevators = new HashMap<String,Elevator>();
+		this.elevators = new HashMap<String,ElevatorInterface>();
 	}
 	
 	//A function to create the chosen number of elevators
 	private void createElevators() {
-		for (int i = 0; i < UserInputData.getInstance().getNumElevators(); i++) {
+		for (int i = 1; i <= UserInputData.getInstance().getNumElevators(); i++) {
 			StringBuilder stringBuilder = new StringBuilder(String.valueOf("el"));
 			stringBuilder.append(i);
 			String id = stringBuilder.toString();
@@ -96,12 +102,12 @@ public final class ElevatorFacade {
 		return ids;
 	}
 	
-	public String[] printMap(Map<String, Elevator> map) {
+	private String[] printMap(Map<String, ElevatorInterface> map) {
 	    Iterator it = map.entrySet().iterator();
 	    String[] ids = new String[this.elevators.size()];
 	    int i = 0;
 	    while (it.hasNext()) {
-	    		Map.Entry<String, Elevator> pair = (Map.Entry<String, Elevator>)it.next();
+	    		Map.Entry<String, ElevatorInterface> pair = (Map.Entry<String, ElevatorInterface>)it.next();
 	    		ids[i] = pair.getKey();
 	        it.remove(); // avoids a ConcurrentModificationException
 	        i++;
@@ -109,5 +115,22 @@ public final class ElevatorFacade {
 	    return ids;
 	}
 	
+			/////////////////////////////////
+			//				               //
+			//    Facade Communication     //
+			//				               //
+			/////////////////////////////////
+	
+	public void addRiderToElevator(String elevatorId, String riderId) {
+		ElevatorInterface theElevator = elevators.get(elevatorId);
+		theElevator.addRider(riderId);
+		// call time on enter...
+	}
+	
+	public void removeRiderToElevator(String elevatorId, String riderId) {
+		ElevatorInterface theElevator = elevators.get(elevatorId);
+		theElevator.removeRider(riderId);
+		// Call time on exit...
+	}
 	
 }

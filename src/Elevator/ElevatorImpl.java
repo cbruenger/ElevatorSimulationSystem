@@ -1,10 +1,8 @@
 package Elevator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import Interfaces.ElevatorInterface;
-import Rider.Rider;
 
 /*////////////////////////////////////////
  * 										*
@@ -22,7 +20,8 @@ public class ElevatorImpl implements ElevatorInterface{
 	private int current_floor;
 	private boolean door_open;
 	
-	private HashSet<Rider> riders;
+	private ArrayList<String> riderIds;
+	// Floors
 	private ArrayList<Integer> pickUps;
 	private ArrayList<Integer> dropOffs;
 	
@@ -30,7 +29,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	public ElevatorImpl(String id) {
 		
 		//Create necessary data structures
-		this.createRidersHashSet();
+		this.createRidersArray();
 		this.createPickUpsArrayList();
 		this.createDropOffsArrayList();
 		
@@ -49,8 +48,8 @@ public class ElevatorImpl implements ElevatorInterface{
 	//														//
 	///////////////////////////////////////////////////////////
 	
-	private void createRidersHashSet() {
-		this.riders = new HashSet<Rider>();
+	private void createRidersArray() {
+		this.riderIds = new ArrayList<String>();
 	}
 	
 	private void createPickUpsArrayList() {
@@ -92,6 +91,14 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.setCurrentFloor(this.getCurrentFloor() - 1);
 	}
 	
+	public void addRider(String riderId) {
+		this.riderIds.add(riderId);
+	}
+	
+	public void removeRider(String riderId) {
+		this.riderIds.remove(riderId);
+	}
+	
 	public int getCurrentFloor() {
 		return this.current_floor;
 	}
@@ -118,11 +125,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	
 	
 	public ArrayList<String> getRiderIds() {
-		ArrayList<String> riderIds = new ArrayList<String>();
-		for (Rider i : this.riders) {
-			riderIds.add(i.getId());
-		}
-		return riderIds;
+		return this.riderIds;
 	}
 	
 	public ArrayList<Integer> getPickUps() {

@@ -7,6 +7,8 @@ public interface ElevatorInterface {
 	public void moveDown();
 	public void openDoors();
 	public void closeDoors();
+	public void addRider(String riderId);
+	public void removeRider(String riderId);
 	public String getId();
 	public int getCurrentFloor();
 	public String getDirection();
