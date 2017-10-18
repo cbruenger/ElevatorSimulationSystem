@@ -2,10 +2,11 @@ package Elevator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import Rider.Rider;
 import Interfaces.ElevatorInterface;
 import Interfaces.RiderInterface;
 import enumerators.Direction;
+import Building.Building;
 
 /*////////////////////////////////////////
  * 										*
@@ -45,11 +46,11 @@ public class ElevatorImpl implements ElevatorInterface{
 		
 	}
 	
-	////////////////////////////////////////////////////////////
-	//														//
-	//     Private Setter methods called by constructor      //
-	//														//
-	///////////////////////////////////////////////////////////
+	///////////////////////////////
+	//							//
+	//     Private methods      //
+	//						   //
+	/////////////////////////////
 	
 	private void createRidersArray() {
 		this.riders = new ArrayList<RiderInterface>();
@@ -67,40 +68,47 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.id = id;
 	}
 	
+	private void removeRider(Rider rider) {
+		//Check if rider exists in riders and throw error if not
+		this.riders.remove(rider);
+		rider.exitElevator();
+		//Tell building to decommission riders? May be multiple riders so send in ArrayList?
+	}
 	
-	/////////////////////////////
-	//						   //
-	//     Public methods      //
-	//						  //
-	////////////////////////////
-	
-	public void setDirection(Direction direction) {
+	private void setDirection(Direction direction) {
 		this.direction = direction;
 	}
 	
-	public void setCurrentFloor(int floor) {
+	private void setCurrentFloor(int floor) {
 		this.currentFloor = floor;
 	}
 	
-	public void setDoorStatus(boolean status) {
+	private void setDoorStatus(boolean status) {
 		this.doorOpen = status;
 	}
 	
-	public void moveUp() {
+	private void moveUp() {
 		this.setCurrentFloor(this.getCurrentFloor() + 1);
 	}
 	
-	public void moveDown() {
+	private void moveDown() {
 		this.setCurrentFloor(this.getCurrentFloor() - 1);
 	}
 	
-	public void addRider(String riderId) {
-		this.riderIds.add(riderId);
+	
+	
+	
+	
+	
+	
+	
+	public void addRider(Rider rider) {
+		//Check if rider is already in elevator and throw error if needed
+		//Then add
+		this.riders.add(rider);
 	}
 	
-	public void removeRider(String riderId) {
-		this.riderIds.remove(riderId);
-	}
+	
 	
 	public int getCurrentFloor() {
 		return this.currentFloor;
@@ -110,15 +118,15 @@ public class ElevatorImpl implements ElevatorInterface{
 		return this.direction;
 	}
 	
-	public boolean getDoorOpenStatus() {
+	private boolean getDoorOpenStatus() {
 		return this.doorOpen;
 	}
 	
-	public void openDoors() {
+	private void openDoors() {
 		this.doorOpen = true;
 	}
 	
-	public void closeDoors() {
+	private void closeDoors() {
 		this.doorOpen = false;
 	}
 	
@@ -128,7 +136,10 @@ public class ElevatorImpl implements ElevatorInterface{
 	
 	
 	public ArrayList<String> getRiderIds() {
-		return this.riderIds;
+		ArrayList<String> ids = new ArrayList<String>();
+		for (RiderInterface rider : this.riders)
+			ids.add(rider.getId());
+		return ids;
 	}
 	
 	public ArrayList<Integer> getPickUps() {

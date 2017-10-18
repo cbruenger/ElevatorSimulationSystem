@@ -25,7 +25,7 @@ public class Elevator implements ElevatorInterface{
 	/////////////////////////////
 
 	public void update(long time) {
-		move(time);
+		this.move(time);
 		checkFloorStops();
 			//will check if floorstops are empty... will make call in checkFloorStops to ReEvaluate if necessary...
 		checkRiderInElevator():
@@ -45,13 +45,13 @@ public class Elevator implements ElevatorInterface{
 		
 	}
 	
-	public void openDoors() {
-		this.delegate.openDoors();
-	}
-	
-	public void closeDoors() {
-		this.delegate.closeDoors();
-	}
+//	public void openDoors() {
+//		this.delegate.openDoors();
+//	}
+//	
+//	public void closeDoors() {
+//		this.delegate.closeDoors();
+//	}
 	
 	public void addRider(String riderId) {
 		this.delegate.addRider(riderId);
@@ -69,6 +69,10 @@ public class Elevator implements ElevatorInterface{
 	
 	private void setDelegate(String id) {
 		this.delegate = ElevatorFactory.build(id);
+	}
+	
+	private void moveUp() {
+		
 	}
 	
 	public String getId() {

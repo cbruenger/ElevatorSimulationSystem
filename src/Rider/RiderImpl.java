@@ -143,7 +143,7 @@ public class RiderImpl implements RiderInterface {
 	}
 
 	@Override
-	public void exitElavator() {
+	public void exitElevator() {
 		this.setExitTime();
 		this.setRideTime();
 	}

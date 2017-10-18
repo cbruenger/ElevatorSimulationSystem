@@ -39,7 +39,7 @@ public final class Building {
 	private void initialize() {
 		this.createElevators();
 		this.createFloors();
-		this.setDecommissionedRiders(); 
+		this.initializeDecommissionedRidersArrayList(); 
 	}
 	
 	//Initializes the Elevators
@@ -68,12 +68,12 @@ public final class Building {
 			}
 		}
 	
-	private void setDecommissionedRiders() {
+	private void initializeDecommissionedRidersArrayList() {
 		this.decommissionedRiders = new ArrayList<RiderInterface>();
 	}
 		
 	public void update(Long sleepTime) {
-		for (String elevatorId: elevators.keySet()) {
+		for (String elevatorId : elevators.keySet()) {
 			elevators.get(elevatorId).update(sleepTime);
 		}
 	}
@@ -81,7 +81,7 @@ public final class Building {
 	public void decommissionRider(ArrayList<RiderInterface> riders) {
 		for (RiderInterface rider: riders) {
 			this.decommissionedRiders.add(rider);
-			//rider.setTime()
+			//rider.setTime() ----->
 		}
 	}
 	

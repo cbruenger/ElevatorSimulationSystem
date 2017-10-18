@@ -9,7 +9,7 @@ public interface RiderInterface {
 	public long getWaitTime();
 	public long getRideTime();
 	public void enterElevator();
-	public void exitElavator();
+	public void exitElevator();
 	//public long getRequestTime();
 	//public long getEnterTime();
 	//public long getExitTime();

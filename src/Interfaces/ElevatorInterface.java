@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import enumerators.Direction;
 
 public interface ElevatorInterface {
-	public void moveUp();
-	public void moveDown();
-	public void openDoors();
-	public void closeDoors();
+	public void update();
+	//public void moveUp();
+	//public void moveDown();
+	//public void openDoors();
+	//public void closeDoors();
 	public void addRider(String riderId);
 	public void removeRider(String riderId);
 	public String getId();

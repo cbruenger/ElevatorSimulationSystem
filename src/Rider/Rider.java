@@ -59,8 +59,8 @@ public class Rider implements RiderInterface {
 	}
 
 	@Override
-	public void exitElavator() {
-		this.delegate.exitElavator();
+	public void exitElevator() {
+		this.delegate.exitElevator();
 	}
 	
 	//////////////////////////
