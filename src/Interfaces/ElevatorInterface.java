@@ -1,7 +1,8 @@
 package Interfaces;
 
 import java.util.ArrayList;
-import DataStore.Direction;
+
+import enumerators.Direction;
 
 public interface ElevatorInterface {
 	public void moveUp();

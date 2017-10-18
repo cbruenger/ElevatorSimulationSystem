@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Factories.FloorFactory;
 import Interfaces.FloorInterface;
+import Interfaces.RiderInterface;
 
 public class Floor implements FloorInterface {
 	
@@ -31,18 +32,18 @@ public class Floor implements FloorInterface {
 	}
 
 	@Override
-	public ArrayList<String> getRiderIds() {
-		return delegate.getRiderIds();
+	public ArrayList<RiderInterface> getRiders() {
+		return delegate.getRiders();
 	}
 
 	@Override
-	public void removeRider(String riderId) {
-		delegate.removeRider(riderId);
+	public void removeRider(RiderInterface rider) {
+		delegate.removeRider(rider);
 	}
 	
 	@Override
-	public void addRider(String riderId) {
-		delegate.addRider(riderId);
+	public void addRider(RiderInterface rider) {
+		delegate.addRider(rider);
 	}
 
 	/////////////////////////////

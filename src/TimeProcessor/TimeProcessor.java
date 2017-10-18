@@ -39,14 +39,17 @@ public final class TimeProcessor {
 		long sleepTime = DataStore.getInstance().getSleepTime();
 		while (currentTime <= duration) {
 			//DoSimWork -> generate ppl and shit
-			
 			Building.getInstance().update(sleepTime);
-			
+		
 			// artificial sleep...
 			try { Thread.sleep(sleepTime);}
-			catch(InterupetedException ex) {}
+			catch(InterruptedException ex) {ex.printStackTrace();}
+			currentTime += sleepTime;
 		}
-		
+		// Print out final results
+		//building.getInstance.completeReport()
+		//Close GUI
 	}
+
 	
 }

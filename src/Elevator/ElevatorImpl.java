@@ -1,8 +1,11 @@
 package Elevator;
 
 import java.util.ArrayList;
-import DataStore.Direction;
+import java.util.HashMap;
+
 import Interfaces.ElevatorInterface;
+import Interfaces.RiderInterface;
+import enumerators.Direction;
 
 /*////////////////////////////////////////
  * 										*
@@ -20,23 +23,23 @@ public class ElevatorImpl implements ElevatorInterface{
 	private int currentFloor;
 	private boolean doorOpen;
 	
-	private ArrayList<String> riderIds;
-	// Floors
-	private ArrayList<Integer> pickUps;
-	private ArrayList<Integer> dropOffs;
+	private ArrayList<RiderInterface> riders;
+	// HashMap of directions to floor #/IDs
+	private HashMap<Direction, ArrayList<String>> pickUps;
+	private HashMap<Direction, ArrayList<String>> dropOffs;
 	
 	//Constructor
 	public ElevatorImpl(String id) {
 		
 		//Create necessary data structures
 		this.createRidersArray();
-		this.createPickUpsArrayList();
-		this.createDropOffsArrayList();
+		this.createPickUpsMap();
+		this.createDropOffsMap();
 		
 		
 		//Set initial variable values
 		this.setId(id);
-		this.setDirection(DataStore.Direction.IDLE);
+		this.setDirection(enumerators.Direction.IDLE);
 		this.setCurrentFloor(1);
 		this.setDoorStatus(false);
 		
@@ -49,15 +52,15 @@ public class ElevatorImpl implements ElevatorInterface{
 	///////////////////////////////////////////////////////////
 	
 	private void createRidersArray() {
-		this.riderIds = new ArrayList<String>();
+		this.riders = new ArrayList<RiderInterface>();
 	}
 	
-	private void createPickUpsArrayList() {
-		this.pickUps = new ArrayList<Integer>();
+	private void createPickUpsMap() {
+		this.pickUps = new HashMap<Direction, ArrayList<String>>();
 	}
 	
-	private void createDropOffsArrayList() {
-		this.dropOffs = new ArrayList<Integer>();
+	private void createDropOffsMap() {
+		this.dropOffs = new HashMap<Direction, ArrayList<String>>();
 	}
 	
 	private void setId(String id) {

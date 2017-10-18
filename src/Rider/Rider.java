@@ -29,12 +29,12 @@ public class Rider implements RiderInterface {
 	}
 	
 	@Override
-	public int getStartFloor() {
+	public String getStartFloor() {
 		return this.delegate.getStartFloor();
 	}
 
 	@Override
-	public int getDestinationFloor() {
+	public String getDestinationFloor() {
 		return this.delegate.getDestinationFloor();
 	}
 	

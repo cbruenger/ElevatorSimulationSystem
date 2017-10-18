@@ -5,8 +5,8 @@ import Interfaces.RiderInterface;
 public class RiderImpl implements RiderInterface {
 
 	private String id;
-	private int startFloor;
-	private int destinationFloor;
+	private String startFloor;
+	private String destinationFloor;
 	private String direction;
 	private long requestTime;
 	private long enterTime;
@@ -41,11 +41,11 @@ public class RiderImpl implements RiderInterface {
 	}
 	
 	private void setStartFloor(int startFloor) {
-		this.startFloor = startFloor;
+		this.startFloor = Integer.toString(startFloor);
 	}
 	
 	private void setDestinationFloor(int destinationFloor) {
-		this.destinationFloor = destinationFloor;
+		this.destinationFloor = Integer.toString(destinationFloor);
 	}
 	
 	private void setDirection(int startFloor, int destinationFloor) {
@@ -85,12 +85,12 @@ public class RiderImpl implements RiderInterface {
 	}
 
 	@Override
-	public int getStartFloor() {
+	public String getStartFloor() {
 		return this.startFloor;
 	}
 	
 	@Override
-	public int getDestinationFloor() {
+	public String getDestinationFloor() {
 		return this.destinationFloor;
 	}
 	

@@ -7,6 +7,8 @@ import DataStore.DataStore;
 import Elevator.Elevator;
 import Floor.Floor;
 import Interfaces.FloorInterface;
+import Interfaces.RiderInterface;
+import enumerators.Direction;
 import Interfaces.ElevatorInterface;
 
 public final class Building {
@@ -14,7 +16,8 @@ public final class Building {
 	//Class Variables
 	private static Building building;
 	private HashMap<String, FloorInterface> floors;
-	private ArrayList<ElevatorInterface> elevators;
+	private HashMap<String, ElevatorInterface> elevators;
+	private ArrayList<RiderInterface> decommissionedRiders;
 	
 	////////////////////////
 	//				      //
@@ -36,19 +39,20 @@ public final class Building {
 	private void initialize() {
 		this.createElevators();
 		this.createFloors();
+		this.setDecommissionedRiders(); 
 	}
 	
 	//Initializes the Elevators
 	private void createElevators() {
 		//Initialize the ArrayList for elevators to be stored
-		this.elevators = new ArrayList<ElevatorInterface>();
+		this.elevators = new HashMap<String, ElevatorInterface>();
 		
 		//Create the chosen number of elevators
 		for (int i = 1; i <= DataStore.getInstance().getNumElevators(); i++) {
 			StringBuilder stringBuilder = new StringBuilder(String.valueOf("el"));
 			stringBuilder.append(i);
 			String id = stringBuilder.toString();
-			this.elevators.add(new Elevator(id));
+			this.elevators.put(id, new Elevator(id));
 		}
 	}
 	
@@ -63,6 +67,31 @@ public final class Building {
 			this.floors.put(floorNumber, new Floor(floorNumber));
 			}
 		}
+	
+	private void setDecommissionedRiders() {
+		this.decommissionedRiders = new ArrayList<RiderInterface>();
+	}
 		
+	public void update(Long sleepTime) {
+		for (String elevatorId: elevators.keySet()) {
+			elevators.get(elevatorId).update(sleepTime);
+		}
+	}
+	
+	public void decommissionRider(ArrayList<RiderInterface> riders) {
+		for (RiderInterface rider: riders) {
+			this.decommissionedRiders.add(rider);
+			//rider.setTime()
+		}
+	}
+	
+	public void addRiderToFloor(RiderInterface rider) {
+			FloorInterface theFloor = floors.get(rider.getStartFloor());
+			theFloor.addRider(rider);
+		}
+	
+	public void pressButton(String elevatorId, String floorNumber, Direction dir) {
+		elevators.get(elevatorId);
+	}
 	
 }

@@ -2,7 +2,7 @@ package Elevator;
 import java.util.ArrayList;
 import Factories.ElevatorFactory;
 import Interfaces.ElevatorInterface;
-import DataStore.Direction;
+import enumerators.Direction;
 
 public class Elevator implements ElevatorInterface{
 	
@@ -24,13 +24,25 @@ public class Elevator implements ElevatorInterface{
 	//				           //
 	/////////////////////////////
 
-	
-	public void moveUp() {
-		this.delegate.moveUp();
+	public void update(long time) {
+		move(time);
+		checkFloorStops();
+			//will check if floorstops are empty... will make call in checkFloorStops to ReEvaluate if necessary...
+		checkRiderInElevator():
+			//will check riders in elevator...will call to process floor if necessary and reEvalute...
+		
 	}
 	
-	public void moveDown() {
-		this.delegate.moveDown();
+	
+	public void move(long time) {
+		if(this.getDirection() != enumerators.Direction.IDLE) {
+			//determine how quickly to move...
+			//determine move UP
+			//or determine move DOWN
+			
+			//Once full time for movement has occured print out statement of elevator moving to floor X
+		}
+		
 	}
 	
 	public void openDoors() {
@@ -83,46 +95,5 @@ public class Elevator implements ElevatorInterface{
 		return this.delegate.getDropOffs();
 	}
 	
-	
-	////
-	// testing
-	////
-//	public static void main(String[] args) {
-//		System.out.println("Start:\n");
-//		
-//		Elevator e1 = new Elevator(1);
-//		Elevator e2 = new Elevator(2);
-//		Elevator e3 = new Elevator(3);
-//		System.out.printf("Elevator 1 Start floor: %s \n",e1.getCurrFloor());
-//		System.out.printf("Elevator 2 Start floor: %s \n",e2.getCurrFloor());
-//		System.out.printf("Elevator 3 Start floor: %s \n",e3.getCurrFloor());
-//		
-//		//move each floor up by 2
-//		e1.moveUp();
-//		e2.moveUp();
-//		e3.moveUp();
-//		e1.moveUp();
-//		e2.moveUp();
-//		e3.moveUp();
-//		
-//		System.out.printf("Elevator 1 floor: %s \n",e1.getCurrFloor());
-//		System.out.printf("Elevator 2 floor: %s \n",e2.getCurrFloor());
-//		System.out.printf("Elevator 3 floor: %s \n",e3.getCurrFloor());
-//		
-//		// new input...
-//		e1.moveDown();
-//		e2.moveUp();
-//		e2.moveUp();
-//		e3.moveUp();
-//		e3.moveDown();
-//		
-//		System.out.printf("Elevator 1 final floor: %s \n",e1.getCurrFloor());
-//		System.out.printf("Elevator 2 final floor: %s \n",e2.getCurrFloor());
-//		System.out.printf("Elevator 3 final floor: %s \n",e3.getCurrFloor());
-//		
-//		System.out.printf("Elevator 1 final direction: %s \n",e1.getDirection());
-//		System.out.printf("Elevator 2 final direction: %s \n",e2.getDirection());
-//		System.out.printf("Elevator 3 final direction: %s \n",e3.getDirection());
-//	}
 	
 	}

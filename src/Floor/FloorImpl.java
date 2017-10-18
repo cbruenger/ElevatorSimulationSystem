@@ -3,12 +3,13 @@ package Floor;
 import java.util.ArrayList;
 
 import Interfaces.FloorInterface;
+import Interfaces.RiderInterface;
 
 public class FloorImpl implements FloorInterface{
 
 	private String floorNumber;
 	
-	private ArrayList<String> riderIds;
+	private ArrayList<RiderInterface> riders;
 	
 	////////////////////////
 	//				      //
@@ -32,7 +33,7 @@ public class FloorImpl implements FloorInterface{
 	////////////////////
 	
 	private void createRidersArrayList() {
-		this.riderIds = new ArrayList<String>();
+		this.riders = new ArrayList<RiderInterface>();
 	}
 
 	private void setFloor(String floorNumber) {
@@ -50,8 +51,8 @@ public class FloorImpl implements FloorInterface{
 		return this.floorNumber;
 	}
 
-	public ArrayList<String> getRiderIds() {
-		return this.riderIds;
+	public ArrayList<RiderInterface> getRiders() {
+		return this.riders;
 	}
 	
 	
@@ -61,13 +62,12 @@ public class FloorImpl implements FloorInterface{
 	//				        //
 	//////////////////////////
 
-	public void removeRider(String riderId) {
-		this.riderIds.remove(riderId);
+	public void removeRider(RiderInterface rider) {
+		this.riders.remove(rider);
 	}
 	
-	public void addRider(String riderId) {
-		this.riderIds.add(riderId);
+	public void addRider(RiderInterface riderId) {
+		this.riders.add(riderId);
 	}
-	
 
 }
