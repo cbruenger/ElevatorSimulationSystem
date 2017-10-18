@@ -1,8 +1,8 @@
 package Elevator;
 import java.util.ArrayList;
-
 import Factories.ElevatorFactory;
 import Interfaces.ElevatorInterface;
+import DataStore.Direction;
 
 public class Elevator implements ElevatorInterface{
 	
@@ -67,7 +67,7 @@ public class Elevator implements ElevatorInterface{
 		return this.delegate.getCurrentFloor();
 	}
 	
-	public String getDirection() {
+	public Direction getDirection() {
 		return this.delegate.getDirection();
 	}
 

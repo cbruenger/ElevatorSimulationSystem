@@ -1,6 +1,7 @@
 package Interfaces;
 
 import java.util.ArrayList;
+import DataStore.Direction;
 
 public interface ElevatorInterface {
 	public void moveUp();
@@ -11,7 +12,7 @@ public interface ElevatorInterface {
 	public void removeRider(String riderId);
 	public String getId();
 	public int getCurrentFloor();
-	public String getDirection();
+	public Direction getDirection();
 	public ArrayList<String> getRiderIds();
 	public ArrayList<Integer> getPickUps();
 	public ArrayList<Integer> getDropOffs();

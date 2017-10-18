@@ -1,7 +1,7 @@
 package Elevator;
 
 import java.util.ArrayList;
-
+import DataStore.Direction;
 import Interfaces.ElevatorInterface;
 
 /*////////////////////////////////////////
@@ -16,9 +16,9 @@ import Interfaces.ElevatorInterface;
 public class ElevatorImpl implements ElevatorInterface{
 	
 	private String id;
-	private String direction;
-	private int current_floor;
-	private boolean door_open;
+	private Direction direction;
+	private int currentFloor;
+	private boolean doorOpen;
 	
 	private ArrayList<String> riderIds;
 	// Floors
@@ -36,7 +36,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		
 		//Set initial variable values
 		this.setId(id);
-		this.setDirection("IDLE");
+		this.setDirection(DataStore.Direction.IDLE);
 		this.setCurrentFloor(1);
 		this.setDoorStatus(false);
 		
@@ -71,16 +71,16 @@ public class ElevatorImpl implements ElevatorInterface{
 	//						  //
 	////////////////////////////
 	
-	public void setDirection(String direction) {
+	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
 	
 	public void setCurrentFloor(int floor) {
-		this.current_floor = floor;
+		this.currentFloor = floor;
 	}
 	
 	public void setDoorStatus(boolean status) {
-		this.door_open = status;
+		this.doorOpen = status;
 	}
 	
 	public void moveUp() {
@@ -100,23 +100,23 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	public int getCurrentFloor() {
-		return this.current_floor;
+		return this.currentFloor;
 	}
 	
-	public String getDirection() {
+	public Direction getDirection() {
 		return this.direction;
 	}
 	
 	public boolean getDoorOpenStatus() {
-		return this.door_open;
+		return this.doorOpen;
 	}
 	
 	public void openDoors() {
-		this.door_open = true;
+		this.doorOpen = true;
 	}
 	
 	public void closeDoors() {
-		this.door_open = false;
+		this.doorOpen = false;
 	}
 	
 	public String getId() {
