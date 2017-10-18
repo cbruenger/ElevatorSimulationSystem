@@ -1,27 +1,29 @@
-package UserInputData;
+package DataStore;
 import java.util.Scanner;
 
-public final class UserInputData {
+public final class DataStore {
 
 	//Class variables
-	private static UserInputData instance;
+	private static DataStore instance;
 	private Scanner scanner;
 	private int numFloors;
 	private int numElevators;
 	private int speed;
 	private int doorsOpenTime;
 	private int idleTime;
+	private int sleepTime;
+	private int duration;
 	
 	//Constructor
-	private UserInputData() {
+	private DataStore() {
 		this.initializeScanner();
 		this.getData();
 		this.closeScanner();
 	}
 	
 	//A function to get an instance of the class. Initializes instance if needed
-	public static UserInputData getInstance() {
-		if (instance == null) instance = new UserInputData();
+	public static DataStore getInstance() {
+		if (instance == null) instance = new DataStore();
 		return instance;
 	}
 	
@@ -53,6 +55,12 @@ public final class UserInputData {
 		System.out.println("Enter the idle time before returning to floor 1 in seconds:\n");
 		String idleTimeString = this.scanner.nextLine();
 		System.out.println();
+		System.out.println("Enter the sleep time in seconds:\n");
+		String sleepTimeString = this.scanner.nextLine();
+		System.out.println();
+		System.out.println("Enter the duration of the simulation in seconds:\n");
+		String durationTimeString = this.scanner.nextLine();
+		System.out.println();
 		
 		//Handle the parsing of the input with errors
 		int numFloors = Integer.parseInt(numFloorsString);
@@ -60,6 +68,8 @@ public final class UserInputData {
 		int speed = Integer.parseInt(speedString);
 		int doorsOpenTime = Integer.parseInt(doorsOpenTimeString);
 		int idleTime = Integer.parseInt(idleTimeString);
+		int sleepTime = Integer.parseInt(sleepTimeString);
+		int duration = Integer.parseInt(durationTimeString);
 		
 		//Set data variables
 		this.setNumFloors(numFloors);
@@ -67,6 +77,8 @@ public final class UserInputData {
 		this.setSpeed(speed);
 		this.setDoorsOpenTime(doorsOpenTime);
 		this.setIdleTime(idleTime);
+		this.setSleepTime(sleepTime);
+		this.setDuration(duration);
 	}
 	
 	////////////////////
@@ -90,19 +102,31 @@ public final class UserInputData {
 	//A function to set the speed at which an elevator moves between floors
 	private void setSpeed(int speed) {
 		// TODO error handling
-		this.speed = speed;
+		this.speed = speed * 1000;
 	}
 	
 	//A function to set the amount of time an elevator's doors stay open
 	private void setDoorsOpenTime(int doorsOpenTime) {
 		// TODO error handling
-		this.doorsOpenTime = doorsOpenTime;
+		this.doorsOpenTime = doorsOpenTime * 1000;
 	}
 		
 	//A function to set the amount of time an elevator stays idle until returning to floor 1
 	private void setIdleTime(int idleTime) {
 		// TODO error handling
-		this.idleTime = idleTime;
+		this.idleTime = idleTime * 1000;
+	}
+	
+	//A function to set the sleep time 
+	private void setSleepTime(int sleepTime) {
+		// TODO error handling
+		this.sleepTime = sleepTime * 1000;
+	}
+	
+	//A function to set the duration of the simulation
+	private void setDuration(int duration) {
+		// TODO error handling
+		this.duration = duration * 1000;
 	}
 	
 	////////////////////
@@ -134,6 +158,16 @@ public final class UserInputData {
 	//A function to get the amount of time an elevator stays idle before returning to floor 1
 	public int getIdleTime() {
 		return this.idleTime;
+	}
+	
+	//A function to get the sleep time
+	public int getSleepTime() {
+		return this.sleepTime;
+	}
+	
+	//A function to get duration of the simulation
+	public int getDurationLong() {
+		return this.duration;
 	}
 	
 }

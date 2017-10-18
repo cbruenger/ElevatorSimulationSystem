@@ -6,7 +6,7 @@ import Interfaces.FloorInterface;
 
 public class FloorImpl implements FloorInterface{
 
-	private String floor_number;
+	private String floorNumber;
 	
 	private ArrayList<String> riderIds;
 	
@@ -19,7 +19,7 @@ public class FloorImpl implements FloorInterface{
 	public FloorImpl(String floor_number) {
 		
 		//Create necessary data structures
-		this.createRidersArray();
+		this.createRidersArrayList();
 		
 		//Set initial variable values
 		this.setFloor(floor_number);
@@ -31,12 +31,12 @@ public class FloorImpl implements FloorInterface{
 	//				  //
 	////////////////////
 	
-	private void createRidersArray() {
+	private void createRidersArrayList() {
 		this.riderIds = new ArrayList<String>();
 	}
 
-	private void setFloor(String floor_number) {
-		this.floor_number = floor_number;
+	private void setFloor(String floorNumber) {
+		this.floorNumber = floorNumber;
 	}
 	
 	
@@ -47,7 +47,7 @@ public class FloorImpl implements FloorInterface{
       /////////////////////
 	
 	public String getFloorNumber() {
-		return this.floor_number;
+		return this.floorNumber;
 	}
 
 	public ArrayList<String> getRiderIds() {

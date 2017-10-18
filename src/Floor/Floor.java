@@ -15,8 +15,8 @@ public class Floor implements FloorInterface {
 	//				      //
 	////////////////////////
 	
-	public Floor(String floor_number){
-		this.setDelegate(floor_number);
+	public Floor(String floorNumber){
+		this.setDelegate(floorNumber);
 	}
 	
 	/////////////////////////////

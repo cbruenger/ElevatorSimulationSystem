@@ -1,12 +1,13 @@
 package Facades;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import DataStore.DataStore;
 import Floor.Floor;
 import Interfaces.FloorInterface;
-import UserInputData.UserInputData;
 
 public final class FloorFacade {
 	
@@ -35,7 +36,7 @@ public final class FloorFacade {
 	private void initialize() {
 		
 		//Set class variables
-		this.setNumberOfFloors(UserInputData.getInstance().getNumFloors());
+		this.setNumberOfFloors();
 		
 		//Creates the hash map for floors to be stored
 		this.createFloorsHashMap();
@@ -51,16 +52,16 @@ public final class FloorFacade {
 	
 	//A function to create the chosen number of floors
 	private void createFloors() {
-		for (int i = 1; i <= UserInputData.getInstance().getNumFloors(); i++) {
+		for (int i = 1; i <= DataStore.getInstance().getNumFloors(); i++) {
 			String floorNumber = Integer.toString(i);
 			this.floors.put(floorNumber, new Floor(floorNumber));
 		}
 	}
 	
 
-	private void setNumberOfFloors(int floors) {
+	private void setNumberOfFloors() {
 		// TODO error handling
-		this.numberOfFloors = floors;
+		this.numberOfFloors = DataStore.getInstance().getNumFloors();
 	}
 	
 	
@@ -71,22 +72,12 @@ public final class FloorFacade {
 	}
 	
 	//A function to get the IDs of the all floors
-	public String[] getFloorsIds() {
-		String[] ids = printMap(this.floors);
+	public ArrayList<String> getFloorIds() {
+		ArrayList<String> ids = new ArrayList<String>();
+		for (String id : this.floors.keySet()) {
+			ids.add(id);
+		}
 		return ids;
-	}
-	
-	private String[] printMap(Map<String, FloorInterface> map) {
-	    Iterator it = map.entrySet().iterator();
-	    String[] ids = new String[this.floors.size()];
-	    int i = 0;
-	    while (it.hasNext()) {
-	    		Map.Entry<String, FloorInterface> pair = (Map.Entry<String, FloorInterface>)it.next();
-	    		ids[i] = pair.getKey();
-	        it.remove(); // avoids a ConcurrentModificationException
-	        i++;
-	    }
-	    return ids;
 	}
 	
 	/////////////////////////////////
@@ -95,13 +86,18 @@ public final class FloorFacade {
 	//				               //
 	/////////////////////////////////
 	
+	
+	//Figure this out better because this shouldn't be public
+	public HashMap<String, FloorInterface> getFloors() {
+		return this.floors;
+	}
+	
 		
 	public void addRiderToFloor(String floorId, String riderId) {
 		FloorInterface theFloor = floors.get(floorId);
 		theFloor.addRider(riderId);
 		//start time...
 	}
-	
 	
 	public void notifyRidersOnThisFloor(String floorId, String elevatorId, String elevatorDirection) {
 		FloorInterface theFloor = floors.get(floorId);

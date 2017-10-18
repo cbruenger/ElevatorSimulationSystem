@@ -2,10 +2,14 @@ package Facades;
 
 import Elevator.Elevator;
 import Interfaces.ElevatorInterface;
-import UserInputData.UserInputData;
+import Interfaces.RiderInterface;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import DataStore.DataStore;
 
 
 public final class ElevatorFacade {
@@ -37,9 +41,9 @@ public final class ElevatorFacade {
 	private void initialize() {
 		
 		//Set class variables
-		this.setElevatorSpeed(UserInputData.getInstance().getSpeed());
-		this.setDoorsOpenTime(UserInputData.getInstance().getDoorsOpenTime());
-		this.setIdleTime(UserInputData.getInstance().getIdleTime());
+		this.setElevatorSpeed(DataStore.getInstance().getSpeed());
+		this.setDoorsOpenTime(DataStore.getInstance().getDoorsOpenTime());
+		this.setIdleTime(DataStore.getInstance().getIdleTime());
 		
 		//Creates the hash map for elevators to be stored
 		this.createElevatorsHashMap();
@@ -55,7 +59,7 @@ public final class ElevatorFacade {
 	
 	//A function to create the chosen number of elevators
 	private void createElevators() {
-		for (int i = 1; i <= UserInputData.getInstance().getNumElevators(); i++) {
+		for (int i = 1; i <= DataStore.getInstance().getNumElevators(); i++) {
 			StringBuilder stringBuilder = new StringBuilder(String.valueOf("el"));
 			stringBuilder.append(i);
 			String id = stringBuilder.toString();
@@ -97,29 +101,25 @@ public final class ElevatorFacade {
 	}
 	
 	//A function to get the IDs of the elevators managed
-	public String[] getElevatorIds() {
-		String[] ids = printMap(this.elevators);
+	public ArrayList<String> getElevatorIds() {
+		ArrayList<String> ids = new ArrayList<String>();
+		for (String id : this.elevators.keySet()) {
+			ids.add(id);
+		}
 		return ids;
 	}
 	
-	private String[] printMap(Map<String, ElevatorInterface> map) {
-	    Iterator it = map.entrySet().iterator();
-	    String[] ids = new String[this.elevators.size()];
-	    int i = 0;
-	    while (it.hasNext()) {
-	    		Map.Entry<String, ElevatorInterface> pair = (Map.Entry<String, ElevatorInterface>)it.next();
-	    		ids[i] = pair.getKey();
-	        it.remove(); // avoids a ConcurrentModificationException
-	        i++;
-	    }
-	    return ids;
-	}
 	
 			/////////////////////////////////
 			//				               //
 			//    Facade Communication     //
 			//				               //
 			/////////////////////////////////
+	
+	//Figure this out better because this shouldn't be public
+	public HashMap<String, ElevatorInterface> getElevators() {
+		return this.elevators;
+	}
 	
 	public void addRiderToElevator(String elevatorId, String riderId) {
 		ElevatorInterface theElevator = elevators.get(elevatorId);

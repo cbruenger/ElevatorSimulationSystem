@@ -1,13 +1,15 @@
 package Facades;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import DataStore.DataStore;
 import Rider.Rider;
+import Interfaces.FloorInterface;
 import Interfaces.RiderInterface;
-import UserInputData.UserInputData;
 
 public final class RiderFacade {
 	
@@ -40,7 +42,7 @@ public final class RiderFacade {
 		this.createRidersHashMap();
 		
 		//Set floors for random generation
-		this.setNumberOfFloors(UserInputData.getInstance().getNumFloors());
+		this.setNumberOfFloors();
 	}
 	
 	//A function to initialize the hash map for floors to be stored
@@ -48,27 +50,17 @@ public final class RiderFacade {
 		this.riders = new HashMap<String,RiderInterface>();
 	}	
 	
-	private void setNumberOfFloors(int floors) {
-		this.maxFloors = floors;
+	private void setNumberOfFloors() {
+		this.maxFloors = DataStore.getInstance().getNumFloors();
 	}
 	
-	//A function to get the IDs of the all floors
-	public String[] getRidersIds() {
-		String[] ids = printMap(this.riders);
+	//A function to get the IDs of the all riders
+	public ArrayList<String> getRiderIds() {
+		ArrayList<String> ids = new ArrayList<String>();
+		for (String id : this.riders.keySet()) {
+			ids.add(id);
+		}
 		return ids;
-	}
-	
-	private String[] printMap(Map<String, RiderInterface> map) {
-	    Iterator it = map.entrySet().iterator();
-	    String[] ids = new String[this.riders.size()];
-	    int i = 0;
-	    while (it.hasNext()) {
-	    		Map.Entry<String, RiderInterface> pair = (Map.Entry<String, RiderInterface>)it.next();
-	    		ids[i] = pair.getKey();
-	        it.remove(); // avoids a ConcurrentModificationException
-	        i++;
-	    }
-	    return ids;
 	}
 	
 	public RiderInterface getRider(String riderId) {
@@ -83,6 +75,7 @@ public final class RiderFacade {
 		while (randomStart == randomDestination) {
 			randomDestination = ThreadLocalRandom.current().nextInt(1, this.maxFloors+1);
 		} 
+		
 		Rider newRider = new Rider(generateId(), randomStart, randomDestination);
 		this.addToRiderMap(newRider);
 		this.addRiderToFloor(randomStart, newRider.getId());
@@ -109,6 +102,11 @@ public final class RiderFacade {
 	//    Facade Communication     //
 	//				               //
 	/////////////////////////////////
+	
+	//Figure this out better because this shouldn't be public
+	public HashMap<String, RiderInterface> getRiders() {
+		return this.riders;
+	}
 	
 	private void addRiderToFloor(int floorId, String riderId) {
 		FloorFacade.getInstance().addRiderToFloor(Integer.toString(floorId), riderId);

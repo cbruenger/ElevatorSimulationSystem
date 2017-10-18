@@ -49,7 +49,7 @@ public class RiderImpl implements RiderInterface {
 	}
 	
 	private void setDirection(int startFloor, int destinationFloor) {
-		if (startFloor-destinationFloor > 0) this.direction = "DOWN";
+		if (startFloor - destinationFloor > 0) this.direction = "DOWN";
 		else this.direction = "UP";
 	}
 		
