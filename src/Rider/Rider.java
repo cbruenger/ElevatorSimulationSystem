@@ -2,6 +2,7 @@ package Rider;
 
 import Factories.RiderFactory;
 import Interfaces.RiderInterface;
+import enumerators.Direction;
 
 public class Rider implements RiderInterface {
 
@@ -29,17 +30,17 @@ public class Rider implements RiderInterface {
 	}
 	
 	@Override
-	public String getStartFloor() {
+	public int getStartFloor() {
 		return this.delegate.getStartFloor();
 	}
 
 	@Override
-	public String getDestinationFloor() {
+	public int getDestinationFloor() {
 		return this.delegate.getDestinationFloor();
 	}
 	
 	@Override
-	public String getDirection() {
+	public Direction getDirection() {
 		return this.delegate.getDirection();
 	}
 

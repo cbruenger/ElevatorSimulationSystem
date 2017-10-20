@@ -5,7 +5,7 @@ import Interfaces.ElevatorInterface;
 
 public class ElevatorFactory{
 	
-	public static ElevatorInterface build(String id){
-		return new ElevatorImpl(id);
+	public static ElevatorInterface build(int elevatorNumber){
+		return new ElevatorImpl(elevatorNumber);
 	}
 }

@@ -16,7 +16,7 @@ public class Floor implements FloorInterface {
 	//				      //
 	////////////////////////
 	
-	public Floor(String floorNumber){
+	public Floor(int floorNumber){
 		this.setDelegate(floorNumber);
 	}
 	
@@ -27,22 +27,23 @@ public class Floor implements FloorInterface {
 	/////////////////////////////
 	
 	@Override
-	public String getFloorNumber() {
+	public int getFloorNumber() {
 		return delegate.getFloorNumber();
 	}
 
+	//Only for testing temporarily in our main
 	@Override
 	public ArrayList<RiderInterface> getRiders() {
 		return delegate.getRiders();
 	}
-
-	@Override
-	public void removeRider(RiderInterface rider) {
-		delegate.removeRider(rider);
-	}
 	
 	@Override
 	public void addRider(RiderInterface rider) {
+		delegate.addRider(rider);
+	}
+	
+	@Override
+	public void removeRider(RiderInterface rider) {
 		delegate.addRider(rider);
 	}
 
@@ -52,8 +53,8 @@ public class Floor implements FloorInterface {
 	//				           //
 	/////////////////////////////
 	
-	private void setDelegate(String floor_number) {
-		this.delegate = FloorFactory.build(floor_number);
+	private void setDelegate(int floorNumber) {
+		this.delegate = FloorFactory.build(floorNumber);
 	}
 	
 }

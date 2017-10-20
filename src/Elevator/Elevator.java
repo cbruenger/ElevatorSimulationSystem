@@ -1,7 +1,10 @@
 package Elevator;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import Factories.ElevatorFactory;
 import Interfaces.ElevatorInterface;
+import Interfaces.RiderInterface;
 import enumerators.Direction;
 
 public class Elevator implements ElevatorInterface{
@@ -14,8 +17,12 @@ public class Elevator implements ElevatorInterface{
 	//				      //
 	////////////////////////
 	
-	public Elevator(String id){
-		this.setDelegate(id);
+	public Elevator(int elevatorNumber){
+		this.setDelegate(elevatorNumber);
+	}
+	
+	private void setDelegate(int elevatorNumber) {
+		this.delegate = ElevatorFactory.build(elevatorNumber);
 	}
 	
 	/////////////////////////////
@@ -23,81 +30,56 @@ public class Elevator implements ElevatorInterface{
 	//    Interface Methods    //
 	//				           //
 	/////////////////////////////
-
-	public void update(long time) {
-		this.move(time);
-		checkFloorStops();
-			//will check if floorstops are empty... will make call in checkFloorStops to ReEvaluate if necessary...
-		checkRiderInElevator():
-			//will check riders in elevator...will call to process floor if necessary and reEvalute...
-		
+	
+	@Override
+	public int getElevatorNumber() {
+		return this.delegate.getElevatorNumber();
 	}
 	
-	
-	public void move(long time) {
-		if(this.getDirection() != enumerators.Direction.IDLE) {
-			//determine how quickly to move...
-			//determine move UP
-			//or determine move DOWN
-			
-			//Once full time for movement has occured print out statement of elevator moving to floor X
-		}
-		
-	}
-	
-//	public void openDoors() {
-//		this.delegate.openDoors();
-//	}
-//	
-//	public void closeDoors() {
-//		this.delegate.closeDoors();
-//	}
-	
-	public void addRider(String riderId) {
-		this.delegate.addRider(riderId);
-	}
-	
-	public void removeRider(String riderId) {
-		this.delegate.removeRider(riderId);
-	}
-	
-	
-	//////
-	// All other methods
-	//////
-	
-	
-	private void setDelegate(String id) {
-		this.delegate = ElevatorFactory.build(id);
-	}
-	
-	private void moveUp() {
-		
-	}
-	
-	public String getId() {
-		return this.delegate.getId();
-	}
-	
+	@Override
 	public int getCurrentFloor() {
 		return this.delegate.getCurrentFloor();
 	}
 	
+	@Override
 	public Direction getDirection() {
 		return this.delegate.getDirection();
 	}
+	
+	/*
+	 * Maybe instead of returning pickups and drop-offs just 
+	 * return the current direction, destination, and whether its
+	 * an up or down request?
+	 */
+	@Override
+	public HashMap<Direction, ArrayList<Integer>> getPickUps() {
+		return this.delegate.getPickUps();
+	}
+	
+	@Override
+	public HashMap<Direction, ArrayList<Integer>> getDropOffs() {
+		return this.delegate.getDropOffs();
+	}
 
+	//Temporary for testing in main
+	@Override
 	public ArrayList<String> getRiderIds() {
 		return this.delegate.getRiderIds();
 	}
 	
-	public ArrayList<Integer> getPickUps() {
-		return this.delegate.getPickUps();
-	}
-		
-	public ArrayList<Integer> getDropOffs() {
-		return this.delegate.getDropOffs();
+	@Override
+	public void update(long time) {
+		this.delegate.update(time);
 	}
 	
-	
+	@Override
+	public void addRider(RiderInterface rider) {
+		this.delegate.addRider(rider);
 	}
+	
+	@Override
+	public void addPickupRequest(Direction direction, int floor) {
+		this.delegate.addPickupRequest(direction, floor);
+	}
+	
+}

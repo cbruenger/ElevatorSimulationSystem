@@ -7,7 +7,7 @@ import Interfaces.RiderInterface;
 
 public class FloorImpl implements FloorInterface{
 
-	private String floorNumber;
+	private int floorNumber;
 	
 	private ArrayList<RiderInterface> riders;
 	
@@ -17,40 +17,40 @@ public class FloorImpl implements FloorInterface{
 	//				      //
 	////////////////////////
 	
-	public FloorImpl(String floor_number) {
+	public FloorImpl(int floorNumber) {
 		
 		//Create necessary data structures
 		this.createRidersArrayList();
 		
 		//Set initial variable values
-		this.setFloor(floor_number);
+		this.setFloorNumber(floorNumber);
 	}
 	
-	////////////////////
-	//				  //
-	//    Setters     //
-	//				  //
-	////////////////////
+	/////////////////////////////
+	//						  //
+	//    Setters/Private     //
+	//				  		 //
+	///////////////////////////
 	
 	private void createRidersArrayList() {
 		this.riders = new ArrayList<RiderInterface>();
 	}
 
-	private void setFloor(String floorNumber) {
+	private void setFloorNumber(int floorNumber) {
 		this.floorNumber = floorNumber;
 	}
 	
-	
-      ////////////////////
-      //				 //
+      /////////////////////
+      //				 	 //
       //    Getters      //
-      //				 //
+      //				 	//
       /////////////////////
 	
-	public String getFloorNumber() {
+	public int getFloorNumber() {
 		return this.floorNumber;
 	}
 
+	//Only temporarily for testing in our main
 	public ArrayList<RiderInterface> getRiders() {
 		return this.riders;
 	}
@@ -61,13 +61,13 @@ public class FloorImpl implements FloorInterface{
 	//    Other Methods     //
 	//				        //
 	//////////////////////////
-
-	public void removeRider(RiderInterface rider) {
-		this.riders.remove(rider);
-	}
 	
 	public void addRider(RiderInterface riderId) {
 		this.riders.add(riderId);
+	}
+	
+	public void removeRider(RiderInterface rider) {
+		this.riders.remove(rider);
 	}
 
 }

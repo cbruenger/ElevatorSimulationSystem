@@ -12,6 +12,7 @@ public final class DataStore {
 	private int doorsOpenTime;
 	private int idleTime;
 	private int sleepTime;
+	private int riderGenerationTime;
 	private int duration;
 	
 	//Constructor
@@ -39,6 +40,8 @@ public final class DataStore {
 	//A function to get user input, parse it to integers, and call the setters
 	public void getData() {
 		
+		// TODO handle funky situations with time. Make sure sleep time <= floor speed
+		
 		//Get input
 		System.out.println("Enter the number of floors:\n");
 		String numFloorsString = this.scanner.nextLine();
@@ -58,6 +61,9 @@ public final class DataStore {
 		System.out.println("Enter the sleep time in seconds:\n");
 		String sleepTimeString = this.scanner.nextLine();
 		System.out.println();
+		System.out.println("Enter the occurrence at which new Riders should be generated in seconds:\n");
+		String riderGenerationTimeString = this.scanner.nextLine();
+		System.out.println();
 		System.out.println("Enter the duration of the simulation in seconds:\n");
 		String durationTimeString = this.scanner.nextLine();
 		System.out.println();
@@ -69,6 +75,7 @@ public final class DataStore {
 		int doorsOpenTime = Integer.parseInt(doorsOpenTimeString);
 		int idleTime = Integer.parseInt(idleTimeString);
 		int sleepTime = Integer.parseInt(sleepTimeString);
+		int riderGenerationTime = Integer.parseInt(riderGenerationTimeString);
 		int duration = Integer.parseInt(durationTimeString);
 		
 		//Set data variables
@@ -78,6 +85,7 @@ public final class DataStore {
 		this.setDoorsOpenTime(doorsOpenTime);
 		this.setIdleTime(idleTime);
 		this.setSleepTime(sleepTime);
+		this.setRiderGenerationTime(riderGenerationTime);
 		this.setDuration(duration);
 	}
 	
@@ -123,6 +131,12 @@ public final class DataStore {
 		this.sleepTime = sleepTime * 1000;
 	}
 	
+	//A function to set the rider generation time 
+	private void setRiderGenerationTime(int riderGenerationTime) {
+		// TODO error handling
+		this.riderGenerationTime = riderGenerationTime * 1000;
+	}
+	
 	//A function to set the duration of the simulation
 	private void setDuration(int duration) {
 		// TODO error handling
@@ -165,8 +179,13 @@ public final class DataStore {
 		return this.sleepTime;
 	}
 	
+	//A function to get the rider generation time
+	public int getRiderGenerationTime() {
+		return this.riderGenerationTime;
+	}
+	
 	//A function to get duration of the simulation
-	public int getDurationLong() {
+	public int getDurationMillis() {
 		return this.duration;
 	}
 	
