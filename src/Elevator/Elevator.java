@@ -73,8 +73,8 @@ public class Elevator implements ElevatorInterface{
 	}
 	
 	@Override
-	public void addRider(RiderInterface rider) {
-		this.delegate.addRider(rider);
+	public void addRiders(ArrayList<RiderInterface> riders) {
+		this.delegate.addRiders(riders);
 	}
 	
 	@Override

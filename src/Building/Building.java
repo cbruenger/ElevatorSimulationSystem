@@ -102,10 +102,9 @@ public final class Building {
 		}
 	}
 	
-	public void decommissionRider(ArrayList<RiderInterface> riders) {
+	public void decommissionRiders(ArrayList<RiderInterface> riders) {
 		for (RiderInterface rider: riders) {
 			this.decommissionedRiders.add(rider);
-			//rider.setTime() -----> Will probably be called by the rider itself when exitElevator() is called
 		}
 	}
 	

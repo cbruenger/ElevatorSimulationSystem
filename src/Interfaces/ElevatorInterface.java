@@ -17,7 +17,7 @@ public interface ElevatorInterface {
 	
 	//Useful functions
 	public void update(long time);
-	public void addRider(RiderInterface rider);
+	public void addRiders(ArrayList<RiderInterface> riders);
 	public void addPickupRequest(Direction direction, int floor);
 	
 	//public void removeRider(String riderId);
