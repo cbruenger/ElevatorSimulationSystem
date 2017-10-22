@@ -210,8 +210,19 @@ public class ElevatorImpl implements ElevatorInterface{
 	@Override
 	public void addPickupRequest(Direction direction, int floor) {
 		// TODO error handling
-		//See lecture at 1hr 39min
-		//this.pickUps.put(direction, floor);
+		
+		/*If the direction doesn't exist in the pickups Array, create a list for the
+		 * direction being requested, and add the direction with the list containing
+		 * the given floor into the array.
+		 * Otherwise, just add the floor to the direction's list in the array 
+		 */
+		if (this.pickUps.get(direction) == null) {
+			ArrayList<Integer> floorsList = new ArrayList<Integer>();
+			floorsList.add(floor);
+			this.pickUps.put(direction, floorsList);
+		} else {
+			this.pickUps.get(direction).add(floor);
+		}
 	}
 
 }

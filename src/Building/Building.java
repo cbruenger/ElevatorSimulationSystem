@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import DataStore.DataStore;
+import TimeProcessor.TimeProcessor;
 import Elevator.Elevator;
 import Floor.Floor;
 import Interfaces.FloorInterface;
@@ -110,14 +111,14 @@ public final class Building {
 	
 	//elevatorRequested(rider.getStartFloor(), rider.getDirection())
 	public void elevatorRequested(int floor, Direction direction) {
-		this.elevators.get(elevatorToAssign).addPickupRequest(direction, floor);
+		this.elevators.get(this.elevatorToAssign).addPickupRequest(direction, floor);
 		this.incrementElevatorToAssign();
 	}
 	
 	
-	public void addRiderToFloor(RiderInterface rider) {
+	public void addRiderToFloor(RiderInterface rider, int startFloor) {
 		// TODO error handling
-		FloorInterface floor = floors.get(rider.getStartFloor());
+		FloorInterface floor = floors.get(startFloor);
 		floor.addRider(rider);
 	}
 	
@@ -136,23 +137,10 @@ public final class Building {
 	}
 	
 	//Return an ArrayList of people who need to transfer from a floor to an elevator that is waiting
-	//Also remove the person from the floor
+	//Also removes the people from the floor
 	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, Direction direction) {
-		
-		//Initialize transfer 
-		ArrayList<RiderInterface> people = new ArrayList<RiderInterface>();
-		
-		//If the floor has people and they direction matches, add to transfer list and remove from floor
-		if (!this.floors.isEmpty()) {
-			for (RiderInterface rider : this.floors.get(floor).getRiders()) {
-				if (rider.getDirection() == direction) {
-					people.add(rider);
-					this.floors.get(floor).removeRider(rider);
-				}
-			}
-		}
-		
-		return people;
+		// TODO error handling
+		return this.floors.get(floor).getRidersByDirection(direction);
 	}
 	
 	//A function to get the IDs of the all floors.

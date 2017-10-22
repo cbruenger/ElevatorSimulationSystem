@@ -55,12 +55,31 @@ public final class TimeProcessor {
 	//Generates riders, adds them to a floor, and notifies the building of a floor request
 	private void riderSimWork() {
 		
+		if (DataStore.getInstance().getTestNumber() == 1) {
+			
+			//Generate people with requests according to Test 1 from project description
+			if (this.getCurrentTimeMillis() == 0) {
+				RiderInterface rider = this.generateRider(1, 10);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				System.out.println(this.getTimeString() + "Person " + rider.getId() + " pressed " + rider.getDirection() + " on Floor " + rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
+			
+		} else if (DataStore.getInstance().getTestNumber() == 2) {
+			//Generate people with requests according to Test 2 from project description
+		} else if (DataStore.getInstance().getTestNumber() == 3) {
+			//Generate people with requests according to Test 3 from project description
+		} else if (DataStore.getInstance().getTestNumber() == 4) {
+			//Generate people with requests according to Test 4 from project description
+		}
+		
 		//Generates first rider at start of simulation, and also at a designated recurrence time
-		if (this.currentTimeMillis == 0 || this.currentTimeMillis % DataStore.getInstance().getRiderGenerationTime() == 0) {
-			RiderInterface rider = this.generateRandomRider();
-			this.addRiderToFloor(rider);
-			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
-		}	
+//		if (this.currentTimeMillis == 0 || this.currentTimeMillis % DataStore.getInstance().getRiderGenerationTime() == 0) {
+//			RiderInterface rider = this.generateRandomRider();
+//			this.addRiderToFloor(rider);
+//			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+//		}	
 	}
 	
 	//Returns a rider with random start/destination floors
@@ -83,8 +102,9 @@ public final class TimeProcessor {
 	//This isn't being used in riderSimWork but kept it here just in case
 	private RiderInterface generateRider(int startFloor, int destinationFloor) {
 		
-		//Create and return rider
+		//Create, print, and return rider
 		RiderInterface newRider = new Rider(generateRiderId(), startFloor, destinationFloor);
+		System.out.println(this.getTimeString() + "Person " + newRider.getId() + " created on Floor " + newRider.getStartFloor() + ", wants to go " + newRider.getDirection() + " to Floor " + newRider.getDestinationFloor());
 		return newRider;
 		
 	}
@@ -98,8 +118,8 @@ public final class TimeProcessor {
 	
 	//Passes the building a rider to add to the rider's current floor
 	//Maybe move the rider generation and all rider functions into the building???
-	private void addRiderToFloor(RiderInterface rider) {
-		Building.getInstance().addRiderToFloor(rider);
+	private void addRiderToFloor(RiderInterface rider, int floor) {
+		Building.getInstance().addRiderToFloor(rider, floor);
 	}
 	
 	//Returns the current time

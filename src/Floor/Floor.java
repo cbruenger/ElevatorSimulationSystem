@@ -1,7 +1,7 @@
 package Floor;
 
 import java.util.ArrayList;
-
+import enumerators.Direction;
 import Factories.FloorFactory;
 import Interfaces.FloorInterface;
 import Interfaces.RiderInterface;
@@ -45,6 +45,11 @@ public class Floor implements FloorInterface {
 	@Override
 	public void removeRider(RiderInterface rider) {
 		delegate.addRider(rider);
+	}
+	
+	@Override
+	public ArrayList<RiderInterface> getRidersByDirection(Direction direction) {
+		return delegate.getRidersByDirection(direction);
 	}
 
 	/////////////////////////////

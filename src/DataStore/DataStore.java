@@ -6,6 +6,7 @@ public final class DataStore {
 	//Class variables
 	private static DataStore instance;
 	private Scanner scanner;
+	private int testNumber;
 	private int numFloors;
 	private int numElevators;
 	private int speed;
@@ -43,6 +44,9 @@ public final class DataStore {
 		// TODO handle funky situations with time. Make sure sleep time <= floor speed
 		
 		//Get input
+		System.out.println("Enter the Test number (1 - 4) described in the the project assignment that you want to test:\n");
+		String testNumberString = this.scanner.nextLine();
+		System.out.println();
 		System.out.println("Enter the number of floors:\n");
 		String numFloorsString = this.scanner.nextLine();
 		System.out.println();
@@ -69,6 +73,7 @@ public final class DataStore {
 		System.out.println();
 		
 		//Handle the parsing of the input with errors
+		int testNumber = Integer.parseInt(testNumberString);
 		int numFloors = Integer.parseInt(numFloorsString);
 		int numElevators = Integer.parseInt(numElevatorsString);
 		int speed = Integer.parseInt(speedString);
@@ -79,6 +84,7 @@ public final class DataStore {
 		int duration = Integer.parseInt(durationTimeString);
 		
 		//Set data variables
+		this.setTestNumber(testNumber);
 		this.setNumFloors(numFloors);
 		this.setNumElevators(numElevators);
 		this.setSpeed(speed);
@@ -94,6 +100,12 @@ public final class DataStore {
 	//    Setters     //
 	//				  //
 	////////////////////
+	
+	//A function to set the test number described in the project description that the user wants to test
+	private void setTestNumber(int testNumber) {
+		// TODO error handling
+		this.testNumber = testNumber;
+	}
 	
 	//A function to set the number of floors in the building
 	private void setNumFloors(int numFloors) {
@@ -148,6 +160,11 @@ public final class DataStore {
 	//    Getters     //
 	//				  //
 	////////////////////
+	
+	//A function to set the test number described in the project description that the user wants to test
+	public int getTestNumber() {
+		return this.testNumber;
+	}
 	
 	//A function to return the number of floors in the building
 	public int getNumFloors() {
