@@ -46,6 +46,11 @@ public class Elevator implements ElevatorInterface{
 		return this.delegate.getDirection();
 	}
 	
+	@Override
+	public Direction getPendingDirection() {
+		return delegate.getPendingDirection();
+	}
+	
 	/*
 	 * Maybe instead of returning pickups and drop-offs just 
 	 * return the current direction, destination, and whether its

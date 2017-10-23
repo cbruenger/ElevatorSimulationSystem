@@ -11,6 +11,7 @@ public interface ElevatorInterface {
 	public int getElevatorNumber();
 	public int getCurrentFloor();
 	public Direction getDirection();
+	public Direction getPendingDirection();
 	public HashMap<Direction, ArrayList<Integer>> getPickUps();
 	public HashMap<Direction, ArrayList<Integer>> getDropOffs();
 	public ArrayList<String> getRiderIds(); //Temporary for testing in our main

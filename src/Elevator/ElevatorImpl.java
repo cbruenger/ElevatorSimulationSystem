@@ -53,7 +53,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		//Set initial variable values
 		this.setElevatorNumber(elevatorNumber);
 		this.setDirection(Direction.IDLE);
-		this.pendingDirection = Direction.IDLE;
+		this.setPendingDirection(Direction.IDLE);
 		this.setCurrentFloor(1);
 		this.setDoorStatus(false);
 		
@@ -86,6 +86,10 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.direction = direction;
 	}
 	
+	private void setPendingDirection(Direction direction ) {
+		this.pendingDirection = direction;
+	}
+	
 	private void setCurrentFloor(int floor) {
 		// TODO error handling
 		this.currentFloor = floor;
@@ -110,21 +114,36 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	private void move(long time) {
-		///TODO: check if basement or top floor.  throw error
+		///TODO: throw errors if trying to go beyond top/bottom floor
+		
+		/*First check if the elevator is at a floor where it needs to stop. 
+		 * If needs to stop, don't move. 
+		 * Figure out where to handle changing the direction to the pending direction. 
+		 * And probably setting the pending direction to idle once it has swapped over to the current direction
+		 * */
+		
 		if (this.direction != Direction.IDLE) {
 			double distancePerTravelSpeed = time/DataStore.getInstance().getSpeed();
-			//Move it up!
+			//Move it up if not on top floor!
 			if (this.direction == Direction.UP) {
-				this.currentFloor += distancePerTravelSpeed;
+				if (this.currentFloor < DataStore.getInstance().getNumFloors())
+					this.currentFloor += distancePerTravelSpeed;
+				else 
+					//Remove this print statement and replace with error
+					System.out.println("Cannot go above Floor " + DataStore.getInstance().getNumFloors());
 			}
-			// Move it down!
-			else{
-				this.currentFloor -= distancePerTravelSpeed;
+			// Move it down if not on 1st floor!
+			else {
+				if (this.currentFloor > 1)
+					this.currentFloor -= distancePerTravelSpeed;
+				else
+					//Remove this print statement and replace with error
+					System.out.println("Cannot go below Floor 1");
 			}
 			
 			//Check if at a floor
 			if (this.currentFloor % 1.0 == 0) {
-				//print statement - at a floor
+				//Print statement
 			}
 			else {
 				//No print statement... maybe say - in movement...
@@ -156,6 +175,32 @@ public class ElevatorImpl implements ElevatorInterface{
 	private void pickUpRiders() {
 		ArrayList<RiderInterface> incomingRiders = Building.getInstance().getWaitersFromFloor(this.currentFloor, this.direction);
 		this.addRiders(incomingRiders);
+		this.addNewRidersRequests(incomingRiders);
+	}
+	
+	//Adds newly picked up rider's floor requests for when a rider enters and pushes a destination floor button
+	private void addNewRidersRequests(ArrayList<RiderInterface> newRiders) {
+		//TODO error handling?
+		for (RiderInterface newRider : newRiders) {
+			if (this.getDropOffs().get(newRider.getDirection()) == null) {
+				ArrayList<Integer> dropOffList = new ArrayList<Integer>();
+				dropOffList.add(newRider.getDestinationFloor());
+				this.getDropOffs().put(newRider.getDirection(), dropOffList);
+			} else {
+				this.getDropOffs().get(newRider.getDirection()).add(newRider.getDestinationFloor());
+			}
+			
+			//Print info
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Rider Request made for Floor " + newRider.getDestinationFloor() + " [Current Floor Requests:");
+			for (int i : this.pickUps.get(this.direction)) {
+				System.out.print(" " + i);
+			}
+			System.out.print("][Current Rider Requests:");
+			for (int i : this.dropOffs.get(this.direction)) {
+				System.out.print(" " + i);
+			}
+			System.out.print("]\n");
+		}
 	}
 	
 	@Override
@@ -181,27 +226,27 @@ public class ElevatorImpl implements ElevatorInterface{
 	
 	private void reevaluateDirection() {
 		// Did i finish a pending request?
-		if (pendingDirection == Direction.DOWN) {
+		if (this.pendingDirection == Direction.DOWN) {
 			if (currentFloor == pickUps.get(Direction.DOWN).get(0)) {
-				pendingDirection = Direction.IDLE;
+				this.pendingDirection = Direction.IDLE;
 				this.direction = Direction.DOWN;
 				//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
 				pickUps.get(this.getDirection()).remove(0);
 			}
 		}
-		if (pendingDirection == Direction.UP) {
+		if (this.pendingDirection == Direction.UP) {
 			if (currentFloor == pickUps.get(Direction.UP).get(0)) {
-				pendingDirection = Direction.IDLE;
+				this.pendingDirection = Direction.IDLE;
 				this.direction = Direction.UP;
 				//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
-				pickUps.get(this.getDirection()).remove(0);
+				this.pickUps.get(this.getDirection()).remove(0);
 			}
 		}
 		
 		//Are there any riders in the car at the moment?
-		if (riders.isEmpty()) {
+		if (this.riders.isEmpty()) {
 			//Any pick up requests?
-			if (pickUps.isEmpty()) {
+			if (this.pickUps.isEmpty()) {
 				this.direction = Direction.IDLE;
 			}
 			// No riders, but we do have pickUps, then now we set elevator en route 
@@ -210,15 +255,15 @@ public class ElevatorImpl implements ElevatorInterface{
 				//how to determine which direction to look into??
 				//random logic right now... I choose DOWN requests first...
 				
-				if (!pickUps.get(Direction.DOWN).isEmpty()) { 
+				if (!this.pickUps.get(Direction.DOWN).isEmpty()) { 
 					this.pendingDirection = Direction.DOWN;
-					if (this.currentFloor - pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
+					if (this.currentFloor - this.pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
 					else this.direction = Direction.UP;
 				}
 				
-				if (!pickUps.get(Direction.UP).isEmpty()) {
+				if (!this.pickUps.get(Direction.UP).isEmpty()) {
 					this.pendingDirection = Direction.UP;
-					if (this.currentFloor - pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
+					if (this.currentFloor - this.pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
 					else this.direction = Direction.UP;
 				}
 				
@@ -249,6 +294,11 @@ public class ElevatorImpl implements ElevatorInterface{
 	@Override
 	public Direction getDirection() {
 		return this.direction;
+	}
+	
+	@Override
+	public Direction getPendingDirection() {
+		return this.pendingDirection;
 	}
 	
 	/*
