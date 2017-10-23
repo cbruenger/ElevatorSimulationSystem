@@ -1,6 +1,8 @@
 package Floor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import TimeProcessor.TimeProcessor;
 import Interfaces.FloorInterface;
 import Interfaces.RiderInterface;
@@ -75,13 +77,16 @@ public class FloorImpl implements FloorInterface{
 		
 		//Create an empty list, then add riders to it with the given direction and delete from floor
 		ArrayList<RiderInterface> ridersToTransfer = new ArrayList<RiderInterface>();
-		for (RiderInterface rider : this.riders) {
+		
+		for (RiderInterface rider : riders) {
 			if (rider.getDirection() == direction) {
 				ridersToTransfer.add(rider);
-				this.riders.remove(rider);
+				//this.riders.remove(rider);
 			}
 		}
-		return riders;
+		this.riders.removeAll(ridersToTransfer);
+		System.out.println(ridersToTransfer.toString());
+		return ridersToTransfer;
 	}
 
 }

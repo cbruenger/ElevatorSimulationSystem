@@ -106,11 +106,13 @@ public class ElevatorImpl implements ElevatorInterface{
 	private void openDoors() {
 		// TODO error handling
 		this.doorOpen = true;
+		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " opens doors\n");
 	}
 	
 	private void closeDoors() {
 		// TODO error handling
 		this.doorOpen = false;
+		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " closes doors\n");
 	}
 	
 	private void move(long time) {
@@ -173,10 +175,14 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	private void pickUpRiders() {
-		ArrayList<RiderInterface> incomingRiders = Building.getInstance().getWaitersFromFloor(this.currentFloor, this.direction);
-		this.addRiders(incomingRiders);
-		this.addNewRidersRequests(incomingRiders);
+		// if I my pending request is the same as my direction OR if i have no pending request, I'll get waiters.
+		if (this.pendingDirection == this.direction || this.pendingDirection == Direction.IDLE) {
+			ArrayList<RiderInterface> incomingRiders = Building.getInstance().getWaitersFromFloor(this.currentFloor, this.direction);
+			this.addRiders(incomingRiders);
+			this.addNewRidersRequests(incomingRiders);
+		}
 	}
+	
 	
 	//Adds newly picked up rider's floor requests for when a rider enters and pushes a destination floor button
 	private void addNewRidersRequests(ArrayList<RiderInterface> newRiders) {
@@ -189,91 +195,99 @@ public class ElevatorImpl implements ElevatorInterface{
 			} else {
 				this.getDropOffs().get(newRider.getDirection()).add(newRider.getDestinationFloor());
 			}
-			
-			//Print info
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Rider Request made for Floor " + newRider.getDestinationFloor() + " [Current Floor Requests:");
-			for (int i : this.pickUps.get(this.direction)) {
-				System.out.print(" " + i);
-			}
-			System.out.print("][Current Rider Requests:");
-			for (int i : this.dropOffs.get(this.direction)) {
-				System.out.print(" " + i);
-			}
-			System.out.print("]\n");
 		}
 	}
+	
 	
 	@Override
 	public void update(long time) {
 		this.move(time);
-		//need to drop/pickup off person
-		if (!dropOffs.isEmpty() && !pickUps.isEmpty()) {
+//		//need to drop/pickup off person
+//		if (!dropOffs.isEmpty() || !pickUps.isEmpty()) {
 			//If we're at a floor, call process
 			if (this.getCurrentFloor() % 1 == 0) {
 				processFloor();
 			}
 			reevaluateDirection();
-		}
+			System.out.println("FINISHED A RE_EVALUATE");
+		//}
 	}
 	
 	private void processFloor() {
+		//this.floorCheck();
 		this.openDoors();
 		this.removeRiders();
 		this.pickUpRiders();
-		//this.reevaluateDirection();
+		
+		//close doors needs to happen X seconds later... 
 		this.closeDoors();
 	}
 	
+//	public void floorCheck() {
+//		for (int floor: this.pickUps.get(this.direction)) {
+//			if floor
+//		}
+//	}
+	
 	private void reevaluateDirection() {
+		//needs to check dropoffs
+		
 		// Did i finish a pending request?
 		if (this.pendingDirection == Direction.DOWN) {
+			//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
 			if (currentFloor == pickUps.get(Direction.DOWN).get(0)) {
 				this.pendingDirection = Direction.IDLE;
 				this.direction = Direction.DOWN;
 				//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
 				pickUps.get(this.getDirection()).remove(0);
+				//return;
 			}
 		}
 		if (this.pendingDirection == Direction.UP) {
+			//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
 			if (currentFloor == pickUps.get(Direction.UP).get(0)) {
 				this.pendingDirection = Direction.IDLE;
 				this.direction = Direction.UP;
 				//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
 				this.pickUps.get(this.getDirection()).remove(0);
+				//return;
 			}
 		}
 		
-		//Are there any riders in the car at the moment?
-		if (this.riders.isEmpty()) {
-			//Any pick up requests?
-			if (this.pickUps.isEmpty()) {
-				this.direction = Direction.IDLE;
+		if (!this.riders.isEmpty()) {
+			//Do I have any dropoffs I need to finish?
+			if (!(this.dropOffs.get(Direction.DOWN) == null) && !this.dropOffs.get(Direction.DOWN).isEmpty()) { 
+				this.direction = Direction.DOWN;
+				//return; //trying to stop... not continue down conditional list
 			}
-			// No riders, but we do have pickUps, then now we set elevator en route 
-			else {
-				
-				//how to determine which direction to look into??
-				//random logic right now... I choose DOWN requests first...
-				
-				if (!this.pickUps.get(Direction.DOWN).isEmpty()) { 
-					this.pendingDirection = Direction.DOWN;
-					if (this.currentFloor - this.pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
-					else this.direction = Direction.UP;
-				}
-				
-				if (!this.pickUps.get(Direction.UP).isEmpty()) {
-					this.pendingDirection = Direction.UP;
-					if (this.currentFloor - this.pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
-					else this.direction = Direction.UP;
-				}
-				
+			
+			if (!(this.dropOffs.get(Direction.UP) == null) && !this.dropOffs.get(Direction.UP).isEmpty()) {
+				this.direction = Direction.UP;
+				//return; //trying to stop... not continue down conditional list
+			}
+		}
+		if (riders.isEmpty()) {
+			//Check any pick up requests I might have...
+			if (!(this.pickUps.get(Direction.DOWN) == null) && !this.pickUps.get(Direction.DOWN).isEmpty()) { 
+				this.pendingDirection = Direction.DOWN;
+				if (this.currentFloor - this.pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
+				else this.direction = Direction.UP;
+				//return;
+			}
+			
+			if (!(this.pickUps.get(Direction.UP) == null) && !this.pickUps.get(Direction.UP).isEmpty()) {
+				this.pendingDirection = Direction.UP;
+				if (this.currentFloor - this.pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
+				else this.direction = Direction.UP;
+				//return;
 			}
 		}
 		
-		//  Any riders in the car are headed the same direction (presumption...), therefore we stay on the same direction...
+		//No requests? then I am idle
+		//if (this.pickUps.isEmpty() || this.dropOffs.isEmpty())
+		else this.direction = Direction.IDLE;
 		
 	}
-	
 	
 	/////////////////////////////
 	//				           //
@@ -335,6 +349,8 @@ public class ElevatorImpl implements ElevatorInterface{
 			this.riders.add(rider);
 			rider.enterElevator();
 			
+			//this.addDropOffRequest(rider.getDirection() ,rider.getDestinationFloor());
+			
 			//Print info
 			System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " entered Elevator " + this.elevatorNumber + " [Riders:");
 			for (RiderInterface currentRider : this.riders) {
@@ -343,6 +359,16 @@ public class ElevatorImpl implements ElevatorInterface{
 			System.out.print("]\n");
 		}
 	}
+	
+//	private void addDropOffRequest(Direction direction, int floor) {
+//		if (this.dropOffs.get(direction) == null) {
+//			ArrayList<Integer> floorsList = new ArrayList<Integer>();
+//			floorsList.add(floor);
+//			this.dropOffs.put(direction, floorsList);
+//		} else {
+//			this.dropOffs.get(direction).add(floor);
+//		}
+//	}
 	
 	@Override
 	public void addPickupRequest(Direction direction, int floor) {
@@ -361,6 +387,8 @@ public class ElevatorImpl implements ElevatorInterface{
 		} else {
 			this.pickUps.get(direction).add(floor);
 		}
+		
+		
 	}
 
 }

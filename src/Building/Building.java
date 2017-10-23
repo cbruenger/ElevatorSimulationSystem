@@ -100,6 +100,7 @@ public final class Building {
 		//Notify each elevator 
 		for (int elevatorId : this.elevators.keySet()) {
 			this.elevators.get(elevatorId).update(sleepTime);
+			System.out.println("# of people on floor 1 = " + floors.get(1).getRiders().size());
 		}
 	}
 	
@@ -141,6 +142,10 @@ public final class Building {
 	//Also removes the people from the floor
 	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, Direction direction) {
 		// TODO error handling
+//		ArrayList<RiderInterface> riders = this.floors.get(floor).getRidersByDirection(direction);
+//		for (RiderInterface rider: riders) {
+//			this.floors.get(floor).removeRider(rider);
+//			}
 		return this.floors.get(floor).getRidersByDirection(direction);
 	}
 	

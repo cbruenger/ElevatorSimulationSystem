@@ -139,6 +139,7 @@ public class RiderImpl implements RiderInterface {
 	
 	@Override
 	public void enterElevator() {
+		
 		this.setEnterTime();
 		this.setWaitTime();
 	}
