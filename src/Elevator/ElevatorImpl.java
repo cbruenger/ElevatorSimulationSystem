@@ -3,7 +3,7 @@ package Elevator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import TimeProcessor.TimeProcessor;
-import Rider.Rider;
+import DataStore.DataStore;
 import enumerators.Direction;
 import Interfaces.ElevatorInterface;
 import Interfaces.RiderInterface;
@@ -32,7 +32,10 @@ public class ElevatorImpl implements ElevatorInterface{
 	// Change HashMap to ArrayList because they need be able to be sorted and direction can be
 	// retrieved through the getDirection() function???
 	private HashMap<Direction, ArrayList<Integer>> pickUps;
+	
+	//  we don't really use drop offs
 	private HashMap<Direction, ArrayList<Integer>> dropOffs;
+	//
 	
 	////////////////////////
 	//				      //
@@ -50,6 +53,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		//Set initial variable values
 		this.setElevatorNumber(elevatorNumber);
 		this.setDirection(Direction.IDLE);
+		this.pendingDirection = Direction.IDLE;
 		this.setCurrentFloor(1);
 		this.setDoorStatus(false);
 		
@@ -91,14 +95,6 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.doorOpen = status;
 	}
 	
-	private void moveUp() {
-		this.setCurrentFloor(this.getCurrentFloor() + 1);
-	}
-	
-	private void moveDown() {
-		this.setCurrentFloor(this.getCurrentFloor() - 1);
-	}
-	
 	private boolean getDoorOpenStatus() {
 		return this.doorOpen;
 	}
@@ -114,26 +110,28 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	private void move(long time) {
-		
-		if (this.direction == Direction.IDLE) {
+		///TODO: check if basement or top floor.  throw error
+		if (this.direction != Direction.IDLE) {
+			double distancePerTravelSpeed = time/DataStore.getInstance().getSpeed();
+			//Move it up!
+			if (this.direction == Direction.UP) {
+				this.currentFloor += distancePerTravelSpeed;
+			}
+			// Move it down!
+			else{
+				this.currentFloor -= distancePerTravelSpeed;
+			}
 			
-			return;
-			
+			//Check if at a floor
+			if (this.currentFloor % 1.0 == 0) {
+				//print statement - at a floor
+			}
+			else {
+				//No print statement... maybe say - in movement...
+			}
 		}
-//		if (this.getDirection() != Rider.Direction.IDLE) {
-//			//determine how quickly to move...
-//			//determine move UP
-//			//or determine move DOWN
-//			
-//			//Once full time for movement has occured print out statement of elevator moving to floor X
-//		}
-		
 	}
 	
-	//Removes a number of riders from the elevator
-	//Tells building to decommission them
-	//Tells rider to calculate ride time
-	//Prints info
 	private void removeRiders() {
 		// TODO error handling. Check if rider exists in riders and throw error if not
 		
@@ -160,16 +158,74 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.addRiders(incomingRiders);
 	}
 	
+	@Override
+	public void update(long time) {
+		this.move(time);
+		//need to drop/pickup off person
+		if (!dropOffs.isEmpty() && !pickUps.isEmpty()) {
+			//If we're at a floor, call process
+			if (this.getCurrentFloor() % 1 == 0) {
+				processFloor();
+			}
+			reevaluateDirection();
+		}
+	}
+	
 	private void processFloor() {
-		
 		this.openDoors();
 		this.removeRiders();
 		this.pickUpRiders();
-		this.reevaluateDirection();
+		//this.reevaluateDirection();
 		this.closeDoors();
 	}
 	
 	private void reevaluateDirection() {
+		// Did i finish a pending request?
+		if (pendingDirection == Direction.DOWN) {
+			if (currentFloor == pickUps.get(Direction.DOWN).get(0)) {
+				pendingDirection = Direction.IDLE;
+				this.direction = Direction.DOWN;
+				//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
+				pickUps.get(this.getDirection()).remove(0);
+			}
+		}
+		if (pendingDirection == Direction.UP) {
+			if (currentFloor == pickUps.get(Direction.UP).get(0)) {
+				pendingDirection = Direction.IDLE;
+				this.direction = Direction.UP;
+				//remove pickup since they are now picked up.  PRESUMES WE ADD TO BACK OF LIST
+				pickUps.get(this.getDirection()).remove(0);
+			}
+		}
+		
+		//Are there any riders in the car at the moment?
+		if (riders.isEmpty()) {
+			//Any pick up requests?
+			if (pickUps.isEmpty()) {
+				this.direction = Direction.IDLE;
+			}
+			// No riders, but we do have pickUps, then now we set elevator en route 
+			else {
+				
+				//how to determine which direction to look into??
+				//random logic right now... I choose DOWN requests first...
+				
+				if (!pickUps.get(Direction.DOWN).isEmpty()) { 
+					this.pendingDirection = Direction.DOWN;
+					if (this.currentFloor - pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
+					else this.direction = Direction.UP;
+				}
+				
+				if (!pickUps.get(Direction.UP).isEmpty()) {
+					this.pendingDirection = Direction.UP;
+					if (this.currentFloor - pickUps.get(Direction.DOWN).get(0) >= 0) this.direction = Direction.DOWN;
+					else this.direction = Direction.UP;
+				}
+				
+			}
+		}
+		
+		//  Any riders in the car are headed the same direction (presumption...), therefore we stay on the same direction...
 		
 	}
 	
@@ -219,15 +275,6 @@ public class ElevatorImpl implements ElevatorInterface{
 		return ids;
 	}
 	
-	@Override
-	public void update(long time) {
-		this.move(time);
-		//checkFloorStops();
-			//will check if floorstops are empty... will make call in checkFloorStops to ReEvaluate if necessary...
-		//checkRiderInElevator();
-			//will check riders in elevator...will call to process floor if necessary and reEvalute...
-		
-	}
 	
 	@Override
 	public void addRiders(ArrayList<RiderInterface> incomingRiders) {
@@ -256,6 +303,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		 * the given floor into the array.
 		 * Otherwise, just add the floor to the direction's list in the array 
 		 */
+		
 		if (this.pickUps.get(direction) == null) {
 			ArrayList<Integer> floorsList = new ArrayList<Integer>();
 			floorsList.add(floor);

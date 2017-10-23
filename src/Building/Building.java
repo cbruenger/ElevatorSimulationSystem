@@ -93,6 +93,7 @@ public final class Building {
 		}
 	}
 	
+	
 	//Function called by TimeProcessor for updating the elevator activity
 	public void update(Long sleepTime) {
 		
@@ -101,6 +102,7 @@ public final class Building {
 			this.elevators.get(elevatorId).update(sleepTime);
 		}
 	}
+	
 	
 	public void decommissionRiders(ArrayList<RiderInterface> riders) {
 		for (RiderInterface rider: riders) {
