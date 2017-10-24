@@ -87,9 +87,53 @@ public final class TimeProcessor {
 			
 			
 		} else if (DataStore.getInstance().getTestNumber() == 3) {
+			
 			//Generate people with requests according to Test 3 from project description
+			if (this.getCurrentTimeMillis() == 0) {
+				RiderInterface rider = this.generateRider(1, 20);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
+			if (this.getCurrentTimeMillis() == 3000) {
+				RiderInterface rider = this.generateRider(1, 10);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
 		} else if (DataStore.getInstance().getTestNumber() == 4) {
+			
 			//Generate people with requests according to Test 4 from project description
+			if (this.getCurrentTimeMillis() == 0) {
+				RiderInterface rider = this.generateRider(1, 20);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
+			if (this.getCurrentTimeMillis() == 1000) {
+				RiderInterface rider = this.generateRider(1, 20);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
+			if (this.getCurrentTimeMillis() == 2000) {
+				RiderInterface rider = this.generateRider(1, 20);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
+			if (this.getCurrentTimeMillis() == 3000) {
+				RiderInterface rider = this.generateRider(1, 20);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
+			if (this.getCurrentTimeMillis() == 4000) {
+				RiderInterface rider = this.generateRider(1, 10);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+			}
+			
 		}
 		
 		//Generates first rider at start of simulation, and also at a designated recurrence time
