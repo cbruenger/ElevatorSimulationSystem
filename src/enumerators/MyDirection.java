@@ -1,5 +1,5 @@
 package enumerators;
 
-public enum Direction {
+public enum MyDirection {
 	UP, DOWN, IDLE;
 }

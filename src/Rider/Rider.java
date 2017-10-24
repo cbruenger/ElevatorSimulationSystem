@@ -2,7 +2,7 @@ package Rider;
 
 import Factories.RiderFactory;
 import Interfaces.RiderInterface;
-import enumerators.Direction;
+import enumerators.MyDirection;
 
 public class Rider implements RiderInterface {
 
@@ -40,7 +40,7 @@ public class Rider implements RiderInterface {
 	}
 	
 	@Override
-	public Direction getDirection() {
+	public MyDirection getDirection() {
 		return this.delegate.getDirection();
 	}
 

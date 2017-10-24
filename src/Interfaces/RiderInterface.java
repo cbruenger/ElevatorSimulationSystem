@@ -1,13 +1,13 @@
 package Interfaces;
 
-import enumerators.Direction;
+import enumerators.MyDirection;
 
 public interface RiderInterface {
 	
 	public String getId();
 	public int getStartFloor();
 	public int getDestinationFloor();
-	public Direction getDirection();
+	public MyDirection getDirection();
 	public long getWaitTime();
 	public long getRideTime();
 	public void enterElevator();

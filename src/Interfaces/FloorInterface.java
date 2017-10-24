@@ -1,7 +1,7 @@
 package Interfaces;
 
 import java.util.ArrayList;
-import enumerators.Direction;
+import enumerators.MyDirection;
 
 public interface FloorInterface {
 	
@@ -9,5 +9,5 @@ public interface FloorInterface {
 	public ArrayList<RiderInterface> getRiders(); //Only for testing temporarily in our main
 	public void removeRider(RiderInterface rider);
 	public void addRider(RiderInterface rider);
-	public ArrayList<RiderInterface> getRidersByDirection(Direction direction);
+	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction);
 }

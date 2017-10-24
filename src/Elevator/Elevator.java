@@ -5,7 +5,7 @@ import java.util.HashMap;
 import Factories.ElevatorFactory;
 import Interfaces.ElevatorInterface;
 import Interfaces.RiderInterface;
-import enumerators.Direction;
+import enumerators.MyDirection;
 
 public class Elevator implements ElevatorInterface{
 	
@@ -42,12 +42,12 @@ public class Elevator implements ElevatorInterface{
 	}
 	
 	@Override
-	public Direction getDirection() {
+	public MyDirection getDirection() {
 		return this.delegate.getDirection();
 	}
 	
 	@Override
-	public Direction getPendingDirection() {
+	public MyDirection getPendingDirection() {
 		return delegate.getPendingDirection();
 	}
 	
@@ -57,12 +57,12 @@ public class Elevator implements ElevatorInterface{
 	 * an up or down request?
 	 */
 	@Override
-	public HashMap<Direction, ArrayList<Integer>> getPickUps() {
+	public HashMap<MyDirection, ArrayList<Integer>> getPickUps() {
 		return this.delegate.getPickUps();
 	}
 	
 	@Override
-	public HashMap<Direction, ArrayList<Integer>> getDropOffs() {
+	public HashMap<MyDirection, ArrayList<Integer>> getDropOffs() {
 		return this.delegate.getDropOffs();
 	}
 
@@ -83,7 +83,7 @@ public class Elevator implements ElevatorInterface{
 	}
 	
 	@Override
-	public void addPickupRequest(Direction direction, int floor) {
+	public void addPickupRequest(MyDirection direction, int floor) {
 		this.delegate.addPickupRequest(direction, floor);
 	}
 	

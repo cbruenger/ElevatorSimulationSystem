@@ -1,14 +1,14 @@
 package Rider;
 
 import Interfaces.RiderInterface;
-import enumerators.Direction;
+import enumerators.MyDirection;
 
 public class RiderImpl implements RiderInterface {
 
 	private String id;
 	private int startFloor;
 	private int destinationFloor;
-	private Direction direction;
+	private MyDirection direction;
 	private long requestTime;
 	private long enterTime;
 	private long exitTime;
@@ -50,8 +50,8 @@ public class RiderImpl implements RiderInterface {
 	}
 	
 	private void setDirection(int startFloor, int destinationFloor) {
-		if (startFloor - destinationFloor > 0) this.direction = Direction.DOWN;
-		else this.direction = Direction.UP;
+		if (startFloor - destinationFloor > 0) this.direction = MyDirection.DOWN;
+		else this.direction = MyDirection.UP;
 	}
 		
 	private void setRequestTime() {
@@ -96,7 +96,7 @@ public class RiderImpl implements RiderInterface {
 	}
 	
 	@Override
-	public Direction getDirection() {
+	public MyDirection getDirection() {
 		return this.direction;
 	}
 	

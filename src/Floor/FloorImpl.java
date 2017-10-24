@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import TimeProcessor.TimeProcessor;
 import Interfaces.FloorInterface;
 import Interfaces.RiderInterface;
-import enumerators.Direction;
+import enumerators.MyDirection;
 
 public class FloorImpl implements FloorInterface{
 
@@ -72,7 +72,7 @@ public class FloorImpl implements FloorInterface{
 	//Return a list of people who's direction is same as parameter
 	//Also, delete them from floors list before returning
 	@Override
-	public ArrayList<RiderInterface> getRidersByDirection(Direction direction) {
+	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction) {
 		ArrayList<RiderInterface> ridersToDelete = new ArrayList<>();
 		ArrayList<RiderInterface> ridersToTransfer = new ArrayList<>(riders);
 		for (RiderInterface rider: riders) {
@@ -82,6 +82,7 @@ public class FloorImpl implements FloorInterface{
 			}
 			else {
 			ridersToTransfer.remove(rider);
+			System.out.print("");
 			}
 		}
 		riders.removeAll(ridersToDelete);

@@ -4,6 +4,8 @@ import Building.Building;
 import DataStore.DataStore;
 import Interfaces.RiderInterface;
 import Rider.Rider;
+import gui.ElevatorDisplay;
+
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -63,6 +65,7 @@ public final class TimeProcessor {
 		
 		// Print out final results and exit program
 		Building.getInstance().reportData();
+		ElevatorDisplay.getInstance().shutdown();
 		System.exit(0);
 	}
 	
@@ -81,6 +84,8 @@ public final class TimeProcessor {
 			
 		} else if (DataStore.getInstance().getTestNumber() == 2) {
 			//Generate people with requests according to Test 2 from project description
+			
+			
 		} else if (DataStore.getInstance().getTestNumber() == 3) {
 			//Generate people with requests according to Test 3 from project description
 		} else if (DataStore.getInstance().getTestNumber() == 4) {
@@ -125,7 +130,7 @@ public final class TimeProcessor {
 	//Generates rider IDs using an incrementer starting at 1
 	private String generateRiderId() {
 		this.riderIdIncrementer++;
-		String id = "r" + this.riderIdIncrementer;
+		String id = "P" + this.riderIdIncrementer;
 		return id;
 	}
 	

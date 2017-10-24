@@ -9,7 +9,7 @@ import Elevator.Elevator;
 import Floor.Floor;
 import Interfaces.FloorInterface;
 import Interfaces.RiderInterface;
-import enumerators.Direction;
+import enumerators.MyDirection;
 import gui.ElevatorDisplay;
 import Interfaces.ElevatorInterface;
 
@@ -98,9 +98,8 @@ public final class Building {
 	public void update(Long sleepTime) {
 		
 		//Notify each elevator 
-		for (int elevatorId : this.elevators.keySet()) {
-			this.elevators.get(elevatorId).update(sleepTime);
-			System.out.println("# of people on floor 1 = " + floors.get(1).getRiders().size());
+		for (int elevatorNumber : this.elevators.keySet()) {
+			this.elevators.get(elevatorNumber).update(sleepTime);
 		}
 	}
 	
@@ -112,7 +111,7 @@ public final class Building {
 	}
 	
 	//elevatorRequested(rider.getStartFloor(), rider.getDirection())
-	public void elevatorRequested(int floor, Direction direction) {
+	public void elevatorRequested(int floor, MyDirection direction) {
 		this.elevators.get(this.elevatorToAssign).addPickupRequest(direction, floor);
 		this.incrementElevatorToAssign();
 	}
@@ -136,7 +135,7 @@ public final class Building {
 	
 	//Return an ArrayList of people who need to transfer from a floor to an elevator that is waiting
 	//Also removes the people from the floor
-	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, Direction direction) {
+	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction) {
 		// TODO error handling
 //		ArrayList<RiderInterface> riders = this.floors.get(floor).getRidersByDirection(direction);
 //		for (RiderInterface rider: riders) {
