@@ -121,40 +121,77 @@ public class ElevatorImpl implements ElevatorInterface{
 	private void move(long time) {
 		///TODO: throw errors if trying to go beyond top/bottom floor
 		
-		/*First check if the elevator is at a floor where it needs to stop. 
-		 * If needs to stop, don't move. 
-		 * Figure out where to handle changing the direction to the pending direction. 
-		 * And probably setting the pending direction to idle once it has swapped over to the current direction
-		 * */
-		
 		if (this.direction != Direction.IDLE) {
 			double distancePerTravelSpeed = time/DataStore.getInstance().getSpeed();
 			//Move it up if not on top floor!
 			if (this.direction == Direction.UP) {
-				if (this.currentFloor < DataStore.getInstance().getNumFloors())
+				if (this.currentFloor < DataStore.getInstance().getNumFloors()) {
 					this.currentFloor += distancePerTravelSpeed;
-				else 
+					
+					double previousFloor;
+					double nextFloor;
+					
+					if (this.currentFloor % 1.0 == 0) {
+						previousFloor = this.currentFloor - 1;
+						nextFloor = this.currentFloor;
+					} else {
+						previousFloor = Math.floor(this.currentFloor);
+						nextFloor = Math.ceil(this.currentFloor);
+					}
+					
+					System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving from Floor " + (previousFloor) + " to Floor " + nextFloor + " [Current Floor Requests:");
+					for (int i : this.pickUps.get(this.direction)) {
+						System.out.print(" " + i);
+					}
+					System.out.print("][Current Rider Requests:");
+					for (int i : this.dropOffs.get(this.direction)) {
+						System.out.print(" " + i);
+					}
+					System.out.print("]");
+					 
+								
+				} else {
+					
 					//Remove this print statement and replace with error
-					System.out.println("Cannot go above Floor " + DataStore.getInstance().getNumFloors());
-			}
-			// Move it down if not on 1st floor!
-			else {
-				if (this.currentFloor > 1)
-					this.currentFloor -= distancePerTravelSpeed;
-				else
-					//Remove this print statement and replace with error
-					System.out.println("Cannot go below Floor 1");
-			}
+					System.out.println("Cannot go above Floor " + DataStore.getInstance().getNumFloors());	
+				}	
 			
-			//Check if at a floor
-			if (this.currentFloor % 1.0 == 0) {
-				//Print statement
-			}
-			else {
-				//No print statement... maybe say - in movement...
+			// Move it down if not on 1st floor!
+			} else {
+				if (this.currentFloor > 1) {
+					this.currentFloor -= distancePerTravelSpeed;
+					
+					double previousFloor;
+					double nextFloor;
+					
+					if (this.currentFloor % 1.0 == 0) {
+						previousFloor = this.currentFloor + 1;
+						nextFloor = this.currentFloor;
+					} else {
+						previousFloor = Math.ceil(this.currentFloor);
+						nextFloor = Math.floor(this.currentFloor);
+					}
+					
+					System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving from Floor " + (previousFloor) + " to Floor " + nextFloor + " [Current Floor Requests:");
+					for (int i : this.pickUps.get(this.direction)) {
+						System.out.print(" " + i);
+					}
+					System.out.print("][Current Rider Requests:");
+					for (int i : this.dropOffs.get(this.direction)) {
+						System.out.print(" " + i);
+					}
+					System.out.print("]");
+
+					
+				} else {
+					
+					//Remove this print statement and replace with error
+					System.out.println("Cannot go below Floor 1");	
+				}
 			}
 		}
 	}
+	
 	
 	private void removeRiders() {
 		// TODO error handling. Check if rider exists in riders and throw error if not

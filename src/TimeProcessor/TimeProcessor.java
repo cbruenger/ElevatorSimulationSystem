@@ -75,7 +75,6 @@ public final class TimeProcessor {
 			if (this.getCurrentTimeMillis() == 0) {
 				RiderInterface rider = this.generateRider(1, 10);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				System.out.println(this.getTimeString() + "Person " + rider.getId() + " pressed " + rider.getDirection() + " on Floor " + rider.getStartFloor());
 				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
 			}
 			
@@ -176,21 +175,29 @@ public final class TimeProcessor {
 	//Prints the formatted current time string
 	public String getTimeString() {
 		
-		//Build string
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(this.currentTimeMillis % 100_000_000);
-		stringBuilder.append(this.currentTimeMillis % 10_000_000);
-		stringBuilder.append(":");
-		stringBuilder.append(this.currentTimeMillis % 1_000_000);
-		stringBuilder.append(this.currentTimeMillis % 100_000);
-		stringBuilder.append(":");
-		stringBuilder.append(this.currentTimeMillis % 10_000);
-		stringBuilder.append(this.currentTimeMillis % 1_000);
-		stringBuilder.append("  ");
+		long seconds = this.currentTimeMillis / 1000;
+		long hours = seconds / 3600;
+		seconds -= hours * 3600;
+		long minutes = seconds / 60;
+		seconds -= minutes * 60;
 		
-		//Parse to string and return
-		String timeString = stringBuilder.toString();
-		return timeString;
+		return String.format("%d:%02d:%02d  ", hours, minutes, seconds);
+		
+		//Build string
+//		StringBuilder stringBuilder = new StringBuilder();
+//		stringBuilder.append(this.currentTimeMillis % 100_000_000);
+//		stringBuilder.append(this.currentTimeMillis % 10_000_000);
+//		stringBuilder.append(":");
+//		stringBuilder.append(this.currentTimeMillis % 1_000_000);
+//		stringBuilder.append(this.currentTimeMillis % 100_000);
+//		stringBuilder.append(":");
+//		stringBuilder.append(this.currentTimeMillis % 10_000);
+//		stringBuilder.append(this.currentTimeMillis % 1_000);
+//		stringBuilder.append("  ");
+//		
+//		//Parse to string and return
+//		String timeString = stringBuilder.toString();
+//		return timeString;
 		
 	}
 	

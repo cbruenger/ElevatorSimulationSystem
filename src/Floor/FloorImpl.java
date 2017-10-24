@@ -59,8 +59,9 @@ public class FloorImpl implements FloorInterface{
 	}
 	
 	@Override
-	public void addRider(RiderInterface riderId) {
-		this.riders.add(riderId);
+	public void addRider(RiderInterface rider) {
+		System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " pressed " + rider.getDirection() + " on Floor " + rider.getStartFloor());
+		this.riders.add(rider);
 	}
 	
 	@Override
