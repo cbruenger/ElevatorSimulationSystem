@@ -74,10 +74,23 @@ public class ElevatorImpl implements ElevatorInterface{
 	
 	private void createPickUpsMap() {
 		this.pickUps = new HashMap<Direction, ArrayList<Integer>>();
+		ArrayList<Integer> pickUpsUpList = new ArrayList<Integer>();
+		ArrayList<Integer> pickUpsDownList = new ArrayList<Integer>();
+		ArrayList<Integer> pickUpsIdleList = new ArrayList<Integer>();
+		this.pickUps.put(Direction.UP, pickUpsUpList);
+		this.pickUps.put(Direction.DOWN, pickUpsDownList);
+		this.pickUps.put(Direction.IDLE, pickUpsIdleList);
+
 	}
 	
 	private void createDropOffsMap() {
 		this.dropOffs = new HashMap<Direction, ArrayList<Integer>>();
+		ArrayList<Integer> dropOffsUpList = new ArrayList<Integer>();
+		ArrayList<Integer> dropOffsDownList = new ArrayList<Integer>();
+		ArrayList<Integer> dropOffsIdleList = new ArrayList<Integer>();
+		this.dropOffs.put(Direction.UP, dropOffsUpList);
+		this.dropOffs.put(Direction.DOWN, dropOffsDownList);
+		this.dropOffs.put(Direction.IDLE, dropOffsIdleList);
 	}
 	
 	private void setElevatorNumber(int elevatorNumber) {
@@ -223,19 +236,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	
-	//Adds newly picked up rider's floor requests for when a rider enters and pushes a destination floor button
-	private void addNewRidersRequests(ArrayList<RiderInterface> newRiders) {
-		//TODO error handling?
-		for (RiderInterface newRider : newRiders) {
-			if (this.getDropOffs().get(newRider.getDirection()) == null) {
-				ArrayList<Integer> dropOffList = new ArrayList<Integer>();
-				dropOffList.add(newRider.getDestinationFloor());
-				this.getDropOffs().put(newRider.getDirection(), dropOffList);
-			} else {
-				this.getDropOffs().get(newRider.getDirection()).add(newRider.getDestinationFloor());
-			}
-		}
-	}
+	
 	
 	
 	@Override
@@ -441,15 +442,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		}
 	}
 	
-//	private void addDropOffRequest(Direction direction, int floor) {
-//		if (this.dropOffs.get(direction) == null) {
-//			ArrayList<Integer> floorsList = new ArrayList<Integer>();
-//			floorsList.add(floor);
-//			this.dropOffs.put(direction, floorsList);
-//		} else {
-//			this.dropOffs.get(direction).add(floor);
-//		}
-//	}
+
 	
 	@Override
 	public void addPickupRequest(Direction direction, int floor) {
@@ -466,14 +459,18 @@ public class ElevatorImpl implements ElevatorInterface{
 		if (this.currentFloor - floor > 0) this.direction = Direction.DOWN;
 		else this.direction = Direction.UP;
 		
-		if (this.pickUps.get(direction) == null) {
-			ArrayList<Integer> floorsList = new ArrayList<Integer>();
-			floorsList.add(floor);
-			this.pickUps.put(direction, floorsList);
-		} else {
-			this.pickUps.get(direction).add(floor);
-		}
 		
+		this.pickUps.get(direction).add(floor);
+		
+		
+	}
+	
+	//Adds newly picked up rider's floor requests for when a rider enters and pushes a destination floor button
+	private void addNewRidersRequests(ArrayList<RiderInterface> newRiders) {
+		//TODO error handling?
+		for (RiderInterface newRider : newRiders) {
+			this.getDropOffs().get(newRider.getDirection()).add(newRider.getDestinationFloor());
+		}
 	}
 
 }
