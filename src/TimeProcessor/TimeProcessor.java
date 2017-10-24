@@ -4,6 +4,7 @@ import Building.Building;
 import DataStore.DataStore;
 import Interfaces.RiderInterface;
 import Rider.Rider;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -11,9 +12,22 @@ public final class TimeProcessor {
 
 	private static TimeProcessor instance;
 	private long currentTimeMillis;
+	private HashMap<Integer, Long> idleTimes;
+	private HashMap<Integer, Long> doorOpenTimes;
 	private int riderIdIncrementer; //I stashed the rider generator stuff here for now and trashed the facade
 	
-	private TimeProcessor() {}
+	private TimeProcessor() {
+		
+		//Make functions for these
+		idleTimes = new HashMap<Integer, Long>();
+		for (int i = 1; i <= DataStore.getInstance().getNumElevators(); i++) {
+			idleTimes.put(i, (long) 0);
+		}
+		doorOpenTimes = new HashMap<Integer, Long>();
+		for (int i = 1; i <= DataStore.getInstance().getNumElevators(); i++) {
+			doorOpenTimes.put(i, (long) 0);
+		}
+	}
 	
 	//A function to get an instance of the class. Initializes instance if needed
 	public static TimeProcessor getInstance() {
@@ -125,6 +139,38 @@ public final class TimeProcessor {
 	//Returns the current time
 	public long getCurrentTimeMillis() {
 		return this.currentTimeMillis;
+	}
+	
+	//Idle time managing functions
+	public long getIdleTime(int elevatorNumber) {
+		//TODO error handling
+		return this.idleTimes.get(elevatorNumber);
+	}
+	
+	public void updateIdleTime(int elevatorNumber) {
+		//TODO error handling
+		this.idleTimes.put(elevatorNumber, this.idleTimes.get(elevatorNumber) + DataStore.getInstance().getSleepTime());
+	}
+	
+	public void resetIdleTime(int elevatorNumber) {
+		//TODO error handling
+		this.idleTimes.put(elevatorNumber, (long) 0);
+	}
+	
+	//Door open time managing functions
+	public long getDoorOpenTime(int elevatorNumber) {
+		//TODO error handling
+		return this.doorOpenTimes.get(elevatorNumber);
+	}
+	
+	public void updateDoorOpenTime(int elevatorNumber) {
+		//TODO error handling
+		this.doorOpenTimes.put(elevatorNumber, this.doorOpenTimes.get(elevatorNumber) + DataStore.getInstance().getSleepTime());
+	}
+	
+	public void resetDoorOpenTime(int elevatorNumber) {
+		//TODO error handling
+		this.doorOpenTimes.put(elevatorNumber, (long) 0);
 	}
 	
 	//Prints the formatted current time string

@@ -124,10 +124,6 @@ public final class Building {
 		floor.addRider(rider);
 	}
 	
-	public void pressButton(int elevatorNumber, int floorNumber, Direction dir) {
-		this.elevators.get(elevatorNumber);
-	}
-	
 	//Elevator assignment incrementer for phase 1
 	public void incrementElevatorToAssign() {
 		
@@ -146,6 +142,7 @@ public final class Building {
 //		for (RiderInterface rider: riders) {
 //			this.floors.get(floor).removeRider(rider);
 //			}
+		//System.out.println(this.floors.get(floor).getRidersByDirection(direction));
 		return this.floors.get(floor).getRidersByDirection(direction);
 	}
 	
