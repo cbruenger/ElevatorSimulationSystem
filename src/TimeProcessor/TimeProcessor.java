@@ -78,12 +78,24 @@ public final class TimeProcessor {
 			if (this.getCurrentTimeMillis() == 0) {
 				RiderInterface rider = this.generateRider(1, 10);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
 			}
 			
 			
 		} else if (DataStore.getInstance().getTestNumber() == 2) {
+			
 			//Generate people with requests according to Test 2 from project description
+			if (this.getCurrentTimeMillis() == 0) {
+				RiderInterface rider = this.generateRider(1, 20);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+			}
+			
+			if (this.getCurrentTimeMillis() == 12000) {
+				RiderInterface rider = this.generateRider(15, 19);
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+			}
 			
 			
 		} else if (DataStore.getInstance().getTestNumber() == 3) {
@@ -92,13 +104,13 @@ public final class TimeProcessor {
 			if (this.getCurrentTimeMillis() == 0) {
 				RiderInterface rider = this.generateRider(1, 20);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
 			}
 			
 			if (this.getCurrentTimeMillis() == 3000) {
 				RiderInterface rider = this.generateRider(1, 10);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
 			}
 			
 		} else if (DataStore.getInstance().getTestNumber() == 4) {
@@ -107,31 +119,31 @@ public final class TimeProcessor {
 			if (this.getCurrentTimeMillis() == 0) {
 				RiderInterface rider = this.generateRider(1, 20);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
 			}
 			
 			if (this.getCurrentTimeMillis() == 1000) {
 				RiderInterface rider = this.generateRider(1, 20);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
 			}
 			
 			if (this.getCurrentTimeMillis() == 2000) {
 				RiderInterface rider = this.generateRider(1, 20);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 3);
 			}
 			
 			if (this.getCurrentTimeMillis() == 3000) {
 				RiderInterface rider = this.generateRider(1, 20);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 4);
 			}
 			
-			if (this.getCurrentTimeMillis() == 4000) {
+			if (this.getCurrentTimeMillis() == 6000) {
 				RiderInterface rider = this.generateRider(1, 10);
 				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
 			}
 			
 		}
@@ -231,22 +243,6 @@ public final class TimeProcessor {
 		seconds -= minutes * 60;
 		
 		return String.format("%d:%02d:%02d  ", hours, minutes, seconds);
-		
-		//Build string
-//		StringBuilder stringBuilder = new StringBuilder();
-//		stringBuilder.append(this.currentTimeMillis % 100_000_000);
-//		stringBuilder.append(this.currentTimeMillis % 10_000_000);
-//		stringBuilder.append(":");
-//		stringBuilder.append(this.currentTimeMillis % 1_000_000);
-//		stringBuilder.append(this.currentTimeMillis % 100_000);
-//		stringBuilder.append(":");
-//		stringBuilder.append(this.currentTimeMillis % 10_000);
-//		stringBuilder.append(this.currentTimeMillis % 1_000);
-//		stringBuilder.append("  ");
-//		
-//		//Parse to string and return
-//		String timeString = stringBuilder.toString();
-//		return timeString;
 		
 	}
 	

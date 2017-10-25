@@ -111,9 +111,9 @@ public final class Building {
 	}
 	
 	//elevatorRequested(rider.getStartFloor(), rider.getDirection())
-	public void elevatorRequested(int floor, MyDirection direction) {
-		this.elevators.get(this.elevatorToAssign).addPickupRequest(direction, floor);
-		this.incrementElevatorToAssign();
+	public void elevatorRequested(int floor, MyDirection direction, int elevatorNumber) {
+		this.elevators.get(elevatorNumber).addPickupRequest(direction, floor);
+		//this.incrementElevatorToAssign();
 	}
 	
 	

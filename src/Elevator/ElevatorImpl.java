@@ -277,6 +277,10 @@ public class ElevatorImpl implements ElevatorInterface{
 					
 					//Delete this floor from pickups
 					this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+					//If pickups in this direction is empty, delete this direction from pickups
+//					if (this.pickUps.get(this.pendingDirection).isEmpty()) {
+//						this.pickUps.remove(this.pendingDirection);
+//					}
 				}
 				
 				//Check if this stop is for a dropoff
@@ -295,12 +299,31 @@ public class ElevatorImpl implements ElevatorInterface{
 					
 					//Delete this from drop offs
 					this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+					//If drop offs in this direction is empty, delete this direction from drop offs
+//					if (this.dropOffs.get(this.pendingDirection).isEmpty()) {
+//						this.dropOffs.remove(this.pendingDirection);
+//					}
 				}
 				
 				this.direction = this.pendingDirection;
+				this.pendingDirection = this.direction;
 				
-				processFloor();				
-		}	
+				processFloor();	
+				
+		} 
+//		else if (!this.riders.isEmpty()) {
+//			
+//			if (this.getCurrentFloor() % 1 == 0) {
+//				for (RiderInterface rider : this.riders) {
+//					if (rider.getDestinationFloor() == this.currentFloor) {
+//						processFloor();
+//					}
+//				}
+//			}
+//			
+//			
+//			
+//		}
 		
 		reevaluateDirection();
 	}
@@ -327,8 +350,10 @@ public class ElevatorImpl implements ElevatorInterface{
 		if (this.pendingDirection != MyDirection.IDLE) {
 			// I have just gotten to pickup floor and now I will update my direction to drop off the new pickup (assumes no conflict)
 			if (this.pickUps.get(this.direction).isEmpty()) {
-				this.direction = this.pendingDirection;
-				this.pendingDirection = MyDirection.IDLE;
+				if (this.dropOffs.get(this.direction).isEmpty()) {
+					this.direction = this.pendingDirection;
+					this.pendingDirection = MyDirection.IDLE;
+				}
 			}
 			//I currently don't have a pickup request
 		} else {
