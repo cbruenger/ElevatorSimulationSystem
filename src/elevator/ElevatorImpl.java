@@ -6,6 +6,7 @@ import java.util.HashMap;
 import building.Building;
 import dataStore.DataStore;
 import enumerators.MyDirection;
+import errors.*;
 import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
 import interfaces.ElevatorInterface;
@@ -215,26 +216,37 @@ public class ElevatorImpl implements ElevatorInterface{
 	
 	private void removeRiders() {
 		// TODO error handling. Check if rider exists in riders and throw error if not
-		ArrayList<RiderInterface> exitingRiders = new ArrayList<>(riders);
-		ArrayList<RiderInterface> ridersToDelete = new ArrayList<>();
-		for (RiderInterface rider : riders) {
-			if (rider.getDestinationFloor() == this.currentFloor) {
-				ridersToDelete.add(rider);
-				rider.exitElevator();
+		if (this.riders == null || this.riders.isEmpty()) {
+			return;
+		} else {
+			ArrayList<RiderInterface> exitingRiders = new ArrayList<>(riders);
+			ArrayList<RiderInterface> ridersToDelete = new ArrayList<>();
+			for (RiderInterface rider : riders) {
+				if (rider.getDestinationFloor() == this.currentFloor) {
+					ridersToDelete.add(rider);
+					rider.exitElevator();
+				}
+				else exitingRiders.remove(rider);
 			}
-			else exitingRiders.remove(rider);
-		}
-		this.riders.removeAll(ridersToDelete);
-		for (RiderInterface exitingRider : exitingRiders) {
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + exitingRider.getId() + " has left Elevator " + this.elevatorNumber + " [Riders:");
-			for (RiderInterface currentRider : this.riders) {
-				System.out.print(" " + currentRider.getId());
+			this.riders.removeAll(ridersToDelete);
+			for (RiderInterface exitingRider : exitingRiders) {
+				System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + exitingRider.getId() + " has left Elevator " + this.elevatorNumber + " [Riders:");
+				for (RiderInterface currentRider : this.riders) {
+					System.out.print(" " + currentRider.getId());
+				}
+				System.out.print("]\n");
 			}
-			System.out.print("]\n");
+			try {
+				if (this.direction == MyDirection.DOWN) ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
+				else ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
+				Building.getInstance().decommissionRiders(exitingRiders);
+			} catch (InvalidArgumentException e1) {
+				System.out.println(e1.getMessage());
+			} catch (AlreadyDecommissionedException e2) {
+				System.out.println(e2.getMessage());
+			}
+			
 		}
-		if (this.direction == MyDirection.DOWN) ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
-		else ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
-		Building.getInstance().decommissionRiders(exitingRiders);
 	}
 	
 	

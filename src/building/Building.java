@@ -29,7 +29,11 @@ public final class Building {
 	////////////////////////
 	
 	private Building() {
-		this.initialize();
+		try {
+			this.initialize();
+		} catch (AlreadyExistsException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	//A function to get an instance of the class. Initializes instance if needed
@@ -39,7 +43,7 @@ public final class Building {
 	}
 	
 	//Initializes class variables and all other classes necessary for the program
-	private void initialize() {
+	private void initialize() throws AlreadyExistsException {
 		this.createElevators();
 		this.createFloors();
 		this.initializeDecommissionedRidersArrayList();
@@ -50,10 +54,12 @@ public final class Building {
 	//Initializes the Elevators
 	private void createElevators() throws AlreadyExistsException {
 		
-		//Initialize the ArrayList for elevators to be stored
+		//Throw error if elevators have already been created
 		if (this.elevators != null) {
-			throw new AlreadyExistsException("The elevators HashMap has already been created in building");
+			throw new AlreadyExistsException("The elevators HashMap has already been created in building\n");
 		}
+		
+		//Initialize the ArrayList for elevators to be stored
 		this.elevators = new HashMap<Integer,ElevatorInterface>();
 		
 		//Create the chosen number of elevators
@@ -64,7 +70,12 @@ public final class Building {
 	}
 	
 	//Initializes ArrayList and adds floors
-	private void createFloors() {
+	private void createFloors() throws AlreadyExistsException {
+		
+		//Throw error if elevators have already been created
+		if (this.floors != null) {
+			throw new AlreadyExistsException("The floors HashMap has already been created in building\n");
+		}
 		
 		//Initialize the HashMap for floors to be stored
 		this.floors = new HashMap<Integer,FloorInterface>();
@@ -75,13 +86,20 @@ public final class Building {
 			}
 		}
 	
-	private void initializeDecommissionedRidersArrayList() {
+	private void initializeDecommissionedRidersArrayList() throws AlreadyExistsException {
+		
+		//Throw error if list has already been created
+		if (this.decommissionedRiders != null) {
+			throw new AlreadyExistsException("The decommissionedRiders ArrayList has already been created in building\n");
+		}
+		
+		//Initialize ArrayList for past riders to be stored
 		this.decommissionedRiders = new ArrayList<RiderInterface>();
 	}
 	
 	//Initializes the first elevator to be assigned as the first in the list
 	private void initializeElevatorToAssign() {
-		// TODO error handling
+		// TODO Delete this method once assignment logic works in the elevatorController
 		this.elevatorToAssign = 1;
 	}
 	
@@ -96,7 +114,12 @@ public final class Building {
 	
 	
 	//Function called by TimeProcessor for updating the elevator activity
-	public void update(Long sleepTime) {
+	public void update(Long sleepTime) throws InvalidArgumentException {
+		
+		//Throw error if sleepTime is not a positive value
+		if (sleepTime < 0) {
+			throw new InvalidArgumentException("Building update cannot accept a negative value for sleepTime\n");
+		}
 		
 		//Notify each elevator 
 		for (int elevatorNumber : this.elevators.keySet()) {
@@ -105,7 +128,20 @@ public final class Building {
 	}
 	
 	
-	public void decommissionRiders(ArrayList<RiderInterface> riders) {
+	public void decommissionRiders(ArrayList<RiderInterface> riders) throws InvalidArgumentException, AlreadyDecommissionedException {
+		
+		//Check if riders ArrayList is null
+		if (riders == null) {
+			throw new InvalidArgumentException("Building's decommissionRiders method cannot accept a null parameter\n");
+		}
+		//Check if any riders in the ArrayList already exist in the building's decommissionedRiders ArrayList
+		for (RiderInterface rider: riders) {
+			if (this.decommissionedRiders.contains(rider)) {
+				throw new AlreadyDecommissionedException("Rider already exists in building's decommissionedRiders ArrayList\n");
+			}
+		}
+		
+		//Add riders to the building's decommissionedRiders ArrayList
 		for (RiderInterface rider: riders) {
 			this.decommissionedRiders.add(rider);
 		}
