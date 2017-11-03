@@ -148,7 +148,23 @@ public final class Building {
 	}
 	
 	//elevatorRequested(rider.getStartFloor(), rider.getDirection())
-	public void elevatorRequested(int floor, MyDirection direction, int elevatorNumber) {
+	public void elevatorRequested(int floor, MyDirection direction, int elevatorNumber) throws InvalidArgumentException {
+		
+		//Throw error if floor is invalid
+		if (floor < 1 || floor > DataStore.getInstance().getNumFloors()) {
+			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept floor numbers less than 1 or greater than " + DataStore.getInstance().getNumFloors() + "\n");
+		}
+		
+		//Throw error if direction is null or IDLE
+		if (direction == null || direction == MyDirection.IDLE) {
+			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept null or IDLE for direction parameter");
+		}
+		
+		//Throw error if elevatorNumber is invalid
+		if (elevatorNumber < 1 || elevatorNumber > DataStore.getInstance().getNumElevators()) {
+			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept elevatorNumber less than 1 or greater than " + DataStore.getInstance().getNumElevators() + "\n");
+		}
+		
 		this.elevators.get(elevatorNumber).addPickupRequest(direction, floor);
 		//this.incrementElevatorToAssign();
 	}

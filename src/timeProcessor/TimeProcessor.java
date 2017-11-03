@@ -5,7 +5,7 @@ import dataStore.DataStore;
 import gui.ElevatorDisplay;
 import interfaces.RiderInterface;
 import rider.Rider;
-
+import errors.*;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -45,20 +45,24 @@ public final class TimeProcessor {
 		
 		//Runs the simulation for the designated amount of time
 		while (this.currentTimeMillis <= DataStore.getInstance().getDurationMillis()) {
-			
+					
 			//If needed, create riders, add to their start floor, and make floor request
 			riderSimWork();
+				
+			try {
+				
+				//Notify building to update elevator activity
+				Building.getInstance().update(sleepTime);
 			
-			//Notify building to update elevator activity
-			Building.getInstance().update(sleepTime);
-		
-			//Simulation sleeps for designated amount of time
-			try { 
+				//Simulation sleeps for designated amount of time
 				Thread.sleep(sleepTime);
-			} catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}
 			
+			} catch (InvalidArgumentException e1) {
+				System.out.println(e1.getMessage());
+			} catch (InterruptedException e2) {
+				e2.printStackTrace();
+			}
+				
 			//Increment the current time by the designated amount
 			this.currentTimeMillis += sleepTime;
 		}
@@ -72,88 +76,93 @@ public final class TimeProcessor {
 	//Generates riders, adds them to a floor, and notifies the building of a floor request
 	private void riderSimWork() {
 		
-		if (DataStore.getInstance().getTestNumber() == 1) {
-			
-			//Generate people with requests according to Test 1 from project description
-			if (this.getCurrentTimeMillis() == 0) {
-				RiderInterface rider = this.generateRider(1, 10);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-			}
-			
-			
-		} else if (DataStore.getInstance().getTestNumber() == 2) {
-			
-			//Generate people with requests according to Test 2 from project description
-			if (this.getCurrentTimeMillis() == 0) {
-				RiderInterface rider = this.generateRider(1, 20);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-			}
-			
-			if (this.getCurrentTimeMillis() == 12000) {
-				RiderInterface rider = this.generateRider(15, 19);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-			}
-			
-			
-		} else if (DataStore.getInstance().getTestNumber() == 3) {
-			
-			//Generate people with requests according to Test 3 from project description
-			if (this.getCurrentTimeMillis() == 0) {
-				RiderInterface rider = this.generateRider(1, 20);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-			}
-			
-			if (this.getCurrentTimeMillis() == 3000) {
-				RiderInterface rider = this.generateRider(1, 10);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
-			}
-			
-		} else if (DataStore.getInstance().getTestNumber() == 4) {
-			
-			//Generate people with requests according to Test 4 from project description
-			if (this.getCurrentTimeMillis() == 0) {
-				RiderInterface rider = this.generateRider(1, 20);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-			}
-			
-			if (this.getCurrentTimeMillis() == 1000) {
-				RiderInterface rider = this.generateRider(1, 20);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
-			}
-			
-			if (this.getCurrentTimeMillis() == 2000) {
-				RiderInterface rider = this.generateRider(1, 20);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 3);
-			}
-			
-			if (this.getCurrentTimeMillis() == 3000) {
-				RiderInterface rider = this.generateRider(1, 20);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 4);
-			}
-			
-			if (this.getCurrentTimeMillis() == 6000) {
-				RiderInterface rider = this.generateRider(1, 10);
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-			}
-			
-		}
+		try {
 		
-		//Generates first rider at start of simulation, and also at a designated recurrence time
-//		if (this.currentTimeMillis == 0 || this.currentTimeMillis % DataStore.getInstance().getRiderGenerationTime() == 0) {
-//			RiderInterface rider = this.generateRandomRider();
-//			this.addRiderToFloor(rider);
-//			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
-//		}	
+			if (DataStore.getInstance().getTestNumber() == 1) {
+				
+				//Generate people with requests according to Test 1 from project description
+				if (this.getCurrentTimeMillis() == 0) {
+					RiderInterface rider = this.generateRider(1, 10);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+				}
+				
+				
+			} else if (DataStore.getInstance().getTestNumber() == 2) {
+				
+				//Generate people with requests according to Test 2 from project description
+				if (this.getCurrentTimeMillis() == 0) {
+					RiderInterface rider = this.generateRider(1, 20);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+				}
+				
+				if (this.getCurrentTimeMillis() == 12000) {
+					RiderInterface rider = this.generateRider(15, 19);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+				}
+				
+				
+			} else if (DataStore.getInstance().getTestNumber() == 3) {
+				
+				//Generate people with requests according to Test 3 from project description
+				if (this.getCurrentTimeMillis() == 0) {
+					RiderInterface rider = this.generateRider(1, 20);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+				}
+				
+				if (this.getCurrentTimeMillis() == 3000) {
+					RiderInterface rider = this.generateRider(1, 10);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
+				}
+				
+			} else if (DataStore.getInstance().getTestNumber() == 4) {
+				
+				//Generate people with requests according to Test 4 from project description
+				if (this.getCurrentTimeMillis() == 0) {
+					RiderInterface rider = this.generateRider(1, 20);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+				}
+				
+				if (this.getCurrentTimeMillis() == 1000) {
+					RiderInterface rider = this.generateRider(1, 20);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
+				}
+				
+				if (this.getCurrentTimeMillis() == 2000) {
+					RiderInterface rider = this.generateRider(1, 20);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 3);
+				}
+				
+				if (this.getCurrentTimeMillis() == 3000) {
+					RiderInterface rider = this.generateRider(1, 20);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 4);
+				}
+				
+				if (this.getCurrentTimeMillis() == 6000) {
+					RiderInterface rider = this.generateRider(1, 10);
+					this.addRiderToFloor(rider, rider.getStartFloor());
+					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+				}
+				
+			}
+			
+			//Generates first rider at start of simulation, and also at a designated recurrence time
+	//		if (this.currentTimeMillis == 0 || this.currentTimeMillis % DataStore.getInstance().getRiderGenerationTime() == 0) {
+	//			RiderInterface rider = this.generateRandomRider();
+	//			this.addRiderToFloor(rider);
+	//			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
+	//		}
+		} catch (InvalidArgumentException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	//Returns a rider with random start/destination floors
