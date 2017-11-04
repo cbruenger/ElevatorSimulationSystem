@@ -135,6 +135,8 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.doorOpen = false;
 		ElevatorDisplay.getInstance().closeDoors(this.elevatorNumber);
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " closes doors\n");
+		//System.out.println("ELEVATORS CURRENT DIRECTION AFTER DOORS CLOSE is " + this.direction);
+		//System.out.println("ELEVATORS PENDING DIRECTION AFTER DOORS CLOSE is " + this.pendingDirection);
 	}
 	
 	private void move(long time) {
@@ -273,103 +275,93 @@ public class ElevatorImpl implements ElevatorInterface{
 						|| (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor))
 						|| (this.pickUps.get(this.direction).contains(this.currentFloor)) 
 						|| (this.dropOffs.get(this.direction).contains(this.currentFloor)))) { 
-				
-				//Check if this stop is for pickup
-				if (this.pickUps.get(this.pendingDirection).contains(this.currentFloor)) {
-					
-					//Print info
-					System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at " + this.currentFloor + " for Floor Request [Current Floor Requests:");
-					for (int i : this.pickUps.get(this.direction)) {
-						System.out.print(" " + i);
-					}
-					System.out.print("][Current Rider Requests:");
-					for (int i : this.dropOffs.get(this.direction)) {
-						System.out.print(" " + i);
-					}
-					System.out.print("]\n");
-					
-					//Delete this floor from pickups
-					this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-					//If pickups in this direction is empty, delete this direction from pickups
-//					if (this.pickUps.get(this.pendingDirection).isEmpty()) {
-//						this.pickUps.remove(this.pendingDirection);
-//					}
-				}
-				
-				//Check if this stop is for a dropoff
-				if (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor)) {
-					
-					//Print info
-					System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at " + this.currentFloor + " for Rider Request [Current Floor Requests:");
-					for (int i : this.pickUps.get(this.direction)) {
-						System.out.print(" " + i);
-					}
-					System.out.print("][Current Rider Requests:");
-					for (int i : this.dropOffs.get(this.direction)) {
-						System.out.print(" " + i);
-					}
-					System.out.print("]\n");
-					
-					//Delete this from drop offs
-					this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-					//If drop offs in this direction is empty, delete this direction from drop offs
-//					if (this.dropOffs.get(this.pendingDirection).isEmpty()) {
-//						this.dropOffs.remove(this.pendingDirection);
-//					}
-				}
-				
+				checkDropOffs();
+				checkPickUps();
 				this.direction = this.pendingDirection;
-				this.pendingDirection = this.direction;
-				
-				processFloor();	
-				
-		} 
-//		else if (!this.riders.isEmpty()) {
-//			
-//			if (this.getCurrentFloor() % 1 == 0) {
-//				for (RiderInterface rider : this.riders) {
-//					if (rider.getDestinationFloor() == this.currentFloor) {
-//						processFloor();
-//					}
-//				}
-//			}
-//			
-//			
-//			
-//		}
-		
-		reevaluateDirection();
+				this.pendingDirection = this.direction;	
+				processFloor();
+				}
+				reevaluateDirection();
 	}
 	
 	private void processFloor() {
-		//this.floorCheck();
 		this.openDoors();
-		this.removeRiders();
 		this.pickUpRiders();
+		this.removeRiders();
 		
 		//close doors needs to happen X seconds later... 
 		this.closeDoors();
 	}
 	
-//	public void floorCheck() {
-//		for (int floor: this.pickUps.get(this.direction)) {
-//			if floor
-//		}
-//	}
+	public void checkPickUps() {
+		//Check if this stop is for pickup
+		if (this.pickUps.get(this.pendingDirection).contains(this.currentFloor)) {
+			
+			//Print info
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at " + this.currentFloor + " for Floor Request [Current Floor Requests:");
+			for (int i : this.pickUps.get(this.direction)) {
+				System.out.print(" " + i);
+			}
+			System.out.print("][Current Rider Requests:");
+			for (int i : this.dropOffs.get(this.direction)) {
+				System.out.print(" " + i);
+			}
+			System.out.print("]\n");
+			
+			//Delete this floor from pickups
+			this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+		}
+	}
 	
-	private void reevaluateDirection() {
-		//  PLAIN ENGLISH EXPLANATION
-		//I have a pickup
+	public void checkDropOffs() {
+		//Check if this stop is for a dropoff
+		if (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor)) {
+			
+			//Print info
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at " + this.currentFloor + " for Rider Request [Current Floor Requests:");
+			for (int i : this.pickUps.get(this.direction)) {
+				System.out.print(" " + i);
+			}
+			System.out.print("][Current Rider Requests:");
+			for (int i : this.dropOffs.get(this.direction)) {
+				System.out.print(" " + i);
+			}
+			System.out.print("]\n");
+			
+			//Delete this from drop offs
+			this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+		}
+	} 
+	
+	private void reevaluateDirection() {	
 		if (this.pendingDirection != MyDirection.IDLE) {
 			// I have just gotten to pickup floor and now I will update my direction to drop off the new pickup (assumes no conflict)
-			if (this.pickUps.get(this.direction).isEmpty()) {
-				if (this.dropOffs.get(this.direction).isEmpty()) {
+			//REVERSED THE NEXT TWO CONDITIONALS.. they might have short circuited each other/ pickups would preclude drop offs i guess?
+			if (this.dropOffs.get(this.direction).isEmpty()) {
+				if (this.pickUps.get(this.direction).isEmpty()) {
 					this.direction = this.pendingDirection;
 					this.pendingDirection = MyDirection.IDLE;
 				}
+				// I added this to update for more people who are waiting for pick up request...
+				///
+				if (!this.pickUps.get(MyDirection.DOWN).isEmpty()) {
+					System.out.println("I AM CHECKING A NEW PICK UP for down");
+					if (this.currentFloor - this.pickUps.get(MyDirection.DOWN).get(0) > 0) this.direction = MyDirection.DOWN;
+					else this.direction = MyDirection.UP;	
+					this.pendingDirection = MyDirection.DOWN;	
+				}
+				if (!this.pickUps.get(MyDirection.UP).isEmpty()) {
+					System.out.println("I AM CHECKING A NEW PICK UP for up");
+					if (this.currentFloor - this.pickUps.get(MyDirection.UP).get(0) > 0) this.direction = MyDirection.DOWN;
+					else this.direction = MyDirection.UP;	
+					this.pendingDirection = MyDirection.UP;
+				}
+				///
 			}
+			
 			//I currently don't have a pickup request
 		} else {
+			
 			//If there are NO dropOffs in the direction I am moving
 			if (this.dropOffs.get(this.direction).isEmpty()) {
 				//returned to floor 1 check (base case)
@@ -401,6 +393,8 @@ public class ElevatorImpl implements ElevatorInterface{
 				} 
 			} 
 		}
+		//System.out.println("ELEVATORS CURRENT DIRECTION AFTER REEVALUTE is " + this.direction);
+		//System.out.println("ELEVATORS PENDING DIRECTION AFTER REEVALUTE is " + this.pendingDirection);
 	}
 	
 	/////////////////////////////
@@ -485,16 +479,13 @@ public class ElevatorImpl implements ElevatorInterface{
 		 * the given floor into the array.
 		 * Otherwise, just add the floor to the direction's list in the array 
 		 */
-		this.pendingDirection = direction;
+		//changed this...
+		if (this.pendingDirection == MyDirection.IDLE) this.pendingDirection = direction;
+		this.pickUps.get(direction).add(floor);
 		
-		if (this.pickUps.get(direction) == null) {
-			ArrayList<Integer> pickUpList = new ArrayList<Integer>();
-			pickUpList.add(floor);
-			this.pickUps.put(direction, pickUpList);
-		} else {
-			this.pickUps.get(direction).add(floor);
-		}
+		
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " is going to Floor " + floor + " for " + direction + " request  [Current Floor Requests:");
+		
 		for (int i : this.pickUps.get(this.direction)) {
 			System.out.print(" " + i);
 		}
