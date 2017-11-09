@@ -1,15 +1,38 @@
 package mainAC;
 
+import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import building.Building;
 import dataStore.DataStore;
+import errors.InputParsingException;
 import timeProcessor.TimeProcessor;
 
 public class MainAC {
 
 	public static void main(String[] args) {
 		
-		DataStore.getInstance();
+//		DataStore.getInstance();
+//		
+//		Building.getInstance();
+				
+//		
+//		TimeProcessor.getInstance().begin();
 		
-		TimeProcessor.getInstance().begin();
+		
+		
+		
+		
+		
 		
 //		Building.getInstance();
 //		

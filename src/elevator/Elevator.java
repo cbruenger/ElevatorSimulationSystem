@@ -67,10 +67,10 @@ public class Elevator implements ElevatorInterface{
 	}
 
 	//Temporary for testing in main
-	@Override
-	public ArrayList<String> getRiderIds() {
-		return this.delegate.getRiderIds();
-	}
+//	@Override
+//	public ArrayList<String> getRiderIds() {
+//		return this.delegate.getRiderIds();
+//	}
 	
 	@Override
 	public void update(long time) {

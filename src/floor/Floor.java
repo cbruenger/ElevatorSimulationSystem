@@ -1,5 +1,6 @@
 package floor;
 
+import errors.*;
 import java.util.ArrayList;
 import enumerators.MyDirection;
 import factories.FloorFactory;
@@ -31,20 +32,20 @@ public class Floor implements FloorInterface {
 		return delegate.getFloorNumber();
 	}
 
-	//Only for testing temporarily in our main
-	@Override
-	public ArrayList<RiderInterface> getRiders() {
-		return delegate.getRiders();
-	}
+//	//Only for testing temporarily in our main
+//	@Override
+//	public ArrayList<RiderInterface> getRiders() {
+//		return delegate.getRiders();
+//	}
 	
 	@Override
-	public void addRider(RiderInterface rider) {
+	public void addRider(RiderInterface rider) throws AlreadyExistsException {
 		delegate.addRider(rider);
 	}
 	
 	@Override
-	public void removeRider(RiderInterface rider) {
-		delegate.addRider(rider);
+	public void removeRider(RiderInterface rider) throws CannotRemoveException {
+		delegate.removeRider(rider);
 	}
 	
 	@Override
