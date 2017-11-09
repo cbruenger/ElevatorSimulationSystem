@@ -198,7 +198,7 @@ public final class TimeProcessor {
 					this.addRiderToFloor(rider, rider.getStartFloor());
 					//replace this line with controller call taking startFloor/direction
 					//Controller will be the one to call this next line. Rename it to 
-					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
+					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
 				}
 				
 				

@@ -133,7 +133,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	private void setPendingDirection(MyDirection direction ) throws InvalidArgumentException {
-		if (pendingDirection == null) {
+		if (direction == null) {
 			throw new InvalidArgumentException("ElevatorImpl can't accept null during pendingDirection assignment\n");
 		}
 		this.pendingDirection = direction;

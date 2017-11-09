@@ -21,12 +21,12 @@ public class MainAC {
 
 	public static void main(String[] args) {
 		
-//		DataStore.getInstance();
-//		
-//		Building.getInstance();
+		DataStore.getInstance();
+		
+		Building.getInstance();
 				
-//		
-//		TimeProcessor.getInstance().begin();
+		
+		TimeProcessor.getInstance().begin();
 		
 		
 		
