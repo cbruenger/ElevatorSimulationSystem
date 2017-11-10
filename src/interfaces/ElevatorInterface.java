@@ -2,7 +2,7 @@ package interfaces;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import errors.*;
 import enumerators.MyDirection;
 
 public interface ElevatorInterface {
@@ -19,7 +19,7 @@ public interface ElevatorInterface {
 	//Useful functions
 	public void update(long time);
 	public void addRiders(ArrayList<RiderInterface> riders);
-	public void addPickupRequest(MyDirection direction, int floor);
+	public void addPickupRequest(MyDirection direction, int floor) throws InvalidArgumentException;
 	
 	//public void removeRider(String riderId);
 	//public void moveUp();

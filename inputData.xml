@@ -2,7 +2,7 @@
 <data>
 	<numFloors>20</numFloors>
 	<numElevators>4</numElevators>
-	<elevatorCapacity>6</elevatorCapacity>
+	<elevatorCapacity>1</elevatorCapacity>
 	<floorSpeed>1</floorSpeed>
 	<doorsOpenTime>3</doorsOpenTime>
 	<idleTime>5</idleTime>

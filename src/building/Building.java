@@ -194,7 +194,7 @@ public final class Building {
 		
 		//Throw error if direction is null or IDLE
 		if (direction == null || direction == MyDirection.IDLE) {
-			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept null or IDLE for direction parameter");
+			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept null or IDLE for direction parameter\n");
 		}
 		
 		//Throw error if elevatorNumber is invalid
@@ -203,7 +203,6 @@ public final class Building {
 		}
 		
 		this.elevators.get(elevatorNumber).addPickupRequest(direction, floor);
-		//this.incrementElevatorToAssign();
 	}
 	
 	
@@ -228,15 +227,50 @@ public final class Building {
 	
 	//Return an ArrayList of people who need to transfer from a floor to an elevator that is waiting
 	//Also removes the people from the floor
-	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction) throws InvalidArgumentException {
-		if (floor < 1 || floor > this.numFloors) {
-			throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
-		}
-		if (direction == null) {
-			throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept null value for direction\n");
-		}
-		return this.floors.get(floor).getRidersByDirection(direction);
+	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction, int availableCapacity) throws InvalidArgumentException, BadInputDataException, UnexpectedNullException {
+		try {
+			int totalCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity());
+			if (floor < 1 || floor > this.numFloors) {
+				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
+			}
+			if (direction == null) {
+				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept null value for direction\n");
+			}
+			if (availableCapacity < 0 || availableCapacity > totalCapacity) {
+				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept number less than 0 or greater than " + totalCapacity + " for availableCapacity\n");
+			}
+			ArrayList<RiderInterface> ridersToTransfer = this.floors.get(floor).getRidersByDirection(direction, availableCapacity);
+			if (ridersToTransfer == null)
+				throw new UnexpectedNullException("Building's getWaitersFromFloor method received null value when retreiving riders from floor\n");
+			return ridersToTransfer;
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("Building could not parse DataStore's elevatorCapacity value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("Building received null from DataStore for elevatorCapacity value\n"); 
+	    }
 	}
+	
+//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
+//		
+//		
+//		if (floorNum < 1 || floorNum > this.numFloors) {
+//			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive number less than 1 or greater than " + this.numFloors + " for floorNum arg\n");
+//		}
+//		if (direction == null) {
+//			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive null for direction arg\n");
+//		}
+//		
+//		return this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
+////		try {
+////			boolean waitersLeftBool = this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
+////			return waitersLeftBool;
+////		} catch (InvalidArgumentException e) {
+////			System.out.println(e.getMessage());
+////			e.printStackTrace();
+////			System.exit(-1);
+////		}
+////		return false;
+//	}
 	
 //	//A function to get the IDs of the all floors.
 //	//For temporary use in our main

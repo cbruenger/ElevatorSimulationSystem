@@ -2,6 +2,7 @@ package timeProcessor;
 
 import building.Building;
 import dataStore.DataStore;
+import controller.ElevatorController;
 import gui.ElevatorDisplay;
 import interfaces.RiderInterface;
 import rider.Rider;
@@ -17,7 +18,7 @@ public final class TimeProcessor {
 	private HashMap<Integer, Long> idleTimes;
 	private HashMap<Integer, Long> doorOpenTimes;
 	private int riderIdIncrementer; //I stashed the rider generator stuff here for now and trashed the facade
-	private int numFloors; //Might not need this
+	//private int numFloors; //Might not need this
 	
 	private TimeProcessor() {
 		
@@ -25,7 +26,7 @@ public final class TimeProcessor {
 			
 			this.createIdleTimesHashMap();
 			this.createDoorOpenTimesHashMap();
-			this.setNumFloors();
+			//this.setNumFloors();
 			
 		} catch (AlreadyExistsException e1) {
 			System.out.println(e1.getMessage());
@@ -90,20 +91,50 @@ public final class TimeProcessor {
 	    }
 	}
 	
-	private void setNumFloors() throws BadInputDataException {
+//	private void setNumFloors() throws BadInputDataException {
+//		
+//		try { 
+//			int numFloorsTemp = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
+//			if (numFloorsTemp > 1)
+//				this.numFloors = numFloorsTemp;
+//			else
+//				throw new BadInputDataException("TimeProcessor received a value less than 2 for numFloors from DataStore\n");
+//	    } catch (NumberFormatException e) { 
+//	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numFloors value to int\n"); 
+//	    } catch(NullPointerException e) {
+//	        throw new BadInputDataException("TimeProcessor received null from DataStore for numFloors value\n"); 
+//	    }
+//		
+//	}
+	
+	private int getNumFloors() throws BadInputDataException {
 		
 		try { 
-			int numFloorsTemp = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
-			if (numFloorsTemp > 1)
-				this.numFloors = numFloorsTemp;
+			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
+			if (numFloors > 1)
+				return numFloors;
 			else
 				throw new BadInputDataException("TimeProcessor received a value less than 2 for numFloors from DataStore\n");
 	    } catch (NumberFormatException e) { 
 	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numFloors value to int\n"); 
 	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for numFloors value\n"); 
+	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value\n"); 
 	    }
 		
+	}
+	
+	private int getRidersPerMinute() throws BadInputDataException {
+		try {
+			int ridersPerMinute = Integer.parseInt(DataStore.getInstance().getRidersPerMinute());
+			if (ridersPerMinute > 0)
+				return ridersPerMinute;
+			else
+				throw new BadInputDataException("TimeProcessor cannot accept number less than 1 for ridersPerMinute from DataStore\n");
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's ridersPerMinute value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for ridersPerMinute value\n"); 
+	    }
 	}
 	
 	private long getSleepTime() throws BadInputDataException {
@@ -149,6 +180,9 @@ public final class TimeProcessor {
 			//Store the amount of time that the simulation should sleep for between action cycles
 			long sleepTime = this.getSleepTime();
 			
+			//Initial print statement
+			System.out.println(this.getTimeString() + "PROGRAM STARTING, AWAITING RIDER GENERATION");
+			
 			//Runs the simulation for the designated amount of time
 			while (this.currentTimeMillis <= this.getDurationMillis()) {
 						
@@ -189,17 +223,117 @@ public final class TimeProcessor {
 	private void riderSimWork() {
 		
 		try {
+			
+			int ridersPerMinute = this.getRidersPerMinute();
+			int riderGenerationChancePerCycle = (int) Math.ceil(((float)ridersPerMinute/60) * 100);
+			int randomInt = (int) Math.ceil(Math.random() * 100);
+			
+			if (randomInt <= riderGenerationChancePerCycle) {
+				RiderInterface rider = this.generateRandomRider();
+				this.addRiderToFloor(rider, rider.getStartFloor());
+				//replace this line with controller call taking startFloor/direction
+				//Controller will be the one to call this next line. Rename it to 
+				ElevatorController.getInstance().pickupRequest(rider.getStartFloor(), rider.getDirection());
+			}
 		
 			//if (DataStore.getInstance().getTestNumber() == 1) {
 				
 				//Generate people with requests according to Test 1 from project description
-				if (this.getCurrentTimeMillis() == 0) {
-					RiderInterface rider = this.generateRandomRider();
-					this.addRiderToFloor(rider, rider.getStartFloor());
-					//replace this line with controller call taking startFloor/direction
-					//Controller will be the one to call this next line. Rename it to 
-					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
-				}
+//				if (this.getCurrentTimeMillis() == 0) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 4000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 2);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 8000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 3);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 12000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 4);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 16000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 20000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 2);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 24000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 3);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 28000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 4);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 32000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 36000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 2);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 40000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 3);
+//				}
+//				
+//				if (this.getCurrentTimeMillis() == 44000) {
+//					RiderInterface rider = this.generateRandomRider();
+//					this.addRiderToFloor(rider, rider.getStartFloor());
+//					//replace this line with controller call taking startFloor/direction
+//					//Controller will be the one to call this next line. Rename it to 
+//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 4);
+//				}
 				
 				
 //			} else if (DataStore.getInstance().getTestNumber() == 2) {
@@ -274,28 +408,39 @@ public final class TimeProcessor {
 	//			this.addRiderToFloor(rider);
 	//			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
 	//		}
-		} catch (InvalidArgumentException e) {
-			System.out.println(e.getMessage());
+		} catch (InvalidArgumentException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (BadInputDataException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
+	
+	
 	//Returns a rider with random start/destination floors
-	private RiderInterface generateRandomRider() {
-		
-		//Get start/destination floors
-		int randomStart = ThreadLocalRandom.current().nextInt(1, this.numFloors + 1);
-		int randomDestination = ThreadLocalRandom.current().nextInt(1, this.numFloors + 1);
-		
-		//Make sure start and destination are not same
-		while (randomStart == randomDestination) {
-			randomDestination = ThreadLocalRandom.current().nextInt(1, this.numFloors + 1);
-		} 
-		
-		//Create, print and return rider
-		RiderInterface newRider = new Rider(generateRiderId(), randomStart, randomDestination);
-		System.out.println(this.getTimeString() + "Person " + newRider.getId() + " created on Floor " + newRider.getStartFloor() + ", wants to go " + newRider.getDirection() + " to Floor " + newRider.getDestinationFloor());
-		return newRider;
-		
+	private RiderInterface generateRandomRider() throws BadInputDataException {
+		try {
+			int numFloors = this.getNumFloors();
+			//Get start/destination floors
+			int randomStart = ThreadLocalRandom.current().nextInt(1, numFloors + 1);
+			int randomDestination = ThreadLocalRandom.current().nextInt(1, numFloors + 1);
+			
+			//Make sure start and destination are not same
+			while (randomStart == randomDestination) {
+				randomDestination = ThreadLocalRandom.current().nextInt(1, numFloors + 1);
+			} 
+			
+			//Create, print and return rider
+			RiderInterface newRider = new Rider(generateRiderId(), randomStart, randomDestination);
+			System.out.println(this.getTimeString() + "Person " + newRider.getId() + " created on Floor " + newRider.getStartFloor() + ", wants to go " + newRider.getDirection() + " to Floor " + newRider.getDestinationFloor());
+			return newRider;
+		} catch (BadInputDataException e) {
+			throw e;
+		}
 	}
 
 	//This isn't being used in riderSimWork but kept it here just in case

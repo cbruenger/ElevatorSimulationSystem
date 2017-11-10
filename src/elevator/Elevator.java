@@ -1,7 +1,7 @@
 package elevator;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import errors.*;
 import enumerators.MyDirection;
 import factories.ElevatorFactory;
 import interfaces.ElevatorInterface;
@@ -83,7 +83,7 @@ public class Elevator implements ElevatorInterface{
 	}
 	
 	@Override
-	public void addPickupRequest(MyDirection direction, int floor) {
+	public void addPickupRequest(MyDirection direction, int floor) throws InvalidArgumentException {
 		this.delegate.addPickupRequest(direction, floor);
 	}
 	

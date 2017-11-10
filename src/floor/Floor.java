@@ -49,9 +49,14 @@ public class Floor implements FloorInterface {
 	}
 	
 	@Override
-	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction) {
-		return delegate.getRidersByDirection(direction);
+	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
+		return delegate.getRidersByDirection(direction, availableCapacity);
 	}
+	
+//	@Override
+//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
+//		return delegate.waitersLeftBehind(floorNum, direction);
+//	}
 
 	/////////////////////////////
 	//				           //
