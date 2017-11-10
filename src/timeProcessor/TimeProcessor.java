@@ -233,7 +233,7 @@ public final class TimeProcessor {
 				this.addRiderToFloor(rider, rider.getStartFloor());
 				//replace this line with controller call taking startFloor/direction
 				//Controller will be the one to call this next line. Rename it to 
-				ElevatorController.getInstance().pickupRequest(rider.getStartFloor(), rider.getDirection());
+				//ElevatorController.getInstance().pickupRequest(rider.getStartFloor(), rider.getDirection());
 			}
 		
 			//if (DataStore.getInstance().getTestNumber() == 1) {
@@ -408,10 +408,10 @@ public final class TimeProcessor {
 	//			this.addRiderToFloor(rider);
 	//			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
 	//		}
-		} catch (InvalidArgumentException e1) {
-			System.out.println(e1.getMessage());
-			e1.printStackTrace();
-			System.exit(-1);
+//		} catch (InvalidArgumentException e1) {
+//			System.out.println(e1.getMessage());
+//			e1.printStackTrace();
+//			System.exit(-1);
 		} catch (BadInputDataException e2) {
 			System.out.println(e2.getMessage());
 			e2.printStackTrace();
@@ -436,7 +436,6 @@ public final class TimeProcessor {
 			
 			//Create, print and return rider
 			RiderInterface newRider = new Rider(generateRiderId(), randomStart, randomDestination);
-			System.out.println(this.getTimeString() + "Person " + newRider.getId() + " created on Floor " + newRider.getStartFloor() + ", wants to go " + newRider.getDirection() + " to Floor " + newRider.getDestinationFloor());
 			return newRider;
 		} catch (BadInputDataException e) {
 			throw e;

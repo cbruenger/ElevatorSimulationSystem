@@ -8,11 +8,14 @@ import errors.*;
 import interfaces.FloorInterface;
 import interfaces.RiderInterface;
 import timeProcessor.TimeProcessor;
+import interfaces.ButtonInterface;
+import button.Button;
 
 public class FloorImpl implements FloorInterface{
 
 	private int floorNumber;
-	
+	private ButtonInterface upButton;
+	private ButtonInterface downButton;
 	private ArrayList<RiderInterface> riders;
 	
 	////////////////////////
@@ -24,11 +27,16 @@ public class FloorImpl implements FloorInterface{
 	public FloorImpl(int floorNumber) {
 		
 		try {
-			//Create necessary data structures
-			this.createRidersArrayList();
 			
 			//Set initial variable values
 			this.setFloorNumber(floorNumber);
+			
+			//Create buttons
+			this.createUpButton();
+			this.createDownButton();
+			
+			//Create necessary data structures
+			this.createRidersArrayList();
 			
 		} catch (AlreadyExistsException e2) {
 			System.out.println(e2.getMessage());
@@ -49,16 +57,6 @@ public class FloorImpl implements FloorInterface{
 	//				  		 //
 	///////////////////////////
 	
-	private void createRidersArrayList() throws AlreadyExistsException {
-		
-		//Throw error if elevators have already been created
-		if (this.riders != null) {
-			throw new AlreadyExistsException("The riders ArrayList has already been created in FloorImpl\n");
-		}
-		
-		this.riders = new ArrayList<RiderInterface>();
-	}
-
 	private void setFloorNumber(int floorNumber) throws InvalidArgumentException {
 		
 		try {
@@ -73,6 +71,24 @@ public class FloorImpl implements FloorInterface{
 			System.exit(-1);
 		}
 		
+	}
+	
+	private void createUpButton() {
+		this.upButton = new Button(MyDirection.UP, this.floorNumber);
+	}
+	
+	private void createDownButton() {
+		this.downButton = new Button(MyDirection.DOWN, this.floorNumber);
+	}
+	
+	private void createRidersArrayList() throws AlreadyExistsException {
+		
+		//Throw error if elevators have already been created
+		if (this.riders != null) {
+			throw new AlreadyExistsException("The riders ArrayList has already been created in FloorImpl\n");
+		}
+		
+		this.riders = new ArrayList<RiderInterface>();
 	}
 	
 	private int getNumFloors() throws BadInputDataException {
@@ -107,6 +123,17 @@ public class FloorImpl implements FloorInterface{
 		
 	}
 	
+	private void pushButton(MyDirection direction) throws InvalidArgumentException {
+		if (direction == null) {
+			throw new InvalidArgumentException("FloorImpl's pushButton method cannot accept null for direction arg\n");
+		}
+		if (direction == MyDirection.UP) {
+			this.upButton.push();
+		} else if (direction == MyDirection.DOWN) {
+			this.downButton.push();
+		}
+	}
+	
 	/////////////////////////////
 	//				           //
 	//    Interface Methods    //
@@ -129,8 +156,17 @@ public class FloorImpl implements FloorInterface{
 		if (this.riders.contains(rider)) {
 			throw new AlreadyExistsException("Rider " + rider.getId() + " is already on floor " + this.floorNumber);
 		}
-		System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " pressed " + rider.getDirection() + " on Floor " + rider.getStartFloor());
-		this.riders.add(rider);
+		try {
+			System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " created on Floor " + rider.getStartFloor() + ", wants to go " + rider.getDirection() + " to Floor " + rider.getDestinationFloor());
+			System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " pressed " + rider.getDirection() + " on Floor " + rider.getStartFloor());
+			this.pushButton(rider.getDirection());
+			this.riders.add(rider);
+		} catch (InvalidArgumentException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
 	}
 	
 	@Override
