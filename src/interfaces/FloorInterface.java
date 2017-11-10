@@ -11,5 +11,5 @@ public interface FloorInterface {
 	public void removeRider(RiderInterface rider) throws CannotRemoveException;
 	public void addRider(RiderInterface rider) throws AlreadyExistsException;
 	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException;
-	//public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException;
+	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException;
 }

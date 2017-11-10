@@ -53,10 +53,10 @@ public class Floor implements FloorInterface {
 		return delegate.getRidersByDirection(direction, availableCapacity);
 	}
 	
-//	@Override
-//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-//		return delegate.waitersLeftBehind(floorNum, direction);
-//	}
+	@Override
+	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
+		return delegate.waitersLeftBehind(floorNum, direction);
+	}
 
 	/////////////////////////////
 	//				           //

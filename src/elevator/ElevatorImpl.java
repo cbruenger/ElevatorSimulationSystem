@@ -395,7 +395,6 @@ public class ElevatorImpl implements ElevatorInterface{
 			if (incomingRiders.size() > this.maxCapacity - this.riders.size()) {
 				throw new BeyondElevatorCapacityException("ElevatorImpl cannot receive " + incomingRiders.size() + " riders with maxCapacity " + this.maxCapacity + " and current capacity " + this.riders.size());
 			}
-			
 			this.addRiders(incomingRiders);
 			this.addNewRidersRequests(incomingRiders);
 			
@@ -468,17 +467,14 @@ public class ElevatorImpl implements ElevatorInterface{
 			if ((this.dropOffs.get(MyDirection.UP).contains(this.currentFloor) || this.dropOffs.get(MyDirection.DOWN).contains(this.currentFloor))
 					|| (this.pickUps.get(this.direction).contains(this.currentFloor) 
 					&& (this.pendingDirection == MyDirection.IDLE || this.pendingDirection == this.direction))) {
-				this.openDoors();
-				this.removeRiders();
-				//this.removeFloorFromDropOffs();
-				this.pickUpRiders();
-				//if (!this.ridersLeftBehind())
-					//this.removeFloorFromPickUps();
-				//close doors needs to happen X seconds later... 
-				this.closeDoors();
-//				if (this.ridersLeftBehind()) {
-//					
-//				}
+			this.openDoors();
+			this.removeRiders();
+			this.removeFloorFromDropOffs();
+			this.pickUpRiders();
+			if (!this.ridersLeftBehind())
+				this.removeFloorFromPickUps();
+			//close doors needs to happen X seconds later... 
+			this.closeDoors();
 			}
 			
 		} catch (AlreadyExistsException e1) {
@@ -493,12 +489,11 @@ public class ElevatorImpl implements ElevatorInterface{
 			System.out.println(e3.getMessage());
 			e3.printStackTrace();
 			System.exit(-1);
+		} catch (InvalidArgumentException e4) {
+			System.out.println(e4.getMessage());
+			e4.printStackTrace();
+			System.exit(-1);
 		}
-//		} catch (InvalidArgumentException e4) {
-//			System.out.println(e4.getMessage());
-//			e4.printStackTrace();
-//			System.exit(-1);
-//		}
 		
 	}
 	
@@ -525,7 +520,7 @@ public class ElevatorImpl implements ElevatorInterface{
 			
 			//Delete this floor from pickups
 			//Moved this to its own function
-			this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+			//this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
 		}
 	}
 	
@@ -552,7 +547,7 @@ public class ElevatorImpl implements ElevatorInterface{
 			
 			//Delete this from drop offs
 			//Moved this to its own function
-			this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+			//this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
 		}
 	} 
 	
@@ -791,17 +786,17 @@ public class ElevatorImpl implements ElevatorInterface{
 		}
 	}
 	
-//	private boolean ridersLeftBehind() throws InvalidArgumentException {
-//		
-//		return Building.getInstance().waitersLeftBehind(this.currentFloor, this.direction);
-//	}
+	private boolean ridersLeftBehind() throws InvalidArgumentException {
+		
+		return Building.getInstance().waitersLeftBehind(this.currentFloor, this.direction);
+	}
 	
-//	private void removeFloorFromDropOffs() {
-//		this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-//	}
-//	
-//	private void removeFloorFromPickUps() {
-//		this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-//	}
+	private void removeFloorFromDropOffs() {
+		this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+	}
+	
+	private void removeFloorFromPickUps() {
+		this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+	}
 
 }

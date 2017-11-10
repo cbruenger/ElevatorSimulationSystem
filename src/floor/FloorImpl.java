@@ -192,19 +192,19 @@ public class FloorImpl implements FloorInterface{
 	
 	
 	
-//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-//		if (floorNum != this.floorNumber) {
-//			throw new InvalidArgumentException("FloorImpl's waitersLeftBehind method cannot accept floorNum arg which is different than own\n");
-//		}
-//		if (direction == null) {
-//			throw new InvalidArgumentException("FloorImpl's waitersLeftBehind method cannot accept null for direction arg\n");
-//		}
-//		for (RiderInterface rider : this.riders) {
-//			if (rider.getDirection() == direction) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
+	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
+		if (floorNum != this.floorNumber) {
+			throw new InvalidArgumentException("FloorImpl's waitersLeftBehind method cannot accept floorNum arg which is different than own\n");
+		}
+		if (direction == null) {
+			throw new InvalidArgumentException("FloorImpl's waitersLeftBehind method cannot accept null for direction arg\n");
+		}
+		for (RiderInterface rider : this.riders) {
+			if (rider.getDirection() == direction) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
