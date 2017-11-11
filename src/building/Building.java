@@ -6,6 +6,7 @@ import errors.*;
 import dataStore.DataStore;
 import elevator.Elevator;
 import enumerators.MyDirection;
+import static enumerators.MyDirection.*;
 import floor.Floor;
 import gui.ElevatorDisplay;
 import interfaces.ElevatorInterface;
@@ -193,7 +194,7 @@ public final class Building {
 		}
 		
 		//Throw error if direction is null or IDLE
-		if (direction == null || direction == MyDirection.IDLE) {
+		if (direction == null || direction == IDLE) {
 			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept null or IDLE for direction parameter\n");
 		}
 		
@@ -201,7 +202,6 @@ public final class Building {
 		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
 			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept elevatorNumber less than 1 or greater than " + DataStore.getInstance().getNumElevators() + "\n");
 		}
-		
 		this.elevators.get(elevatorNumber).addPickupRequest(direction, floor);
 	}
 	

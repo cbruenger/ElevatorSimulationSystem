@@ -2,6 +2,7 @@ package rider;
 
 import dataStore.DataStore;
 import enumerators.MyDirection;
+import static enumerators.MyDirection.*;
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 import interfaces.RiderInterface;
@@ -84,8 +85,8 @@ public class RiderImpl implements RiderInterface {
 		if (startFloor == destinationFloor) {
 			throw new InvalidArgumentException("RiderImpl cannot accept startFloor and destinationFloor values that are equal for direction assignment\n");
 		}
-		if (startFloor - destinationFloor > 0) this.direction = MyDirection.DOWN;
-		else this.direction = MyDirection.UP;
+		if (startFloor - destinationFloor > 0) this.direction = DOWN;
+		else this.direction = UP;
 	}
 		
 	private void setRequestTime() {

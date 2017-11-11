@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import dataStore.DataStore;
 import enumerators.MyDirection;
+
+import static enumerators.MyDirection.*;
 import errors.*;
 import interfaces.FloorInterface;
 import interfaces.RiderInterface;
@@ -74,11 +76,11 @@ public class FloorImpl implements FloorInterface{
 	}
 	
 	private void createUpButton() {
-		this.upButton = new Button(MyDirection.UP, this.floorNumber);
+		this.upButton = new Button(UP, this.floorNumber);
 	}
 	
 	private void createDownButton() {
-		this.downButton = new Button(MyDirection.DOWN, this.floorNumber);
+		this.downButton = new Button(DOWN, this.floorNumber);
 	}
 	
 	private void createRidersArrayList() throws AlreadyExistsException {
@@ -127,10 +129,26 @@ public class FloorImpl implements FloorInterface{
 		if (direction == null) {
 			throw new InvalidArgumentException("FloorImpl's pushButton method cannot accept null for direction arg\n");
 		}
-		if (direction == MyDirection.UP) {
+		if (direction == UP) {
 			this.upButton.push();
-		} else if (direction == MyDirection.DOWN) {
+		} else if (direction == DOWN) {
 			this.downButton.push();
+		}
+	}
+	
+	private void resetButton(MyDirection direction) throws InvalidArgumentException {
+		if (direction == null || direction == IDLE) {
+			throw new InvalidArgumentException("FloorImpl's resetButton cannot accept null or IDLE for direction arg\n");
+		}
+		try {
+			if (direction == UP) {
+				this.upButton.reset();
+			} else if (direction == DOWN) {
+				this.downButton.reset();
+			}
+		} catch (AlreadyExistsException e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -181,6 +199,7 @@ public class FloorImpl implements FloorInterface{
 	//Also, delete them from floors list before returning
 	@Override
 	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
+		//TODO break this up into separate methods
 		try {
 			int maxCapacity = this.getMaxElevatorCapacity();
 			if (availableCapacity < 0 || availableCapacity > maxCapacity) {
@@ -210,13 +229,24 @@ public class FloorImpl implements FloorInterface{
 				indexToDelete--;
 				printCapacityNotification = true;
 			}
+			riders.removeAll(ridersToDelete);
+			if (!ridersToTransfer.isEmpty() || printCapacityNotification) {
+				this.resetButton(direction);
+			}
 			if (printCapacityNotification) {
 				System.out.println(TimeProcessor.getInstance().getTimeString() + "Elevator at capacity, " + ridersToTransfer.size() + " person(s) will enter, " + numToLeaveBehind + " person(s) will request again");
+				for (RiderInterface rider : this.riders) {
+					if (rider.getDirection() == direction) {
+						System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " pressed " + rider.getDirection() + " on Floor " + rider.getStartFloor());
+						this.pushButton(direction);
+					}
+				}
 			}
 			//
 			//System.out.println("Riders to delete post-loop " + ridersToDelete.size());
 			//System.out.println("Riders being returned for transfer " + ridersToTransfer.size());
-			riders.removeAll(ridersToDelete);
+			
+			
 			return ridersToTransfer;
 		} catch (BadInputDataException e) {
 			System.out.println(e.getMessage());

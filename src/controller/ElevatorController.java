@@ -3,6 +3,7 @@ package controller;
 import building.Building;
 import dataStore.DataStore;
 import enumerators.MyDirection;
+import static enumerators.MyDirection.*;
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 
@@ -67,7 +68,7 @@ public class ElevatorController {
 			}
 			
 			//Throw error if direction is null or IDLE
-			if (direction == null || direction == MyDirection.IDLE) {
+			if (direction == null || direction == IDLE) {
 				throw new InvalidArgumentException("ElevatorController's pickupRequest method cannot accept null or IDLE for direction parameter\n");
 			}
 			
