@@ -304,10 +304,10 @@ public class ElevatorImpl implements ElevatorInterface{
 //						}
 						System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving UP from Floor " + (this.currentFloor) + " to Floor " + (this.currentFloor+1) + " ");
 						this.printRequests();
-						 				
-					} else {
-						throw new ElevatorOutOfBoundsException("Elevator cannot go above floor " + numFloors + "\n");	
-					}	
+					}	 				
+//					} else {
+//						throw new ElevatorOutOfBoundsException("Elevator cannot go above floor " + numFloors + "\n");	
+//					}	
 				
 				// Move it down if not on 1st floor!
 				} else {
@@ -327,10 +327,11 @@ public class ElevatorImpl implements ElevatorInterface{
 						
 						System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving DOWN from Floor " + (this.currentFloor) + " to Floor " + (this.currentFloor-1) + " ");
 						this.printRequests();
-		
-					} else {						
-						throw new ElevatorOutOfBoundsException("Elevator cannot go below floor 1\n");	
 					}
+		
+//					} else {						
+//						throw new ElevatorOutOfBoundsException("Elevator cannot go below floor 1\n");	
+//					}
 				}
 			}
 			
