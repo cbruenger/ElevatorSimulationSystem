@@ -2,6 +2,8 @@ package interfaces;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import elevator.ElevatorDTO;
 import errors.*;
 import enumerators.MyDirection;
 
@@ -20,6 +22,7 @@ public interface ElevatorInterface {
 	public void update(long time);
 	public void addRiders(ArrayList<RiderInterface> riders);
 	public void addPickupRequest(MyDirection direction, int floor) throws InvalidArgumentException;
+	public ElevatorDTO getDTO();
 	
 	//public void removeRider(String riderId);
 	//public void moveUp();

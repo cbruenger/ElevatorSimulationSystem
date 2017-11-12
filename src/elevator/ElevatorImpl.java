@@ -195,6 +195,14 @@ public class ElevatorImpl implements ElevatorInterface{
 		}
 		this.doorOpen = false;
 		ElevatorDisplay.getInstance().closeDoors(this.elevatorNumber);
+		switch (this.direction) {
+        case UP:  ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
+            break;
+        case DOWN: ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
+        	break;
+        default: ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.IDLE);
+        	break;
+		}
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Doors Close\n");
 		//System.out.println("ELEVATORS CURRENT DIRECTION AFTER DOORS CLOSE is " + this.direction);
 		//System.out.println("ELEVATORS PENDING DIRECTION AFTER DOORS CLOSE is " + this.pendingDirection);
@@ -803,6 +811,16 @@ public class ElevatorImpl implements ElevatorInterface{
 			}
 		}
 		System.out.print("]\n");
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ElevatorDTO getDTO() {
+		ArrayList<Integer> dropOffsClone = (ArrayList<Integer>) this.dropOffs.get(UP).clone();
+		ArrayList<Integer> otherDropOffsClone = (ArrayList<Integer>) this.dropOffs.get(DOWN).clone();
+		dropOffsClone.addAll(otherDropOffsClone);
+		ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.direction, this.pendingDirection, this.pickUps.get(UP), this.pickUps.get(DOWN), dropOffsClone);
+		return DTO;
 	}
 
 }

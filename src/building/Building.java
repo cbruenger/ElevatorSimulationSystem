@@ -5,6 +5,7 @@ import java.util.HashMap;
 import errors.*;
 import dataStore.DataStore;
 import elevator.Elevator;
+import elevator.ElevatorDTO;
 import enumerators.MyDirection;
 import static enumerators.MyDirection.*;
 import floor.Floor;
@@ -291,5 +292,9 @@ public final class Building {
 	//A function for printing the average wait/ride times for riders and end of simulation
 	public void reportData() {
 		// TODO 
+	}
+
+	public ElevatorDTO getElevatorDTO(int i) {
+		return this.elevators.get(i).getDTO();
 	}
 }

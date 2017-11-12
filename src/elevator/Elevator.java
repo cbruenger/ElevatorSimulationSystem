@@ -86,5 +86,11 @@ public class Elevator implements ElevatorInterface{
 	public void addPickupRequest(MyDirection direction, int floor) throws InvalidArgumentException {
 		this.delegate.addPickupRequest(direction, floor);
 	}
+
+	@Override
+	public ElevatorDTO getDTO() {
+		// TODO Auto-generated method stub
+		return this.delegate.getDTO();
+	}
 	
 }

@@ -1,9 +1,13 @@
 package controller;
 
 import building.Building;
+import elevator.ElevatorDTO;
 import dataStore.DataStore;
 import enumerators.MyDirection;
 import static enumerators.MyDirection.*;
+
+import java.util.ArrayList;
+
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 
@@ -62,18 +66,37 @@ public class ElevatorController {
 	
 	public void pickupRequest(int floor, MyDirection direction) throws InvalidArgumentException {
 			
-			//Throw error if floor is invalid
-			if (floor < 1 || floor > this.numFloors) {
-				throw new InvalidArgumentException("ElevatorController's pickupRequest method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
-			}
-			
-			//Throw error if direction is null or IDLE
-			if (direction == null || direction == IDLE) {
-				throw new InvalidArgumentException("ElevatorController's pickupRequest method cannot accept null or IDLE for direction parameter\n");
-			}
-			
-			Building.getInstance().assignElevatorForPickup(floor, direction, 1);
+		//Throw error if floor is invalid
+		if (floor < 1 || floor > this.numFloors) {
+			throw new InvalidArgumentException("ElevatorController's pickupRequest method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
 		}
+		
+		//Throw error if direction is null or IDLE
+		if (direction == null || direction == IDLE) {
+			throw new InvalidArgumentException("ElevatorController's pickupRequest method cannot accept null or IDLE for direction parameter\n");
+		}
+		
+		ArrayList<ElevatorDTO> elevatorDTOs = this.getElevatorDTOs();
+		
+		//check if any elevator is idle first
+		for (int i = 0; i < this.numElevators; i++) {
+			if (elevatorDTOs.get(i).getDirection() == IDLE && elevatorDTOs.get(i).getPendingDirection() == IDLE) {
+				Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
+				return;
+			}
+		}
+		
+		Building.getInstance().assignElevatorForPickup(floor, direction, 1);
+	}
+	
+	private ArrayList<ElevatorDTO> getElevatorDTOs() {
+		ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
+		//Get the DTO's
+		for (int i = 1; i <= this.numElevators; i++) {
+			elevatorDTOs.add(Building.getInstance().getElevatorDTO(i));
+		}
+		return elevatorDTOs;
+	}
 	
 	
 }
