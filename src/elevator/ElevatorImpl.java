@@ -259,7 +259,6 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 	
 	private long getDoorsOpenTime() throws BadInputDataException {
-		
 		try {
 			long doorsOpenTime = Integer.parseInt(DataStore.getInstance().getDoorsOpenTime()) * 1000;
 			if (doorsOpenTime >= 0)
@@ -272,7 +271,21 @@ public class ElevatorImpl implements ElevatorInterface{
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorImpl received null from DataStore for doorsOpenTime value\n"); 
 	    }
-		
+	}
+	
+	private long getFloorMovementTime() throws BadInputDataException{
+		try {
+			long floorMovementTime = Integer.parseInt(DataStore.getInstance().getSpeed()) * 1000;
+			if (floorMovementTime >= 0)
+				return floorMovementTime;
+			else
+				throw new BadInputDataException("ElevatorImpl cannot accept a negative value for floorMovementTime from DataStore\n");
+
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("ElevatorImpl could not parse DataStore's floorMovementTime value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("ElevatorImpl received null from DataStore for floorMovementTime value\n"); 
+	    }
 	}
 	
 	private void move(long time) throws InvalidArgumentException, ElevatorOutOfBoundsException {
@@ -287,25 +300,24 @@ public class ElevatorImpl implements ElevatorInterface{
 			int numFloors = this.getNumFloors();
 			
 			if (this.direction != IDLE) {
-				double distancePerTravelSpeed = time/speed;
+				
+				
+				//double distancePerTravelSpeed = (double)time/(double)speed;
 				//Move it up if not on top floor!
 				if (this.direction == UP) {
 					if (this.currentFloor < numFloors) {
-						this.currentFloor += distancePerTravelSpeed;
 						
-						double previousFloor;
-						double nextFloor;
-						
-						if (this.currentFloor % 1.0 == 0) {
+						TimeProcessor.getInstance().updateFloorMovementTime(this.elevatorNumber);
+						if (TimeProcessor.getInstance().getFloorMovementTime(this.elevatorNumber) >= speed) {
+							this.currentFloor += 1;
+							TimeProcessor.getInstance().resetFloorMovementTime(this.elevatorNumber);
 							ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
-							previousFloor = this.currentFloor - 1;
-							nextFloor = this.currentFloor;
-						} else {
-							previousFloor = Math.floor(this.currentFloor);
-							nextFloor = Math.ceil(this.currentFloor);
+							return;
 						}
-						
-						System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving UP from Floor " + (previousFloor) + " to Floor " + nextFloor + " ");
+//						} else {
+//							TimeProcessor.getInstance().updateFloorMovementTime(this.elevatorNumber);
+//						}
+						System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving UP from Floor " + (this.currentFloor) + " to Floor " + (this.currentFloor+1) + " ");
 						this.printRequests();
 						 				
 					} else {
@@ -315,21 +327,20 @@ public class ElevatorImpl implements ElevatorInterface{
 				// Move it down if not on 1st floor!
 				} else {
 					if (this.currentFloor > 1) {
-						this.currentFloor -= distancePerTravelSpeed;
 						
-						double previousFloor;
-						double nextFloor;
-						
-						if (this.currentFloor % 1.0 == 0) {
+						TimeProcessor.getInstance().updateFloorMovementTime(this.elevatorNumber);
+
+						if (TimeProcessor.getInstance().getFloorMovementTime(this.elevatorNumber) >= speed) {
+							this.currentFloor -= 1;
+							TimeProcessor.getInstance().resetFloorMovementTime(this.elevatorNumber);
 							ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
-							previousFloor = this.currentFloor + 1;
-							nextFloor = this.currentFloor;
-						} else {
-							previousFloor = Math.ceil(this.currentFloor);
-							nextFloor = Math.floor(this.currentFloor);
+							return;
 						}
+//					}else {
+//							TimeProcessor.getInstance().updateFloorMovementTime(this.elevatorNumber);
+//						}
 						
-						System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving DOWN from Floor " + (previousFloor) + " to Floor " + nextFloor + " ");
+						System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving DOWN from Floor " + (this.currentFloor) + " to Floor " + (this.currentFloor-1) + " ");
 						this.printRequests();
 		
 					} else {						

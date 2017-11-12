@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <data>
-	<numFloors>10</numFloors>
-	<numElevators>2</numElevators>
-	<elevatorCapacity>2</elevatorCapacity>
+	<numFloors>6</numFloors>
+	<numElevators>4</numElevators>
+	<elevatorCapacity>3</elevatorCapacity>
 	<floorSpeed>1</floorSpeed>
-	<doorsOpenTime>3</doorsOpenTime>
+	<doorsOpenTime>2</doorsOpenTime>
 	<idleTime>5</idleTime>
 	<sleepTime>1</sleepTime>
 	<ridersPerMinute>15</ridersPerMinute>

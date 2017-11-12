@@ -2,7 +2,7 @@ package timeProcessor;
 
 import building.Building;
 import dataStore.DataStore;
-import controller.ElevatorController;
+//import controller.ElevatorController;
 import gui.ElevatorDisplay;
 import interfaces.RiderInterface;
 import rider.Rider;
@@ -17,6 +17,7 @@ public final class TimeProcessor {
 	private long currentTimeMillis;
 	private HashMap<Integer, Long> idleTimes;
 	private HashMap<Integer, Long> doorOpenTimes;
+	private HashMap<Integer, Long> floorMovementTimes;
 	private int riderIdIncrementer; //I stashed the rider generator stuff here for now and trashed the facade
 	//private int numFloors; //Might not need this
 	
@@ -26,7 +27,7 @@ public final class TimeProcessor {
 			
 			this.createIdleTimesHashMap();
 			this.createDoorOpenTimesHashMap();
-			//this.setNumFloors();
+			this.createFloorMovementTimesHashMap();
 			
 		} catch (AlreadyExistsException e1) {
 			System.out.println(e1.getMessage());
@@ -67,6 +68,25 @@ public final class TimeProcessor {
 			this.doorOpenTimes = new HashMap<Integer, Long>();
 			for (int i = 1; i <= numElevators; i++) {
 				doorOpenTimes.put(i, (long) 0);
+			}
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
+	    }
+		
+	}
+	
+private void createFloorMovementTimesHashMap() throws AlreadyExistsException, BadInputDataException {
+		
+		if (this.floorMovementTimes != null) {
+			throw new AlreadyExistsException("The floorMovementTimes HashMap has already been created in TimeProcessor\n");
+		}
+		try {
+			int numElevators = this.getNumElevators();
+			this.floorMovementTimes = new HashMap<Integer, Long>();
+			for (int i = 1; i <= numElevators; i++) {
+				floorMovementTimes.put(i, (long) 0);
 			}
 		} catch (NumberFormatException e) { 
 	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
@@ -537,6 +557,36 @@ public final class TimeProcessor {
 		}
 		this.doorOpenTimes.put(elevatorNumber, (long) 0);
 	}
+	
+	//Door floor movement managing functions
+		public double getFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
+			if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
+				throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for get\n");
+			}
+			return this.floorMovementTimes.get(elevatorNumber);
+		}
+		
+		public void updateFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
+			if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
+				throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for update\n");
+			}
+			try {
+				long sleepTime = this.getSleepTime();
+				this.floorMovementTimes.put(elevatorNumber, this.floorMovementTimes.get(elevatorNumber) + sleepTime);
+			} catch (BadInputDataException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
+		
+		public void resetFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
+			if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
+				throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for reset\n");
+			}
+			this.floorMovementTimes.put(elevatorNumber, (long) 0);
+		}
+		
 	
 	//Prints the formatted current time string
 	public String getTimeString() {
