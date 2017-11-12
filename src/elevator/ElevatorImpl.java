@@ -812,14 +812,24 @@ public class ElevatorImpl implements ElevatorInterface{
 		}
 		System.out.print("]\n");
 	}
+	
+	private ArrayList<Integer> getMergedDropOffs() {
+		ArrayList<Integer> dropOffsTotalCopy = new ArrayList<Integer>(this.dropOffs.get(UP));
+		ArrayList<Integer> dropOffsDownCopy = new ArrayList<Integer>(this.dropOffs.get(DOWN));
+		dropOffsTotalCopy.addAll(dropOffsDownCopy);
+		return dropOffsTotalCopy;
+	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ElevatorDTO getDTO() {
-		ArrayList<Integer> dropOffsClone = (ArrayList<Integer>) this.dropOffs.get(UP).clone();
-		ArrayList<Integer> otherDropOffsClone = (ArrayList<Integer>) this.dropOffs.get(DOWN).clone();
-		dropOffsClone.addAll(otherDropOffsClone);
-		ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.direction, this.pendingDirection, this.pickUps.get(UP), this.pickUps.get(DOWN), dropOffsClone);
+		//ArrayList<Integer> dropOffsClone = (ArrayList<Integer>) this.dropOffs.get(UP).clone();
+		//ArrayList<Integer> otherDropOffsClone = (ArrayList<Integer>) this.dropOffs.get(DOWN).clone();
+		//dropOffsClone.addAll(otherDropOffsClone);
+		
+		ArrayList<Integer> mergedDropOffs = this.getMergedDropOffs();
+		ArrayList<Integer> upPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(UP));
+		ArrayList<Integer> downPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(DOWN));
+		ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.direction, this.pendingDirection, upPickUpsCopy, downPickUpsCopy, mergedDropOffs);
 		return DTO;
 	}
 

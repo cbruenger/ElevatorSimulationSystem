@@ -14,13 +14,13 @@ public class ElevatorDTO {
 	private ArrayList<Integer> dropOffs;
 	
 	public ElevatorDTO(int elevatorNumber, int currentFloor, MyDirection direction, MyDirection pendingDirection, ArrayList<Integer> upPickups, ArrayList<Integer> downPickups, ArrayList<Integer> dropOffs){
-	this.setElevatorNumber(elevatorNumber); 
-	this.setCurrentFloor(currentFloor);
-	this.setDirection(direction);
-	this.setPendingDirection(pendingDirection);
-	this.setUpPickups(upPickups);
-	this.setDownPickups(downPickups);
-	this.setDropOffs(dropOffs);
+		this.setElevatorNumber(elevatorNumber); 
+		this.setCurrentFloor(currentFloor);
+		this.setDirection(direction);
+		this.setPendingDirection(pendingDirection);
+		this.setUpPickups(upPickups);
+		this.setDownPickups(downPickups);
+		this.setDropOffs(dropOffs);
 	}
 
 	public int getElevatorNumber() {

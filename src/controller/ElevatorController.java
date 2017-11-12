@@ -5,6 +5,7 @@ import elevator.ElevatorDTO;
 import dataStore.DataStore;
 import enumerators.MyDirection;
 import static enumerators.MyDirection.*;
+import errors.*;
 
 import java.util.ArrayList;
 
@@ -14,11 +15,16 @@ import errors.InvalidArgumentException;
 public class ElevatorController {
 	private int numFloors;
 	private int numElevators;
+	private int defaultElevatorIncrementer;
 	private static ElevatorController instance;
 	
 	private ElevatorController(){
-		try {getData();}
-		catch(BadInputDataException e){
+		try {
+			this.setNumFloors();
+			this.setNumElevators();
+			this.defaultElevatorIncrementer = 1;
+		}
+		catch(BadInputDataException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
@@ -28,11 +34,6 @@ public class ElevatorController {
 	public static ElevatorController getInstance() {
 		if (instance == null) instance = new ElevatorController();
 		return instance;
-	}
-	
-	private void getData() throws BadInputDataException {
-		this.setNumFloors();
-		this.setNumElevators();
 	}
 	
 	private void setNumFloors() throws BadInputDataException {
@@ -63,8 +64,17 @@ public class ElevatorController {
 	    }
 	}
 	
+	private int getDefaultElevator() {
+		if (this.defaultElevatorIncrementer > this.numElevators) {
+			this.defaultElevatorIncrementer = 1;
+			return this.defaultElevatorIncrementer;
+		} else {
+			return this.defaultElevatorIncrementer++;
+		}
+	}
 	
-	public void pickupRequest(int floor, MyDirection direction) throws InvalidArgumentException {
+	
+	public void pickupRequest(int floor, MyDirection direction) throws InvalidArgumentException, UnexpectedNullException {
 			
 		//Throw error if floor is invalid
 		if (floor < 1 || floor > this.numFloors) {
@@ -76,7 +86,11 @@ public class ElevatorController {
 			throw new InvalidArgumentException("ElevatorController's pickupRequest method cannot accept null or IDLE for direction parameter\n");
 		}
 		
+		//Throw error if failed to retrieve elevatorDTOs
 		ArrayList<ElevatorDTO> elevatorDTOs = this.getElevatorDTOs();
+		if (elevatorDTOs == null) {
+			throw new UnexpectedNullException("ElevatorController's pickupRequest cannot use null elevatorDTOs object\n");
+		}
 		
 		//check if any elevator is idle first
 		for (int i = 0; i < this.numElevators; i++) {
@@ -86,16 +100,23 @@ public class ElevatorController {
 			}
 		}
 		
-		Building.getInstance().assignElevatorForPickup(floor, direction, 1);
+		Building.getInstance().assignElevatorForPickup(floor, direction, this.getDefaultElevator());
 	}
 	
 	private ArrayList<ElevatorDTO> getElevatorDTOs() {
-		ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
-		//Get the DTO's
-		for (int i = 1; i <= this.numElevators; i++) {
-			elevatorDTOs.add(Building.getInstance().getElevatorDTO(i));
+		try {
+			ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
+			//Get the DTO's
+			for (int i = 1; i <= this.numElevators; i++) {
+				elevatorDTOs.add(Building.getInstance().getElevatorDTO(i));
+			}
+			return elevatorDTOs;
+		} catch (InvalidArgumentException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
 		}
-		return elevatorDTOs;
+		return null;
 	}
 	
 	

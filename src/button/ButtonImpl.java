@@ -6,6 +6,7 @@ import enumerators.MyDirection;
 import controller.ElevatorController;
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
+import errors.UnexpectedNullException;
 import errors.AlreadyExistsException;
 
 public class ButtonImpl implements ButtonInterface {
@@ -58,9 +59,13 @@ public class ButtonImpl implements ButtonInterface {
 				ElevatorController.getInstance().pickupRequest(this.floorNumber, this.direction);
 				this.currentlyPushed = true;
 			}
-		} catch (InvalidArgumentException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+		} catch (InvalidArgumentException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (UnexpectedNullException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
 			System.exit(-1);
 		}
 		

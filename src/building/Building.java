@@ -35,11 +35,11 @@ public final class Building {
 	private Building() {
 		
 		try {
-			this.getData();
+			this.setNumFloors();
+			this.setNumElevators();
 			this.createFloors();
 			this.createElevators();
 			this.initializeDecommissionedRidersArrayList();
-			//this.initializeElevatorToAssign();
 			this.initializeGui();
 		} catch (BadInputDataException e1) {
 			System.out.println(e1.getMessage());
@@ -56,11 +56,6 @@ public final class Building {
 	public static Building getInstance() {
 		if (building == null) building = new Building();
 		return building;
-	}
-	
-	private void getData() throws BadInputDataException {
-		this.setNumFloors();
-		this.setNumElevators();
 	}
 	
 	private void setNumFloors() throws BadInputDataException {
@@ -294,7 +289,10 @@ public final class Building {
 		// TODO 
 	}
 
-	public ElevatorDTO getElevatorDTO(int i) {
-		return this.elevators.get(i).getDTO();
+	public ElevatorDTO getElevatorDTO(int elevatorNumber) throws InvalidArgumentException {
+		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
+			throw new InvalidArgumentException("Building's getElevatorDTO method cannot accept number less than 1 or greater than " + this.numElevators + " for elevatorNumber arg\n");
+		}
+		return this.elevators.get(elevatorNumber).getDTO();
 	}
 }
