@@ -54,9 +54,15 @@ public class Floor implements FloorInterface {
 	}
 	
 	@Override
-	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-		return delegate.waitersLeftBehind(floorNum, direction);
+	public void addRiderToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
+		delegate.addRiderToDecommissionedList(id);
 	}
+
+	
+//	@Override
+//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
+//		return delegate.waitersLeftBehind(floorNum, direction);
+//	}
 
 	/////////////////////////////
 	//				           //

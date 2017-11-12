@@ -182,6 +182,7 @@ public final class Building {
 		//Add riders to the building's decommissionedRiders ArrayList
 		for (RiderInterface rider: riders) {
 			this.decommissionedRiders.add(rider);
+			this.floors.get(rider.getDestinationFloor()).addRiderToDecommissionedList(rider.getId());
 		}
 	}
 	
@@ -250,28 +251,28 @@ public final class Building {
 	    }
 	}
 	
-	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-		
-		
-		if (floorNum < 1 || floorNum > this.numFloors) {
-			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive number less than 1 or greater than " + this.numFloors + " for floorNum arg\n");
-		}
-		if (direction == null) {
-			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive null for direction arg\n");
-		}
-		
-		return this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
-////		try {
-////			boolean waitersLeftBool = this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
-////			return waitersLeftBool;
-////		} catch (InvalidArgumentException e) {
-////			System.out.println(e.getMessage());
-////			e.printStackTrace();
-////			System.exit(-1);
-////		}
-////		return false;
-	}
-	
+//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
+//		
+//		
+//		if (floorNum < 1 || floorNum > this.numFloors) {
+//			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive number less than 1 or greater than " + this.numFloors + " for floorNum arg\n");
+//		}
+//		if (direction == null) {
+//			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive null for direction arg\n");
+//		}
+//		
+//		return this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
+//////		try {
+//////			boolean waitersLeftBool = this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
+//////			return waitersLeftBool;
+//////		} catch (InvalidArgumentException e) {
+//////			System.out.println(e.getMessage());
+//////			e.printStackTrace();
+//////			System.exit(-1);
+//////		}
+//////		return false;
+//	}
+//	
 //	//A function to get the IDs of the all floors.
 //	//For temporary use in our main
 //	public ArrayList<Integer> getFloorNumbersArray() {
