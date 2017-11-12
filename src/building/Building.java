@@ -284,15 +284,29 @@ public final class Building {
 //		return floorNumbers;
 //	}
 	
+	public ElevatorDTO getElevatorDTO(int elevatorNumber) throws InvalidArgumentException {
+		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
+			throw new InvalidArgumentException("Building's getElevatorDTO method cannot accept number less than 1 or greater than " + this.numElevators + " for elevatorNumber arg\n");
+		}
+		try {
+			ElevatorDTO elevatorDTO = this.elevators.get(elevatorNumber).getDTO();
+			if (elevatorDTO == null) {
+				throw new UnexpectedNullException("Building's getElevatorDTO method received null DTO for elevator " + elevatorNumber + "\n");
+			} else {
+				return elevatorDTO;
+			}
+		} catch (UnexpectedNullException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		return null;
+	}
+	
 	//A function for printing the average wait/ride times for riders and end of simulation
 	public void reportData() {
 		// TODO 
 	}
 
-	public ElevatorDTO getElevatorDTO(int elevatorNumber) throws InvalidArgumentException {
-		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
-			throw new InvalidArgumentException("Building's getElevatorDTO method cannot accept number less than 1 or greater than " + this.numElevators + " for elevatorNumber arg\n");
-		}
-		return this.elevators.get(elevatorNumber).getDTO();
-	}
+	
 }

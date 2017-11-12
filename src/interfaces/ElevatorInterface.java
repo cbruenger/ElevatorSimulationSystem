@@ -22,7 +22,7 @@ public interface ElevatorInterface {
 	public void update(long time);
 	public void addRiders(ArrayList<RiderInterface> riders);
 	public void addPickupRequest(MyDirection direction, int floor) throws InvalidArgumentException;
-	public ElevatorDTO getDTO();
+	public ElevatorDTO getDTO() throws UnexpectedNullException;
 	
 	//public void removeRider(String riderId);
 	//public void moveUp();

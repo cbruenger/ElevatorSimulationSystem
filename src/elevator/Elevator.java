@@ -88,7 +88,7 @@ public class Elevator implements ElevatorInterface{
 	}
 
 	@Override
-	public ElevatorDTO getDTO() {
+	public ElevatorDTO getDTO() throws UnexpectedNullException {
 		// TODO Auto-generated method stub
 		return this.delegate.getDTO();
 	}

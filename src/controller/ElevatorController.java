@@ -103,12 +103,16 @@ public class ElevatorController {
 		Building.getInstance().assignElevatorForPickup(floor, direction, this.getDefaultElevator());
 	}
 	
-	private ArrayList<ElevatorDTO> getElevatorDTOs() {
+	private ArrayList<ElevatorDTO> getElevatorDTOs() throws UnexpectedNullException {
 		try {
 			ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
 			//Get the DTO's
 			for (int i = 1; i <= this.numElevators; i++) {
-				elevatorDTOs.add(Building.getInstance().getElevatorDTO(i));
+				ElevatorDTO elevatorDTO = Building.getInstance().getElevatorDTO(i);
+				if (elevatorDTO == null) {
+					throw new UnexpectedNullException("ElevatorController's getElevatorDTOs method received null for elevator " + i + "\n"); 
+				}
+				elevatorDTOs.add(elevatorDTO);
 			}
 			return elevatorDTOs;
 		} catch (InvalidArgumentException e) {

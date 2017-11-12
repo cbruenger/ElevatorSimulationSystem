@@ -273,21 +273,6 @@ public class ElevatorImpl implements ElevatorInterface{
 	    }
 	}
 	
-	private long getFloorMovementTime() throws BadInputDataException{
-		try {
-			long floorMovementTime = Integer.parseInt(DataStore.getInstance().getSpeed()) * 1000;
-			if (floorMovementTime >= 0)
-				return floorMovementTime;
-			else
-				throw new BadInputDataException("ElevatorImpl cannot accept a negative value for floorMovementTime from DataStore\n");
-
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("ElevatorImpl could not parse DataStore's floorMovementTime value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("ElevatorImpl received null from DataStore for floorMovementTime value\n"); 
-	    }
-	}
-	
 	private void move(long time) throws InvalidArgumentException, ElevatorOutOfBoundsException {
 		
 		if (time < 0) {
@@ -824,7 +809,16 @@ public class ElevatorImpl implements ElevatorInterface{
 		System.out.print("]\n");
 	}
 	
-	private ArrayList<Integer> getMergedDropOffs() {
+	private ArrayList<Integer> getMergedDropOffs() throws UnexpectedNullException {
+		if (this.dropOffs == null) {
+			throw new UnexpectedNullException("ElevatorImpl's dropOffs HashMap is null when trying to merge UP/DOWN for DTO\n");
+		}
+		if (this.dropOffs.get(UP) == null) {
+			throw new UnexpectedNullException("ElevatorImpl's dropOffs UP ArrayList is null when trying to merge UP/DOWN for DTO\n");
+		}
+		if (this.dropOffs.get(DOWN) == null) {
+			throw new UnexpectedNullException("ElevatorImpl's dropOffs DOWN ArrayList is null when trying to merge UP/DOWN for DTO\n");
+		}
 		ArrayList<Integer> dropOffsTotalCopy = new ArrayList<Integer>(this.dropOffs.get(UP));
 		ArrayList<Integer> dropOffsDownCopy = new ArrayList<Integer>(this.dropOffs.get(DOWN));
 		dropOffsTotalCopy.addAll(dropOffsDownCopy);
@@ -832,16 +826,31 @@ public class ElevatorImpl implements ElevatorInterface{
 	}
 
 	@Override
-	public ElevatorDTO getDTO() {
+	public ElevatorDTO getDTO() throws UnexpectedNullException {
 		//ArrayList<Integer> dropOffsClone = (ArrayList<Integer>) this.dropOffs.get(UP).clone();
 		//ArrayList<Integer> otherDropOffsClone = (ArrayList<Integer>) this.dropOffs.get(DOWN).clone();
 		//dropOffsClone.addAll(otherDropOffsClone);
-		
-		ArrayList<Integer> mergedDropOffs = this.getMergedDropOffs();
-		ArrayList<Integer> upPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(UP));
-		ArrayList<Integer> downPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(DOWN));
-		ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.direction, this.pendingDirection, upPickUpsCopy, downPickUpsCopy, mergedDropOffs);
-		return DTO;
+		if (this.pickUps == null) {
+			throw new UnexpectedNullException("ElevatorImpl's pickUps HashMap is null when trying to merge UP/DOWN for DTO\n");
+		}
+		if (this.pickUps.get(UP) == null) {
+			throw new UnexpectedNullException("ElevatorImpl's pickUps UP ArrayList is null when trying to merge UP/DOWN for DTO\n");
+		}
+		if (this.pickUps.get(DOWN) == null) {
+			throw new UnexpectedNullException("ElevatorImpl's pickUps DOWN ArrayList is null when trying to merge UP/DOWN for DTO\n");
+		}
+		try {
+			ArrayList<Integer> mergedDropOffs = this.getMergedDropOffs();
+			ArrayList<Integer> upPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(UP));
+			ArrayList<Integer> downPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(DOWN));
+			ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.direction, this.pendingDirection, upPickUpsCopy, downPickUpsCopy, mergedDropOffs);
+			return DTO;
+		} catch (UnexpectedNullException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		return null;
 	}
 
 }
