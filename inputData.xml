@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <data>
-	<numFloors>20</numFloors>
+	<numFloors>10</numFloors>
 	<numElevators>4</numElevators>
 	<elevatorCapacity>5</elevatorCapacity>
 	<floorSpeed>1</floorSpeed>
@@ -8,5 +8,5 @@
 	<idleTime>10</idleTime>
 	<sleepTime>1</sleepTime>
 	<ridersPerMinute>25</ridersPerMinute>
-	<duration>120</duration>
+	<duration>180</duration>
 </data>

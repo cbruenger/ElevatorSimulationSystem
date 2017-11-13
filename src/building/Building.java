@@ -387,7 +387,8 @@ public final class Building {
 		for (int i = 1; i <= this.numFloors; i++) {
 			System.out.printf("%-5s", i);
 			for (int j = 1; j <= this.numFloors; j++) {
-				if (i < j) {
+				if (i == j) System.out.printf("%-5s", "X");
+				else {
 					if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
 					else {
 						long sum = 0;
@@ -398,22 +399,8 @@ public final class Building {
 						System.out.printf("%-5d", averageRideTime);
 					}
 				}
-				
-				else if (i == j) System.out.printf("%-5s", "X");
-				
-				else if(i > j) {
-					if (!rideTimes.containsKey(j+"-"+i)) System.out.printf("%-5s", "0");
-					else {
-						long sum = 0;
-						for (long k : rideTimes.get(j+"-"+i)) {
-							sum += k;
-						}
-						long averageRideTime = (sum / rideTimes.get(j+"-"+i).size())/1000;
-						System.out.printf("%-5d", averageRideTime);
-					}
-				}
 			}
-			System.out.printf("\n");
+		System.out.printf("\n");
 		}
 	}
 	
@@ -432,7 +419,8 @@ public final class Building {
 			for (int i = 1; i <= this.numFloors; i++) {
 				System.out.printf("%-5s", i);
 				for (int j = 1; j <= this.numFloors; j++) {
-					if (i < j) {
+					if (i == j) System.out.printf("%-5s", "X");
+					else {
 						if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
 						else {
 							long max = Long.MIN_VALUE;
@@ -442,19 +430,6 @@ public final class Building {
 							long maxRideTime = max/1000;
 							System.out.printf("%-5d", maxRideTime);
 						}
-					}
-					
-					else if (i == j) System.out.printf("%-5s", "X");
-					
-					else if(i > j) {
-						if (!rideTimes.containsKey(j+"-"+i)) System.out.printf("%-5s", "0");
-						else {
-							long max = Long.MIN_VALUE;
-							for (long k : rideTimes.get(j+"-"+i)) {
-								if (k > max) max = k;
-							}
-							long maxRideTime = max/1000;
-							System.out.printf("%-5d", maxRideTime);}
 					}
 				}
 				System.out.printf("\n");
@@ -476,7 +451,8 @@ public final class Building {
 		for (int i = 1; i <= this.numFloors; i++) {
 			System.out.printf("%-5s", i);
 			for (int j = 1; j <= this.numFloors; j++) {
-				if (i < j) {
+				if (i == j) System.out.printf("%-5s", "X");
+				else {
 					if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
 					else {
 						long min = Long.MAX_VALUE;
@@ -486,19 +462,6 @@ public final class Building {
 						long minRideTime = min/1000;
 						System.out.printf("%-5d", minRideTime);
 					}
-				}
-				
-				else if (i == j) System.out.printf("%-5s", "X");
-				
-				else if(i > j) {
-					if (!rideTimes.containsKey(j+"-"+i)) System.out.printf("%-5s", "0");
-					else {
-						long min = Long.MAX_VALUE;
-						for (long k : rideTimes.get(j+"-"+i)) {
-							if (k < min) min = k;
-						}
-						long minRideTime = min/1000;
-						System.out.printf("%-5d", minRideTime);}
 				}
 			}
 			System.out.printf("\n");
