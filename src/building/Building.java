@@ -1,6 +1,7 @@
 package building;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import errors.*;
 import dataStore.DataStore;
@@ -212,18 +213,6 @@ public final class Building {
 		
 	}
 	
-	//Elevator assignment incrementer for phase 1
-//	public void incrementElevatorToAssign() {
-//		
-//		//If the current elevator is the last one, reassign to first, otherwise increment
-//		if (this.elevatorToAssign % DataStore.getInstance().getNumElevators() == 0)
-//			this.elevatorToAssign = 1;
-//		else 
-//			elevatorToAssign++;
-//	}
-	
-	//Return an ArrayList of people who need to transfer from a floor to an elevator that is waiting
-	//Also removes the people from the floor
 	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction, int availableCapacity) throws InvalidArgumentException, BadInputDataException, UnexpectedNullException {
 		try {
 			int totalCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity());
@@ -246,43 +235,6 @@ public final class Building {
 	        throw new BadInputDataException("Building received null from DataStore for elevatorCapacity value\n"); 
 	    }
 	}
-	
-//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-//		
-//		
-//		if (floorNum < 1 || floorNum > this.numFloors) {
-//			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive number less than 1 or greater than " + this.numFloors + " for floorNum arg\n");
-//		}
-//		if (direction == null) {
-//			throw new InvalidArgumentException("Building's waitersLeftBehind method cannot receive null for direction arg\n");
-//		}
-//		
-//		return this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
-//////		try {
-//////			boolean waitersLeftBool = this.floors.get(floorNum).waitersLeftBehind(floorNum, direction);
-//////			return waitersLeftBool;
-//////		} catch (InvalidArgumentException e) {
-//////			System.out.println(e.getMessage());
-//////			e.printStackTrace();
-//////			System.exit(-1);
-//////		}
-//////		return false;
-//	}
-//	
-//	//A function to get the IDs of the all floors.
-//	//For temporary use in our main
-//	public ArrayList<Integer> getFloorNumbersArray() {
-//		
-//		//Create ArrayList to return
-//		ArrayList<Integer> floorNumbers = new ArrayList<Integer>();
-//		
-//		//Add elevator numbers to list
-//		for (int floorNumber : this.floors.keySet()) {
-//			floorNumbers.add(floorNumber);
-//		}
-//		
-//		return floorNumbers;
-//	}
 	
 	public ElevatorDTO getElevatorDTO(int elevatorNumber) throws InvalidArgumentException {
 		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
@@ -311,6 +263,7 @@ public final class Building {
 			this.averageRideTimes(rideTimes);
 			this.maxRideTimes(rideTimes);
 			this.minRideTimes(rideTimes);
+			this.riderTimes();
 
 		} catch (UnexpectedNullException e) {
 			System.out.println(e.getMessage());
@@ -333,6 +286,7 @@ public final class Building {
 			}
 		}
 		System.out.println("");
+		System.out.println("************ Wait Times By Floor ************");
 		System.out.printf("%-20s %-20s %-20s %-20s\n", "Start Floor","Average Wait Time","Min Wait Time","Max Wait Time");
 		for (int i = 1; i <= this.numFloors; i++) {
 			if (!floorWaitTimes.containsKey(i)) {
@@ -375,9 +329,9 @@ public final class Building {
 	// Average ride times
 	private void averageRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
 		//// Printing average ride times
+		System.out.println("");
 		System.out.println("************ Average Rider Times By Floor ************");
 		//Print column names
-		System.out.println("");
 		System.out.printf("%-5s", "Floor");
 		for (int floor=1; floor<=this.numFloors; floor++) {
 			System.out.printf("%-5s", floor);
@@ -407,9 +361,9 @@ public final class Building {
 	// Max ride times
 		private void maxRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
 			//// Printing Max ride times
+			System.out.println("");
 			System.out.println("************ Maximum Rider Times By Floor ************");
 			//Print column names
-			System.out.println("");
 			System.out.printf("%-5s", "Floor");
 			for (int floor=1; floor<=this.numFloors; floor++) {
 				System.out.printf("%-5s", floor);
@@ -439,9 +393,9 @@ public final class Building {
 		// Min ride times
 	private void minRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
 		//// Printing Max ride times
+		System.out.println("");
 		System.out.println("************ Minimum Rider Times By Floor ************");
 		//Print column names
-		System.out.println("");
 		System.out.printf("%-5s", "Floor");
 		for (int floor=1; floor<=this.numFloors; floor++) {
 			System.out.printf("%-5s", floor);
@@ -466,6 +420,39 @@ public final class Building {
 			}
 			System.out.printf("\n");
 		}
+	}
+	
+	//get info by persons
+	private void riderTimes() throws UnexpectedNullException{
+		if (this.decommissionedRiders == null) {
+			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+		}
+		HashMap<Integer, ArrayList<RiderInterface>> ridersTimes = new HashMap<Integer, ArrayList<RiderInterface>>();
+		for (RiderInterface rider : this.decommissionedRiders) {
+			Integer riderID = Integer.parseInt(rider.getId().substring(1));
+			if (!ridersTimes.containsKey(riderID)) {
+				ArrayList<RiderInterface> ridersList = new ArrayList<RiderInterface>();
+				ridersList.add(rider);
+				ridersTimes.put(riderID, ridersList);
+			} else {
+				ridersTimes.get(riderID).add(rider);
+			}
+		}
+	//// Printing Max ride times
+		System.out.println("");
+		System.out.println("************ Ride Times By Individual Rider ************");
+		System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person","Start Floor", "End Floor", "Wait Time","Ride Time","Total Time");
+		for (int i = 1; i <= Collections.max(ridersTimes.keySet()); i++) {
+			if (!ridersTimes.containsKey(i)) {
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person "+i, "NA", "NA", "NA", "NA", "NA");
+			} else {
+				RiderInterface rider = ridersTimes.get(i).get(0);
+				long rideTime = rider.getRideTime()/1000;
+				long waitTime = rider.getWaitTime()/1000;
+				long totalTime = rideTime+waitTime;
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person "+i, rider.getStartFloor(), rider.getDestinationFloor(), waitTime+" seconds", rideTime+" seconds", totalTime+" seconds");
+			}
+		}	
 	}
 
 	

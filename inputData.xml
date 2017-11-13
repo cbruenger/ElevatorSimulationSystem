@@ -2,11 +2,11 @@
 <data>
 	<numFloors>10</numFloors>
 	<numElevators>4</numElevators>
-	<elevatorCapacity>5</elevatorCapacity>
-	<floorSpeed>1</floorSpeed>
+	<elevatorCapacity>10</elevatorCapacity>
+	<floorSpeed>2</floorSpeed>
 	<doorsOpenTime>3</doorsOpenTime>
-	<idleTime>10</idleTime>
+	<idleTime>5</idleTime>
 	<sleepTime>1</sleepTime>
-	<ridersPerMinute>25</ridersPerMinute>
+	<ridersPerMinute>15</ridersPerMinute>
 	<duration>180</duration>
 </data>
