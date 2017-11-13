@@ -19,14 +19,13 @@ public class RiderImpl implements RiderInterface {
 	private long waitTime;
 	private long rideTime;
 	
-	////////////////////////
-	//				      //
-	//    Constructor     //
-	//				      //
-	////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 				Constructor 				*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	public RiderImpl(String id, int startFloor, int destinationFloor) {
-		
 		try {
 			int numFloors = this.getNumFloors();
 			this.setId(id);
@@ -43,16 +42,62 @@ public class RiderImpl implements RiderInterface {
 			e2.printStackTrace();
 			System.exit(-1);
 		}
-		
-		
 	}
 	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Interface Methods 			*
+	 * 										*
+	 *////////////////////////////////////////
 	
-	////////////////////
-	//				  //
-	//    Setters     //
-	//				  //
-	////////////////////
+	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
+	public int getStartFloor() {
+		return this.startFloor;
+	}
+	
+	@Override
+	public int getDestinationFloor() {
+		return this.destinationFloor;
+	}
+	
+	@Override
+	public MyDirection getDirection() {
+		return this.direction;
+	}
+	
+	@Override
+	public long getWaitTime() {
+		return this.waitTime;
+	}
+	
+	@Override
+	public long getRideTime() {
+		return this.rideTime;
+	}
+	
+	@Override
+	public void enterElevator() {
+		
+		this.setEnterTime();
+		this.setWaitTime();
+	}
+
+	@Override
+	public void exitElevator() {
+		this.setExitTime();
+		this.setRideTime();
+	}
+	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Methods called by the Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
 	
 	private void setId(String id) throws  InvalidArgumentException {
 		if (id == null || id.isEmpty()) {
@@ -88,6 +133,16 @@ public class RiderImpl implements RiderInterface {
 		if (startFloor - destinationFloor > 0) this.direction = DOWN;
 		else this.direction = UP;
 	}
+	
+	private void requestElevator() {
+		this.setRequestTime();
+	}
+	
+	/*////////////////////////////////////////////
+	 * 											*
+	 * 		Wait/Ride Time Handling Methods		*
+	 * 											*
+	 *////////////////////////////////////////////
 		
 	private void setRequestTime() {
 		this.requestTime = System.currentTimeMillis();
@@ -109,8 +164,13 @@ public class RiderImpl implements RiderInterface {
 		this.rideTime = this.exitTime - this.enterTime;
 	}
     
+    /*////////////////////////////////////////
+	 * 										*
+	 * 		DataStore Retrieval Method		*
+	 * 										*
+	 *////////////////////////////////////////
+    
     private int getNumFloors() throws BadInputDataException {
-		
 		try { 
 			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
 			if (numFloors > 1)
@@ -121,84 +181,6 @@ public class RiderImpl implements RiderInterface {
 	        throw new BadInputDataException("FloorImpl could not parse DataStore's numFloors value to int during floorNumber assignment check\n");
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value during floorNumber assignment check\n"); 
-	    }
-		
+	    }	
 	}
-
-		////////////////////
-		//				   //
-		//    Getters      //
-		//				   //
-		/////////////////////
-	
-	
-	public String getId() {
-		return this.id;
-	}
-
-	@Override
-	public int getStartFloor() {
-		return this.startFloor;
-	}
-	
-	@Override
-	public int getDestinationFloor() {
-		return this.destinationFloor;
-	}
-	
-	@Override
-	public MyDirection getDirection() {
-		return this.direction;
-	}
-	
-//	@Override
-//	public long getRequestTime() {
-//		return this.requestTime;
-//	}
-	
-//	@Override
-//	public long getEnterTime() {
-//		return this.enterTime;
-//	}
-	
-	@Override
-	public long getWaitTime() {
-		return this.waitTime;
-	}
-//
-//	@Override
-//	public long getExitTime() {
-//		return this.exitTime;
-//	}
-	
-	@Override
-	public long getRideTime() {
-		return this.rideTime;
-	}
-	
-	
-		//////////////////////////
-		//				        //
-		//    Other Methods     //
-		//				        //
-		//////////////////////////
-    
-    
-	public void requestElevator() {
-		this.setRequestTime();
-	}
-	
-	@Override
-	public void enterElevator() {
-		
-		this.setEnterTime();
-		this.setWaitTime();
-	}
-
-	@Override
-	public void exitElevator() {
-		this.setExitTime();
-		this.setRideTime();
-	}
-
 }

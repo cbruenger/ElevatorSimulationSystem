@@ -13,10 +13,17 @@ import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 
 public class ElevatorController {
+	
 	private int numFloors;
 	private int numElevators;
 	private int defaultElevatorIncrementer;
 	private static ElevatorController instance;
+	
+	/*////////////////////////////////////////////////////
+	 * 													*
+	 * 		Constructor and Singleton Instance Getter	*
+	 * 													*
+	 *////////////////////////////////////////////////////
 	
 	private ElevatorController(){
 		try {
@@ -35,6 +42,12 @@ public class ElevatorController {
 		if (instance == null) instance = new ElevatorController();
 		return instance;
 	}
+	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Methods called by the Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
 	
 	private void setNumFloors() throws BadInputDataException {
 		try { 
@@ -64,15 +77,31 @@ public class ElevatorController {
 	    }
 	}
 	
-	private int getDefaultElevator() {
-		if (this.defaultElevatorIncrementer > this.numElevators) {
-			this.defaultElevatorIncrementer = 1;
-			return this.defaultElevatorIncrementer;
-		} else {
-			return this.defaultElevatorIncrementer++;
-		}
-	}
+	/*////////////////////////////////////////////////////////////
+	 * 															*
+	 * 		Elevator Request and Assignment Handler Methods		*
+	 * 															*
+	 *////////////////////////////////////////////////////////////
 	
+	private ArrayList<ElevatorDTO> getElevatorDTOs() throws UnexpectedNullException {
+		try {
+			ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
+			//Get the DTO's
+			for (int i = 1; i <= this.numElevators; i++) {
+				ElevatorDTO elevatorDTO = Building.getInstance().getElevatorDTO(i);
+				if (elevatorDTO == null) {
+					throw new UnexpectedNullException("ElevatorController's getElevatorDTOs method received null for elevator " + i + "\n"); 
+				}
+				elevatorDTOs.add(elevatorDTO);
+			}
+			return elevatorDTOs;
+		} catch (InvalidArgumentException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		return null;
+	}
 	
 	public void pickupRequest(int floor, MyDirection direction) throws InvalidArgumentException, UnexpectedNullException {
 			
@@ -103,25 +132,12 @@ public class ElevatorController {
 		Building.getInstance().assignElevatorForPickup(floor, direction, this.getDefaultElevator());
 	}
 	
-	private ArrayList<ElevatorDTO> getElevatorDTOs() throws UnexpectedNullException {
-		try {
-			ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
-			//Get the DTO's
-			for (int i = 1; i <= this.numElevators; i++) {
-				ElevatorDTO elevatorDTO = Building.getInstance().getElevatorDTO(i);
-				if (elevatorDTO == null) {
-					throw new UnexpectedNullException("ElevatorController's getElevatorDTOs method received null for elevator " + i + "\n"); 
-				}
-				elevatorDTOs.add(elevatorDTO);
-			}
-			return elevatorDTOs;
-		} catch (InvalidArgumentException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			System.exit(-1);
+	private int getDefaultElevator() {
+		if (this.defaultElevatorIncrementer < 1) {
+			this.defaultElevatorIncrementer = this.numElevators;
+			return this.defaultElevatorIncrementer;
+		} else {
+			return this.defaultElevatorIncrementer--;
 		}
-		return null;
 	}
-	
-	
 }

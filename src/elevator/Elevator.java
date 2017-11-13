@@ -1,10 +1,10 @@
 package elevator;
-import java.util.ArrayList;
-import errors.*;
+
+import errors.UnexpectedNullException;
+import errors.InvalidArgumentException;
 import enumerators.MyDirection;
 import factories.ElevatorFactory;
 import interfaces.ElevatorInterface;
-import interfaces.RiderInterface;
 
 public class Elevator implements ElevatorInterface{
 	
@@ -27,7 +27,7 @@ public class Elevator implements ElevatorInterface{
 	 *////////////////////////////////////////
 	
 	@Override
-	public void update(long time) {
+	public void update(long time) throws InvalidArgumentException {
 		this.delegate.update(time);
 	}
 	
@@ -43,7 +43,7 @@ public class Elevator implements ElevatorInterface{
 	
 	/*////////////////////////////////////////
 	 * 										*
-	 * 			Private Methods  			*
+	 * 			Delegation Setter  			*
 	 * 										*
 	 *////////////////////////////////////////
 	

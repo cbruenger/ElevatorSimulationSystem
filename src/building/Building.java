@@ -178,7 +178,7 @@ public final class Building {
 		//Add riders to the building's decommissionedRiders ArrayList
 		for (RiderInterface rider: riders) {
 			this.decommissionedRiders.add(rider);
-			this.floors.get(rider.getDestinationFloor()).addRiderToDecommissionedList(rider.getId());
+			this.floors.get(rider.getDestinationFloor()).addPersonToDecommissionedList(rider.getId());
 		}
 	}
 	
@@ -208,7 +208,7 @@ public final class Building {
 			throw new InvalidArgumentException("Building's addRiderToFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
 		}
 		FloorInterface floor = floors.get(startFloor);
-		floor.addRider(rider);
+		floor.addWaitingPerson(rider);
 		
 	}
 	
@@ -236,7 +236,7 @@ public final class Building {
 			if (availableCapacity < 0 || availableCapacity > totalCapacity) {
 				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept number less than 0 or greater than " + totalCapacity + " for availableCapacity\n");
 			}
-			ArrayList<RiderInterface> ridersToTransfer = this.floors.get(floor).getRidersByDirection(direction, availableCapacity);
+			ArrayList<RiderInterface> ridersToTransfer = this.floors.get(floor).getWaitersByDirection(direction, availableCapacity);
 			if (ridersToTransfer == null)
 				throw new UnexpectedNullException("Building's getWaitersFromFloor method received null value when retreiving riders from floor\n");
 			return ridersToTransfer;

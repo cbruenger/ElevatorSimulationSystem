@@ -21,27 +21,19 @@ public class FloorImpl implements FloorInterface{
 	private ArrayList<RiderInterface> peopleWaiting;
 	private ArrayList<String> peopleDecommissioned;
 	
-	////////////////////////
-	//				      //
-	//    Constructor     //
-	//				      //
-	////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 				Constructor 				*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	public FloorImpl(int floorNumber) {
-		
 		try {
-			
-			//Set initial variable values
-			this.setFloorNumber(floorNumber);
-			
-			//Create buttons
+			this.setFloorNumber(floorNumber);			
 			this.createUpButton();
 			this.createDownButton();
-			
-			//Create necessary data structures
-			this.createRidersArrayList();
-			this.peopleDecommissionedArrayList();
-			
+			this.createPeopleWaitingArrayList();
+			this.peopleDecommissionedArrayList();	
 		} catch (AlreadyExistsException e2) {
 			System.out.println(e2.getMessage());
 			e2.printStackTrace();
@@ -51,9 +43,15 @@ public class FloorImpl implements FloorInterface{
 			e3.printStackTrace();
 			System.exit(-1);
 		}
-		
-		
 	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Interface Methods 			*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	
 	
 	/////////////////////////////
 	//						  //
@@ -85,7 +83,7 @@ public class FloorImpl implements FloorInterface{
 		this.downButton = new Button(DOWN, this.floorNumber);
 	}
 	
-	private void createRidersArrayList() throws AlreadyExistsException {
+	private void createPeopleWaitingArrayList() throws AlreadyExistsException {
 		
 		//Throw error if elevators have already been created
 		if (this.peopleWaiting != null) {
@@ -105,21 +103,7 @@ public class FloorImpl implements FloorInterface{
 		this.peopleDecommissioned = new ArrayList<String>();
 	}
 	
-	private int getNumFloors() throws BadInputDataException {
-		
-		try { 
-			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
-			if (numFloors > 1)
-				return numFloors;
-			else
-				throw new BadInputDataException("FloorImpl received a value less than 2 for numFloors from DataStore\n");
-	    } catch (NumberFormatException e) { 
-	        throw new BadInputDataException("FloorImpl could not parse DataStore's numFloors value to int during floorNumber assignment check\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value during floorNumber assignment check\n"); 
-	    }
-		
-	}
+	
 	
 	private int getMaxElevatorCapacity() throws BadInputDataException {
 		
@@ -174,15 +158,9 @@ public class FloorImpl implements FloorInterface{
 	public int getFloorNumber() {
 		return this.floorNumber;
 	}
-
-//	//Only temporarily for testing in our main
-//	@Override
-//	public ArrayList<RiderInterface> getRiders() {
-//		return this.riders;
-//	}
 	
 	@Override
-	public void addRider(RiderInterface rider) throws AlreadyExistsException {
+	public void addWaitingPerson(RiderInterface rider) throws AlreadyExistsException {
 		if (this.peopleWaiting.contains(rider)) {
 			throw new AlreadyExistsException("Rider " + rider.getId() + " is already on floor " + this.floorNumber);
 		}
@@ -200,53 +178,49 @@ public class FloorImpl implements FloorInterface{
 	}
 	
 	@Override
-	public void removeRider(RiderInterface rider) throws CannotRemoveException {
-		if (!this.peopleWaiting.contains(rider)) {
-			throw new CannotRemoveException("FloorImpl's removeRider method cannot remove rider " + rider.getId() + " from floor because the rider is not in rider ArrayList");
-		}
-		this.peopleWaiting.remove(rider);
-	}
-	
-	//Return a list of people who's direction is same as parameter
-	//Also, delete them from floors list before returning
-	@Override
-	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
-		//TODO break this up into separate methods
+	public ArrayList<RiderInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
 		try {
 			int maxCapacity = this.getMaxElevatorCapacity();
-			if (availableCapacity < 0 || availableCapacity > maxCapacity) {
+			if (availableCapacity < 0 || availableCapacity > maxCapacity)
 				throw new InvalidArgumentException("FloorImpl cannot accept number less than 0 or greater than " + maxCapacity + " for availableCapacity arg\n");
-			}
-			//System.out.println("Available capacity pre-loop " + availableCapacity);
-			ArrayList<RiderInterface> ridersToDelete = new ArrayList<>();
-			ArrayList<RiderInterface> ridersToTransfer = new ArrayList<>(this.peopleWaiting);
+			
+			//Find out how any people are going the same direction, maintain a separate list for people to remove from floor
+			ArrayList<RiderInterface> peopleToDeleteFromFloor = new ArrayList<>();
+			ArrayList<RiderInterface> peopleAvailableForTransfer = new ArrayList<>(this.peopleWaiting);
 			for (RiderInterface rider: this.peopleWaiting) {
-				if (rider.getDirection() == direction) {
-					ridersToDelete.add(rider);
-				} else {
-				ridersToTransfer.remove(rider);
-				}
+				if (rider.getDirection() == direction)
+					peopleToDeleteFromFloor.add(rider);
+				else
+					peopleAvailableForTransfer.remove(rider);
 			}
-			//if (ridersToDelete.size() <= availableCapacity && availableCapacity != 0) {
-			int ridersToTransferSize = ridersToTransfer.size();
+			
+			//Find out how many people need to wait for another elevator if the capacity is met
+			int availableToTransferSize = peopleAvailableForTransfer.size();
 			int numToLeaveBehind = 0;
-			if (ridersToTransferSize > availableCapacity) {
-				numToLeaveBehind = ridersToTransferSize - availableCapacity;
-			}
-			int indexToDelete = ridersToTransfer.size() - 1;
+			if (availableToTransferSize > availableCapacity)
+				numToLeaveBehind = availableToTransferSize - availableCapacity;
+
+			//Remove the people who will wait for another elevator from the transfer/delete lists
+			int indexToDelete = peopleAvailableForTransfer.size() - 1;
 			boolean printCapacityNotification = false;
 			for (int i = 0; i < numToLeaveBehind; i++) {
-				ridersToDelete.remove(indexToDelete);
-				ridersToTransfer.remove(indexToDelete);
+				peopleToDeleteFromFloor.remove(indexToDelete);
+				peopleAvailableForTransfer.remove(indexToDelete);
 				indexToDelete--;
 				printCapacityNotification = true;
 			}
-			peopleWaiting.removeAll(ridersToDelete);
-			if (!ridersToTransfer.isEmpty() || printCapacityNotification) {
+			
+			//Remove the people who will transfer from the peopleWaiting list
+			peopleWaiting.removeAll(peopleToDeleteFromFloor);
+			
+			//If there are people needing to request another elevator, reset the button so they can push it
+			if (!peopleAvailableForTransfer.isEmpty() || printCapacityNotification) {
 				this.resetButton(direction);
 			}
+			
+			//If people are needing to request again, print capacity notification and have riders make new requests
 			if (printCapacityNotification) {
-				System.out.println(TimeProcessor.getInstance().getTimeString() + "Elevator at capacity, " + ridersToTransfer.size() + " person(s) will enter, " + numToLeaveBehind + " person(s) will request again");
+				System.out.println(TimeProcessor.getInstance().getTimeString() + "Elevator at capacity, " + peopleAvailableForTransfer.size() + " person(s) will enter, " + numToLeaveBehind + " person(s) will request again");
 				for (RiderInterface rider : this.peopleWaiting) {
 					if (rider.getDirection() == direction) {
 						System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " presses " + rider.getDirection() + " on Floor " + rider.getStartFloor());
@@ -254,19 +228,23 @@ public class FloorImpl implements FloorInterface{
 					}
 				}
 			}
-			//
-			//System.out.println("Riders to delete post-loop " + ridersToDelete.size());
-			//System.out.println("Riders being returned for transfer " + ridersToTransfer.size());
+			
+			/*Since peopleAvailableForTransfer are in a list and have been deleted from the floor, create a temporary list
+			 * so we have a list to iterate through and a separate list to delete from when printing the current Floor People
+			 */
 			ArrayList<String> transfersTemp = new ArrayList<String>();
-			for (RiderInterface person : ridersToTransfer) {
+			for (RiderInterface person : peopleAvailableForTransfer) {
 				transfersTemp.add(person.getId());
 			}
-			for (RiderInterface personLeaving : ridersToTransfer) {
+			for (RiderInterface personLeaving : peopleAvailableForTransfer) {
 				System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + personLeaving.getId()  + " has left Floor " + this.floorNumber + " ");
 				transfersTemp.remove(personLeaving.getId());
 				this.printFloorPeople(transfersTemp);
 			}
-			return ridersToTransfer;
+			
+			//Return the people transfering into the elevator
+			return peopleAvailableForTransfer;
+			
 		} catch (BadInputDataException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -275,33 +253,35 @@ public class FloorImpl implements FloorInterface{
 		return null;
 	}
 	
-	public void addRiderToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
-		if (id == null || id.isEmpty()) {
+	@Override
+	public void addPersonToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
+		if (id == null || id.isEmpty())
 			throw new InvalidArgumentException("FloorImpl's addRiderToDecommissionedList method cannot accept null or empty string for id arg\n");
-		}
-		if (this.peopleDecommissioned.contains(id)) {
+		if (this.peopleDecommissioned.contains(id))
 			throw new AlreadyExistsException("FloorImpl's peopleDecommissioned arrayList already contains id " + id + "\n");
-		}
 		this.peopleDecommissioned.add(id);
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + id  + " entered Floor " + this.floorNumber + " ");
 		this.printFloorPeople(null);
 	}
 	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		   Printing Helper Methods		*
+	 * 										*
+	 *////////////////////////////////////////
+	
 	private void printFloorPeople(ArrayList<String> transferringPeople) {
 		System.out.print("[Floor People:");
 		if (!this.peopleWaiting.isEmpty() || !this.peopleDecommissioned.isEmpty()) {
-			for (RiderInterface personWaiting : this.peopleWaiting) {
+			for (RiderInterface personWaiting : this.peopleWaiting)
 				System.out.print(" " + personWaiting.getId());
-			}
-			for (String personDecommissioned : this.peopleDecommissioned) {
+			for (String personDecommissioned : this.peopleDecommissioned)
 				System.out.print(" " + personDecommissioned);
-			}
 		} else {
 			if (transferringPeople != null) {
 				if (!transferringPeople.isEmpty()) {
-					for (String personId : transferringPeople) {
+					for (String personId : transferringPeople)
 						System.out.print(" " + personId);
-					}
 				} else {
 					System.out.print(" None");
 				}
@@ -312,25 +292,23 @@ public class FloorImpl implements FloorInterface{
 		System.out.print("]\n");
 	}
 
-			
-			
-
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		DataStore Retrieval Methods		*
+	 * 										*
+	 *////////////////////////////////////////
 	
-	
-	
-//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-//		if (floorNum != this.floorNumber) {
-//			throw new InvalidArgumentException("FloorImpl's waitersLeftBehind method cannot accept floorNum arg which is different than own\n");
-//		}
-//		if (direction == null) {
-//			throw new InvalidArgumentException("FloorImpl's waitersLeftBehind method cannot accept null for direction arg\n");
-//		}
-//		for (RiderInterface rider : this.riders) {
-//			if (rider.getDirection() == direction) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
+	private int getNumFloors() throws BadInputDataException {
+		try { 
+			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
+			if (numFloors > 1)
+				return numFloors;
+			else
+				throw new BadInputDataException("FloorImpl received a value less than 2 for numFloors from DataStore\n");
+	    } catch (NumberFormatException e) { 
+	        throw new BadInputDataException("FloorImpl could not parse DataStore's numFloors value to int during floorNumber assignment check\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value during floorNumber assignment check\n"); 
+	    }
+	}	
 }

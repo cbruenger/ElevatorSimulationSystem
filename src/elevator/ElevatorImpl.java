@@ -73,12 +73,13 @@ public class ElevatorImpl implements ElevatorInterface{
 	 *////////////////////////////////////////
 	
 	@Override
-	public void update(long time) {
-		
+	public void update(long sleepTime) throws InvalidArgumentException {
+		if (sleepTime <= 0) 
+			throw new InvalidArgumentException("ElevatorImpl's update method cannot accept number less than or equal to 0 for time arg\n");
 		try {
 			long doorsOpenTimeRequired = getDoorsOpenTime();
 			if (!this.doorOpen) {
-				this.move(time);
+				this.move(sleepTime);
 				if ((this.currentFloor % 1 == 0) 
 						&& ((this.pickUps.get(this.pendingDirection).contains(this.currentFloor)) 
 								|| (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor))
@@ -97,22 +98,17 @@ public class ElevatorImpl implements ElevatorInterface{
 				TimeProcessor.getInstance().resetDoorOpenTime(this.elevatorNumber);
 				this.closeDoors();
 			}
-			
 		} catch (InvalidArgumentException e1) {
 			System.out.println(e1.getMessage());
 			e1.printStackTrace();
 			System.exit(-1);
-		} catch (ElevatorOutOfBoundsException e2) {
+		} catch (BadInputDataException e2) {
 			System.out.println(e2.getMessage());
 			e2.printStackTrace();
 			System.exit(-1);
-		} catch (BadInputDataException e3) {
+		} catch (AlreadyExistsException e3) {
 			System.out.println(e3.getMessage());
 			e3.printStackTrace();
-			System.exit(-1);
-		} catch (AlreadyExistsException e4) {
-			System.out.println(e4.getMessage());
-			e4.printStackTrace();
 			System.exit(-1);
 		}
 	}
@@ -169,33 +165,12 @@ public class ElevatorImpl implements ElevatorInterface{
 		return null;
 	}
 	
-	/*////////////////////////////////////////
-	 * 										*
-	 * 			DTO Building Methods			*
-	 * 										*
-	 *////////////////////////////////////////
-	
-	private ArrayList<Integer> getMergedDropOffs() throws UnexpectedNullException {
-		if (this.dropOffs == null) {
-			throw new UnexpectedNullException("ElevatorImpl's dropOffs HashMap is null when trying to merge UP/DOWN for DTO\n");
-		}
-		if (this.dropOffs.get(UP) == null) {
-			throw new UnexpectedNullException("ElevatorImpl's dropOffs UP ArrayList is null when trying to merge UP/DOWN for DTO\n");
-		}
-		if (this.dropOffs.get(DOWN) == null) {
-			throw new UnexpectedNullException("ElevatorImpl's dropOffs DOWN ArrayList is null when trying to merge UP/DOWN for DTO\n");
-		}
-		ArrayList<Integer> dropOffsTotalCopy = new ArrayList<Integer>(this.dropOffs.get(UP));
-		ArrayList<Integer> dropOffsDownCopy = new ArrayList<Integer>(this.dropOffs.get(DOWN));
-		dropOffsTotalCopy.addAll(dropOffsDownCopy);
-		return dropOffsTotalCopy;
-	}
-	
-	///////////////////////////////
-	//							//
-	//     Private methods      //
-	//						   //
-	/////////////////////////////
+	/*////////////////////////////////////////////////////////
+	 * 														*
+	 * 		Setters and Data Structure Creating Methods 		*
+	 * 		called by the Constructor						*
+	 * 														*
+	 *////////////////////////////////////////////////////////
 	
 	private void createRidersArray() throws AlreadyExistsException {
 		if (this.riders != null) {
@@ -280,21 +255,11 @@ public class ElevatorImpl implements ElevatorInterface{
 	    }
 	}
 	
-	private void addRiders(ArrayList<RiderInterface> incomingRiders) throws InvalidArgumentException {
-		if (incomingRiders == null) {
-			throw new InvalidArgumentException("ElevatorImpl's addRiders method cannot accept null for incomingRiders arg\n");
-		}
-		
-		//Add each incoming rider to elevator and call the enterElevator function on each rider
-		for (RiderInterface rider : incomingRiders) {
-			this.riders.add(rider);
-			rider.enterElevator();
-						
-			//Print info
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " entered Elevator " + this.elevatorNumber + " ");
-			this.printRiders();		
-		}
-	}
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		   Door Handling Methods			*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	private void openDoors() throws AlreadyExistsException {
 		if (this.doorOpen) {
@@ -320,13 +285,119 @@ public class ElevatorImpl implements ElevatorInterface{
         	break;
 		}
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Doors Close\n");
-		//System.out.println("ELEVATORS CURRENT DIRECTION AFTER DOORS CLOSE is " + this.direction);
-		//System.out.println("ELEVATORS PENDING DIRECTION AFTER DOORS CLOSE is " + this.pendingDirection);
 	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		   Rider Handling Methods		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	private void addRiders(ArrayList<RiderInterface> incomingRiders) throws InvalidArgumentException {
+		if (incomingRiders == null) {
+			throw new InvalidArgumentException("ElevatorImpl's addRiders method cannot accept null for incomingRiders arg\n");
+		}
+		
+		//Add each incoming rider to elevator and call the enterElevator function on each rider
+		for (RiderInterface rider : incomingRiders) {
+			this.riders.add(rider);
+			rider.enterElevator();
+						
+			//Print info
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " entered Elevator " + this.elevatorNumber + " ");
+			this.printRiders();		
+		}
+	}
+	
+	private void removeRiders() {
+		
+		if (this.riders == null || this.riders.isEmpty()) 
+			return;
+		
+		ArrayList<RiderInterface> exitingRiders = new ArrayList<>(riders);
+		ArrayList<RiderInterface> ridersToDelete = new ArrayList<>();
+		for (RiderInterface rider : riders) {
+			if (rider.getDestinationFloor() == this.currentFloor) {
+				ridersToDelete.add(rider);
+				rider.exitElevator();
+			}
+			else exitingRiders.remove(rider);
+		}
+		this.riders.removeAll(ridersToDelete);
 			
+		for (RiderInterface exitingRider : exitingRiders) {
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + exitingRider.getId() + " has left Elevator " + this.elevatorNumber + " ");
+			this.printRiders();
+		}
+		
+		try {
+			if (this.direction == DOWN) ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
+			else ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
+			Building.getInstance().decommissionRiders(exitingRiders);
+		} catch (InvalidArgumentException e1) {
+			System.out.println(e1.getMessage());
+		} catch (AlreadyExistsException e2) {
+			System.out.println(e2.getMessage());
+		}
+	}
+	
+	private void pickUpRiders() throws UnexpectedNullException, BeyondElevatorCapacityException {
+		
+		try {
+			
+			ArrayList<RiderInterface> incomingRiders = Building.getInstance().getWaitersFromFloor(this.currentFloor, this.direction, this.maxCapacity - this.riders.size());
+			if (incomingRiders == null) {
+				throw new UnexpectedNullException("ElevatorImpl received null when asking building for floor waiters\n");
+			}
+			if (incomingRiders.size() > this.maxCapacity - this.riders.size()) {
+				throw new BeyondElevatorCapacityException("ElevatorImpl cannot receive " + incomingRiders.size() + " riders with maxCapacity " + this.maxCapacity + " and current capacity " + this.riders.size());
+			}
+			this.addRiders(incomingRiders);
+			this.addNewRidersRequests(incomingRiders);
+			
+		} catch (InvalidArgumentException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(1);
+		} catch (BadInputDataException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
+			System.exit(1);
+		} catch (UnexpectedNullException e3) {
+			System.out.println(e3.getMessage());
+			e3.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
+	//Adds rider's floor requests when a rider enters and pushes a destination floor button
+	private void addNewRidersRequests(ArrayList<RiderInterface> newRiders) throws InvalidArgumentException {
+		if (newRiders == null) {
+			throw new InvalidArgumentException("ElevatorImpl's addNewRidersRequests method cannot accept null as newRiders arg\n");
+		}
+		for (RiderInterface newRider : newRiders) {
+			
+			if (this.dropOffs.get(newRider.getDirection()) == null) {
+				ArrayList<Integer> dropOffList = new ArrayList<Integer>();
+				dropOffList.add(newRider.getDestinationFloor());
+				this.dropOffs.put(newRider.getDirection(), dropOffList);
+			} else {
+				if (!this.dropOffs.get(newRider.getDirection()).contains(newRider.getDestinationFloor()))
+					this.dropOffs.get(newRider.getDirection()).add(newRider.getDestinationFloor());
+			}
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Rider Request made for Floor " + newRider.getDestinationFloor() + " ");
+			this.printRequests();
+		}
+	}
+
+	/*////////////////////////////////////////////////////
+	 * 													*
+	 *		Movement and	 floor processing Methods		*
+	 * 													*
+	 *////////////////////////////////////////////////////
 	
 	
-	private void move(long time) throws InvalidArgumentException, ElevatorOutOfBoundsException {
+	private void move(long time) throws InvalidArgumentException {
 		
 		if (time < 0) {
 			throw new InvalidArgumentException("ElevatorImpl's move method cannot accept negative value for time parameter\n");
@@ -372,96 +443,49 @@ public class ElevatorImpl implements ElevatorInterface{
 					}
 				}
 			}
-			
 		} catch (BadInputDataException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
 	}
 	
-	
-	private void removeRiders() {
-		
-		if (this.riders == null || this.riders.isEmpty()) 
-			return;
-		
-		ArrayList<RiderInterface> exitingRiders = new ArrayList<>(riders);
-		ArrayList<RiderInterface> ridersToDelete = new ArrayList<>();
-		for (RiderInterface rider : riders) {
-			if (rider.getDestinationFloor() == this.currentFloor) {
-				ridersToDelete.add(rider);
-				rider.exitElevator();
-			}
-			else exitingRiders.remove(rider);
-		}
-		this.riders.removeAll(ridersToDelete);
-			
-		for (RiderInterface exitingRider : exitingRiders) {
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + exitingRider.getId() + " has left Elevator " + this.elevatorNumber + " ");
-			this.printRiders();
-		}
-		
-		try {
-			if (this.direction == DOWN) ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
-			else ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
-			Building.getInstance().decommissionRiders(exitingRiders);
-		} catch (InvalidArgumentException e1) {
-			System.out.println(e1.getMessage());
-		} catch (AlreadyExistsException e2) {
-			System.out.println(e2.getMessage());
+	public void checkDropOffs() {
+		if (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor)) {
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at " + this.currentFloor + " for Rider Request ");
+			this.printRequests();
 		}
 	}
 	
-	
-	private void pickUpRiders() throws UnexpectedNullException, BeyondElevatorCapacityException {
-		
-		try {
-			
-			ArrayList<RiderInterface> incomingRiders = Building.getInstance().getWaitersFromFloor(this.currentFloor, this.direction, this.maxCapacity - this.riders.size());
-			if (incomingRiders == null) {
-				throw new UnexpectedNullException("ElevatorImpl received null when asking building for floor waiters\n");
-			}
-			if (incomingRiders.size() > this.maxCapacity - this.riders.size()) {
-				throw new BeyondElevatorCapacityException("ElevatorImpl cannot receive " + incomingRiders.size() + " riders with maxCapacity " + this.maxCapacity + " and current capacity " + this.riders.size());
-			}
-			this.addRiders(incomingRiders);
-			this.addNewRidersRequests(incomingRiders);
-			
-		} catch (InvalidArgumentException e1) {
-			System.out.println(e1.getMessage());
-			e1.printStackTrace();
-			System.exit(1);
-		} catch (BadInputDataException e2) {
-			System.out.println(e2.getMessage());
-			e2.printStackTrace();
-			System.exit(1);
-		} catch (UnexpectedNullException e3) {
-			System.out.println(e3.getMessage());
-			e3.printStackTrace();
-			System.exit(1);
+	public void checkPickUps() {
+		if (this.pickUps.get(this.pendingDirection).contains(this.currentFloor)) {
+			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at Floor " + this.currentFloor + " for Floor Request ");
+			this.printRequests();
 		}
-		
 	}
-
+	
+	private void removeFloorFromDropOffs() {
+		this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+	}
+	
+	private void removeFloorFromPickUps() {
+		this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
+	}
+	
 	private void processFloor() {
 		
 		try {
 			if ((this.dropOffs.get(UP).contains(this.currentFloor) || this.dropOffs.get(DOWN).contains(this.currentFloor))
 					|| (this.pickUps.get(this.direction).contains(this.currentFloor) 
-					&& (this.pendingDirection == IDLE || this.pendingDirection == this.direction))) {
-			this.openDoors();
-			TimeProcessor.getInstance().updateDoorOpenTime(this.elevatorNumber);
-			this.removeRiders();
-			this.removeFloorFromDropOffs();
-			this.removeFloorFromPickUps();
-			this.pickUpRiders();
-			//if (!this.ridersLeftBehind())
-			//close doors needs to happen X seconds later... 
-			//this.closeDoors();
+					&& (this.pendingDirection == IDLE || this.pendingDirection == this.direction)))
+			{
+				this.openDoors();
+				TimeProcessor.getInstance().updateDoorOpenTime(this.elevatorNumber);
+				this.removeRiders();
+				this.removeFloorFromDropOffs();
+				this.removeFloorFromPickUps();
+				this.pickUpRiders();
 			}
-			
 		} catch (AlreadyExistsException e1) {
 			System.out.println(e1.getMessage());
 			e1.printStackTrace();
@@ -479,45 +503,7 @@ public class ElevatorImpl implements ElevatorInterface{
 			e4.printStackTrace();
 			System.exit(-1);
 		}
-		
 	}
-	
-	public void checkPickUps() {
-		//Check if this stop is for pickup
-		if (this.pickUps.get(this.pendingDirection).contains(this.currentFloor)) {
-			
-			//Print info
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at Floor " + this.currentFloor + " for Floor Request ");
-			this.printRequests();
-			
-			//Delete this floor from pickups
-			//Moved this to its own function
-			//this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-		}
-	}
-	
-	public void checkDropOffs() {
-		//Check if this stop is for a dropoff
-		if (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor)) {
-			
-			//Print info
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " has arrived at " + this.currentFloor + " for Rider Request [Floor Requests:");
-			for (int i : this.pickUps.get(UP)) {
-				System.out.print(" " + i);
-			}
-			for (int i : this.pickUps.get(DOWN)) {
-				System.out.print(" " + i);
-			}
-			System.out.print("][Rider Requests:");
-			for (int i : this.dropOffs.get(UP)) {
-				System.out.print(" " + i);
-			}
-			for (int i : this.dropOffs.get(DOWN)) {
-				System.out.print(" " + i);
-			}
-			System.out.print("]\n");
-		}
-	} 
 	
 	private void reevaluateDirection() {	
 		if (this.pendingDirection != IDLE) {
@@ -543,13 +529,11 @@ public class ElevatorImpl implements ElevatorInterface{
 					return;
 				}
 				if (!this.pickUps.get(UP).isEmpty()) {
-					//System.out.println("I AM CHECKING A NEW PICK UP for up");
 					if (this.currentFloor - this.pickUps.get(UP).get(0) > 0) this.direction = DOWN;
 					else this.direction = UP;	
 					this.pendingDirection = UP;
 					return;
 				}
-				///
 			}
 			
 			//I currently don't have a pickup request
@@ -600,71 +584,62 @@ public class ElevatorImpl implements ElevatorInterface{
 		}
 	}
 	
-	//Adds newly picked up rider's floor requests for when a rider enters and pushes a destination floor button
-	private void addNewRidersRequests(ArrayList<RiderInterface> newRiders) throws InvalidArgumentException {
-		if (newRiders == null) {
-			throw new InvalidArgumentException("ElevatorImpl's addNewRidersRequests method cannot accept null as newRiders arg\n");
-		}
-		for (RiderInterface newRider : newRiders) {
-			
-			if (this.dropOffs.get(newRider.getDirection()) == null) {
-				ArrayList<Integer> dropOffList = new ArrayList<Integer>();
-				dropOffList.add(newRider.getDestinationFloor());
-				this.dropOffs.put(newRider.getDirection(), dropOffList);
-			} else {
-				if (!this.dropOffs.get(newRider.getDirection()).contains(newRider.getDestinationFloor()))
-					this.dropOffs.get(newRider.getDirection()).add(newRider.getDestinationFloor());
-			}
-			System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Rider Request made for Floor " + newRider.getDestinationFloor() + " ");
-			this.printRequests();
-			
-		}
-	}
-	
-	private void removeFloorFromDropOffs() {
-		this.dropOffs.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-	}
-	
-	private void removeFloorFromPickUps() {
-		this.pickUps.get(this.pendingDirection).remove(new Integer((int) this.currentFloor));
-	}
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		   Printing Helper Methods		*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	private void printRequests() {
 		System.out.print("[Current Floor Requests:");
-		if (this.pickUps.get(UP).isEmpty() && this.pickUps.get(DOWN).isEmpty()) {
+		if (this.pickUps.get(UP).isEmpty() && this.pickUps.get(DOWN).isEmpty())
 			System.out.print(" None");
-		} else {
-			for (int i : this.pickUps.get(UP)) {
+		else {
+			for (int i : this.pickUps.get(UP))
 				System.out.print(" " + i);
-			}
-			for (int i : this.pickUps.get(DOWN)) {
+			for (int i : this.pickUps.get(DOWN))
 				System.out.print(" " + i);
-			}
 		}
 		System.out.print("][Current Rider Requests:");
-		if (this.dropOffs.get(UP).isEmpty() && this.dropOffs.get(DOWN).isEmpty()) {
+		if (this.dropOffs.get(UP).isEmpty() && this.dropOffs.get(DOWN).isEmpty())
 			System.out.print(" None");
-		} else {
-			for (int i : this.dropOffs.get(UP)) {
+		else {
+			for (int i : this.dropOffs.get(UP))
 				System.out.print(" " + i);
-			}
-			for (int i : this.dropOffs.get(DOWN)) {
+			for (int i : this.dropOffs.get(DOWN))
 				System.out.print(" " + i);
-			}
 		}
 		System.out.print("]\n");
 	}
 	
 	private void printRiders() {
 		System.out.print("[Riders:");
-		if (this.riders.isEmpty()) {
+		if (this.riders.isEmpty())
 			System.out.print(" None");
-		} else {
-			for (RiderInterface currentRider : this.riders) {
+		else {
+			for (RiderInterface currentRider : this.riders)
 				System.out.print(" " + currentRider.getId());
-			}
 		}
 		System.out.print("]\n");
+	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		DTO Builder Helper Method		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	private ArrayList<Integer> getMergedDropOffs() throws UnexpectedNullException {
+		if (this.dropOffs == null)
+			throw new UnexpectedNullException("ElevatorImpl's dropOffs HashMap is null when trying to merge UP/DOWN for DTO\n");
+		if (this.dropOffs.get(UP) == null)
+			throw new UnexpectedNullException("ElevatorImpl's dropOffs UP ArrayList is null when trying to merge UP/DOWN for DTO\n");
+		if (this.dropOffs.get(DOWN) == null)
+			throw new UnexpectedNullException("ElevatorImpl's dropOffs DOWN ArrayList is null when trying to merge UP/DOWN for DTO\n");
+		ArrayList<Integer> dropOffsTotalCopy = new ArrayList<Integer>(this.dropOffs.get(UP));
+		ArrayList<Integer> dropOffsDownCopy = new ArrayList<Integer>(this.dropOffs.get(DOWN));
+		dropOffsTotalCopy.addAll(dropOffsDownCopy);
+		return dropOffsTotalCopy;
 	}
 	
 	/*////////////////////////////////////////
@@ -674,7 +649,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	 *////////////////////////////////////////
 	
 	private int getNumFloors() throws BadInputDataException {
-		
+
 		try { 
 			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
 			if (numFloors > 1)
@@ -686,7 +661,6 @@ public class ElevatorImpl implements ElevatorInterface{
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorImpl received null from DataStore for numFloors value during currentFloor assignment check\n"); 
 	    }
-		
 	}
 	
 	private long getSpeed() throws BadInputDataException {
@@ -703,7 +677,6 @@ public class ElevatorImpl implements ElevatorInterface{
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorImpl received null from DataStore for elevatorSpeed value\n"); 
 	    }
-		
 	}
 	
 	private long getIdleTime() throws BadInputDataException {
@@ -720,7 +693,6 @@ public class ElevatorImpl implements ElevatorInterface{
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorImpl received null from DataStore for idleTime value\n"); 
 	    }
-		
 	}
 	
 	private long getDoorsOpenTime() throws BadInputDataException {
@@ -737,6 +709,4 @@ public class ElevatorImpl implements ElevatorInterface{
 	        throw new BadInputDataException("ElevatorImpl received null from DataStore for doorsOpenTime value\n"); 
 	    }
 	}
-	
-
 }

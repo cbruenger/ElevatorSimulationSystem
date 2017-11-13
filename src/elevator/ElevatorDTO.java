@@ -9,6 +9,7 @@ import errors.InvalidArgumentException;
 
 
 public class ElevatorDTO {
+	
 	private int elevatorNumber;
 	private int currentFloor;
 	private MyDirection direction;
@@ -16,6 +17,12 @@ public class ElevatorDTO {
 	private ArrayList<Integer> upPickups;
 	private ArrayList<Integer> downPickups;
 	private ArrayList<Integer> dropOffs;
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 				Constructor 				*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	public ElevatorDTO(int elevatorNumber, int currentFloor, MyDirection direction, MyDirection pendingDirection, ArrayList<Integer> upPickups, ArrayList<Integer> downPickups, ArrayList<Integer> dropOffs){
 		try {
@@ -31,12 +38,13 @@ public class ElevatorDTO {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
 	}
-
-	public int getElevatorNumber() {
-		return elevatorNumber;
-	}
+	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Setter Methods Called by Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
 
 	private void setElevatorNumber(int elevatorNumber) throws InvalidArgumentException {
 		try {
@@ -52,10 +60,6 @@ public class ElevatorDTO {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-	}
-
-	public int getCurrentFloor() {
-		return currentFloor;
 	}
 
 	private void setCurrentFloor(int currentFloor) throws InvalidArgumentException {
@@ -74,30 +78,18 @@ public class ElevatorDTO {
 		}
 	}
 
-	public MyDirection getDirection() {
-		return direction;
-	}
-
 	private void setDirection(MyDirection direction) throws InvalidArgumentException {
 		if (direction == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setDirection method cannot accept null for direction arg\n");
 		}
 		this.direction = direction;
 	}
-
-	public MyDirection getPendingDirection() {
-		return pendingDirection;
-	}
-
+	
 	private void setPendingDirection(MyDirection pendingDirection) throws InvalidArgumentException {
 		if (pendingDirection == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setPendingDirection method cannot accept null for pendingDirection arg\n");
 		}
 		this.pendingDirection = pendingDirection;
-	}
-
-	public ArrayList<Integer> getUpPickups() {
-		return upPickups;
 	}
 
 	private void setUpPickups(ArrayList<Integer> upPickups) throws InvalidArgumentException {
@@ -107,19 +99,11 @@ public class ElevatorDTO {
 		this.upPickups = upPickups;
 	}
 
-	public ArrayList<Integer> getDownPickups() throws InvalidArgumentException {
-		return downPickups;
-	}
-
 	private void setDownPickups(ArrayList<Integer> downPickups) throws InvalidArgumentException {
 		if (downPickups == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setDownPickups method cannot accept null for downPickups arg\n");
 		}
 		this.downPickups = downPickups;
-	}
-
-	public ArrayList<Integer> getDropOffs() {
-		return dropOffs;
 	}
 
 	private void setDropOffs(ArrayList<Integer> dropOffs) throws InvalidArgumentException {
@@ -128,6 +112,46 @@ public class ElevatorDTO {
 		}
 		this.dropOffs = dropOffs;
 	}
+	
+	/*////////////////////////////
+	 * 							*
+	 * 		Getter Methods 		*
+	 * 							*
+	 *////////////////////////////
+	
+	public int getElevatorNumber() {
+		return elevatorNumber;
+	}
+	
+	public int getCurrentFloor() {
+		return currentFloor;
+	}
+	
+	public MyDirection getDirection() {
+		return direction;
+	}
+	
+	public MyDirection getPendingDirection() {
+		return pendingDirection;
+	}
+	
+	public ArrayList<Integer> getUpPickups() {
+		return upPickups;
+	}
+	
+	public ArrayList<Integer> getDownPickups() throws InvalidArgumentException {
+		return downPickups;
+	}
+	
+	public ArrayList<Integer> getDropOffs() {
+		return dropOffs;
+	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		DataStore Retrieval Methods		*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	private int getNumFloors() throws BadInputDataException {
 		
@@ -160,7 +184,4 @@ public class ElevatorDTO {
 	    }
 		
 	}
-	
-	
- 
 }

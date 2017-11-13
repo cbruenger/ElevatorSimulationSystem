@@ -15,10 +15,7 @@ import org.xml.sax.SAXException;
 
 public final class DataStore {
 
-	//Class variables
 	private static DataStore instance;
-	//private Scanner scanner;
-	//private int testNumber;
 	private String numFloors;
 	private String numElevators;
 	private String elevatorCapacity;
@@ -29,16 +26,16 @@ public final class DataStore {
 	private String ridersPerMinute;
 	private String duration;
 	
-	//Constructor
+	/*////////////////////////////////////////////////////
+	 * 													*
+	 * 		Constructor and Singleton Instance Getter	*
+	 * 													*
+	 *////////////////////////////////////////////////////
+	
 	private DataStore() {
-//		this.initializeScanner();
-//		this.getData();
-//		this.closeScanner();
-		
-		//New stuff
 		try {
 			this.initializeVariables();
-			this.parseData();
+			this.parseInputFile();
 			this.sufficientDataCheck();
 		} catch (InputParsingException e1) {
 			System.out.println(e1.getMessage());
@@ -48,11 +45,16 @@ public final class DataStore {
 		
 	}
 	
-	//A function to get an instance of the class. Initializes instance if needed
 	public static DataStore getInstance() {
 		if (instance == null) instance = new DataStore();
 		return instance;
 	}
+	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Methods called by the Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
 	
 	public void initializeVariables() {
 		this.numFloors = null;
@@ -66,7 +68,7 @@ public final class DataStore {
 		this.duration = null;
 	}
 	
-	public void parseData() throws InputParsingException {
+	public void parseInputFile() throws InputParsingException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -101,7 +103,6 @@ public final class DataStore {
 										break;
 									case "duration":  this.setDuration(dataName.getTextContent());
 										break;
-							
 								} 
 							} catch (InputParsingException e) {
 								System.out.println(e.getMessage());
@@ -127,88 +128,13 @@ public final class DataStore {
 		if (this.duration == null) throw new InsufficientInputException("duration not acquired from parsing XML file\n");
 	}
 	
-	//Creates scanner
-//	private void initializeScanner() {
-//		this.scanner = new Scanner(System.in);
-//	}
-//	
-//	public void closeScanner() {
-//		this.scanner.close();
-//	}
+	/*////////////////////////////////////////////////////////////
+	 * 															*
+	 * 		Methods for assigning parsed data into vaiables		*
+	 * 															*
+	 *////////////////////////////////////////////////////////////
 	
-	//A function to get user input, parse it to integers, and call the setters
-//	public void getData() {
-//		// Explanation of Hardcoding
-//		System.out.println("For phase 1 we've hard coded the tests into the DataStore so\nyou only need to select which test (1-4) you wish to simulate.\nWe've not done any error handling up to this point, but plan on\ncombing over everything we've done so far and adding these exceptions\nbefore continuing to Phase 2.  -Aldo OG & Craig B\n\n");
-//		
-//		System.out.println("Hard coded values are as follows:\n\nNumber of Floors = 20\nNumber of Elevators = 4\nElevator Travel Speed = 1,000ms\nDoors Open Time = NA(Currently...)\nElevator Idle Time = 5,000ms\nSleep Time = 1,000ms\nDuration of Simulation = 100,000ms\n\n");
-//		// TODO handle funky situations with time. Make sure sleep time <= floor speed
-//		
-//		//Get input
-//		System.out.println("Enter the Test number (1 - 4) described in the the project assignment that you want to test:\n");
-//		String testNumberString = this.scanner.nextLine();
-//		System.out.println();
-////		System.out.println("Enter the number of floors:\n");
-////		String numFloorsString = this.scanner.nextLine();
-////		System.out.println();
-////		System.out.println("Enter the number of elevators:\n");
-////		String numElevatorsString = this.scanner.nextLine();
-////		System.out.println();
-////		System.out.println("Enter the elevator's travel speed per floor in seconds:\n");
-////		String speedString = this.scanner.nextLine();
-////		System.out.println();
-//////		System.out.println("Enter how long the doors should stay open in seconds:\n");
-//////		String doorsOpenTimeString = this.scanner.nextLine();
-//////		System.out.println();
-////		System.out.println("Enter the idle time before returning to floor 1 in seconds:\n");
-////		String idleTimeString = this.scanner.nextLine();
-////		System.out.println();
-////		System.out.println("Enter the sleep time in seconds:\n");
-////		String sleepTimeString = this.scanner.nextLine();
-////		System.out.println();
-//////		System.out.println("Enter the occurrence at which new Riders should be generated in seconds:\n");
-//////		String riderGenerationTimeString = this.scanner.nextLine();
-//////		System.out.println();
-////		System.out.println("Enter the duration of the simulation in seconds:\n");
-////		String durationTimeString = this.scanner.nextLine();
-////		System.out.println();
-//		
-//		//Handle the parsing of the input with errors
-//		int testNumber = Integer.parseInt(testNumberString);
-////		int numFloors = Integer.parseInt(numFloorsString);
-////		int numElevators = Integer.parseInt(numElevatorsString);
-////		int speed = Integer.parseInt(speedString);
-//////		int doorsOpenTime = Integer.parseInt(doorsOpenTimeString);
-////		int idleTime = Integer.parseInt(idleTimeString);
-////		int sleepTime = Integer.parseInt(sleepTimeString);
-//////		int riderGenerationTime = Integer.parseInt(riderGenerationTimeString);
-////		int duration = Integer.parseInt(durationTimeString);
-//		
-//		//Set data variables
-//		this.setTestNumber(testNumber);
-////		this.setNumFloors(numFloors);
-////		this.setNumElevators(numElevators);
-////		this.setSpeed(speed);
-//////		this.setDoorsOpenTime(doorsOpenTime);
-////		this.setIdleTime(idleTime);
-////		this.setSleepTime(sleepTime);
-//////		this.setRiderGenerationTime(riderGenerationTime);
-////		this.setDuration(duration);
-//	}
-	
-	////////////////////
-	//				  //
-	//    Setters     //
-	//				  //
-	////////////////////
-	
-	//A function to set the test number described in the project description that the user wants to test
-//	private void setTestNumber(int testNumber) {
-//		// TODO error handling
-//		this.testNumber = testNumber;
-//	}
-	
-	//A function to set the number of floors in the building
+	//Sets the number of floors in the building
 	private void setNumFloors(String numFloors) throws InputParsingException {
 		if (numFloors == null || numFloors.isEmpty()) {
 			throw new InputParsingException("Could not set numFloors due to null or empty value in XML file\n");
@@ -216,7 +142,7 @@ public final class DataStore {
 		this.numFloors = numFloors;
 	}
 	
-	//A function to set the number of elevators in the building
+	//Sets the number of elevators in the building
 	private void setNumElevators(String numElevators) throws InputParsingException {
 		if (numElevators == null || numElevators.isEmpty()) {
 			throw new InputParsingException("Could not set numElevators due to null or empty value in XML file\n");
@@ -224,7 +150,7 @@ public final class DataStore {
 		this.numElevators = numElevators;
 	}
 	
-	//A function to set the capacity of elevators
+	//Sets the capacity of elevators
 	private void setElevatorCapacity(String capacity) throws InputParsingException {
 		if (capacity == null || capacity.isEmpty()) {
 			throw new InputParsingException("Could not set capacity due to null or empty value in XML file\n");
@@ -232,7 +158,7 @@ public final class DataStore {
 		this.elevatorCapacity = capacity;
 	}
 	
-	//A function to set the speed at which an elevator moves between floors
+	//Sets the speed at which an elevator moves between floors
 	private void setSpeed(String speed) throws InputParsingException {
 		if (speed == null || speed.isEmpty()) {
 			throw new InputParsingException("Could not set speed due to null or empty value in XML file\n");
@@ -240,7 +166,7 @@ public final class DataStore {
 		this.speed = speed;
 	}
 	
-	//A function to set the amount of time an elevator's doors stay open
+	//Sets the amount of time an elevator's doors stay open
 	private void setDoorsOpenTime(String doorsOpenTime) throws InputParsingException {
 		if (doorsOpenTime == null || doorsOpenTime.isEmpty()) {
 			throw new InputParsingException("Could not set doorsOpenTime due to null or empty value in XML file\n");
@@ -248,7 +174,7 @@ public final class DataStore {
 		this.doorsOpenTime = doorsOpenTime;
 	}
 		
-	//A function to set the amount of time an elevator stays idle until returning to floor 1
+	//Sets the amount of time an elevator stays idle until returning to floor 1
 	private void setIdleTime(String idleTime) throws InputParsingException {
 		if (idleTime == null || idleTime.isEmpty()) {
 			throw new InputParsingException("Could not set idleTime due to null or empty value in XML file\n");
@@ -256,7 +182,7 @@ public final class DataStore {
 		this.idleTime = idleTime;
 	}
 	
-	//A function to set the sleep time 
+	//Sets the sleep time 
 	private void setSleepTime(String sleepTime) throws InputParsingException {
 		if (sleepTime == null || sleepTime.isEmpty()) {
 			throw new InputParsingException("Could not set sleepTime due to null or empty value in XML file\n");
@@ -264,7 +190,7 @@ public final class DataStore {
 		this.sleepTime = sleepTime;
 	}
 	
-	//A function to set the rider generation time 
+	//Sets the rider generation time 
 	private void setRidersPerMinute(String ridersPerMinute) throws InputParsingException {
 		if (ridersPerMinute == null || ridersPerMinute.isEmpty()) {
 			throw new InputParsingException("Could not set ridersPerMinute due to null or empty value in XML file\n");
@@ -272,7 +198,7 @@ public final class DataStore {
 		this.ridersPerMinute = ridersPerMinute;
 	}
 	
-	//A function to set the duration of the simulation
+	//Sets the duration of the simulation
 	private void setDuration(String duration) throws InputParsingException {
 		if (duration == null || duration.isEmpty()) {
 			throw new InputParsingException("Could not set duration due to null or empty value in XML file\n");
@@ -280,58 +206,53 @@ public final class DataStore {
 		this.duration = duration;
 	}
 	
-	////////////////////
-	//				  //
-	//    Getters     //
-	//				  //
-	////////////////////
+	/*////////////////////////////
+	 * 							*
+	 * 		Getter Methods		*
+	 * 							*
+	 *////////////////////////////
 	
-	//A function to set the test number described in the project description that the user wants to test
-//	public int getTestNumber() {
-//		return this.testNumber;
-//	}
-	
-	//A function to return the number of floors in the building
+	//Returns the number of floors in the building
 	public String getNumFloors() {
 		return this.numFloors;
 	}
 	
-	//A function to return the number of elevators in the building
+	//Returns the number of elevators in the building
 	public String getNumElevators() {
 		return this.numElevators;
 	}
 	
-	//A function to return the max capacity of elevators
+	//Returns the max capacity of elevators
 	public String getElevatorCapacity() {
 		return this.elevatorCapacity;
 	}
 	
-	//A function to get the speed an elevator travels between floors
+	//Returns the speed an elevator travels between floors
 	public String getSpeed() {
 		return this.speed;
 	}
 	
-	//A function to get the amount of time an elevators doors stay open for
+	//Returns the amount of time an elevators doors stay open for
 	public String getDoorsOpenTime() {
 		return this.doorsOpenTime;
 	}
 	
-	//A function to get the amount of time an elevator stays idle before returning to floor 1
+	//Returns the amount of time an elevator stays idle before returning to floor 1
 	public String getIdleTime() {
 		return this.idleTime;
 	}
 	
-	//A function to get the sleep time
+	//Returns the sleep time
 	public String getSleepTime() {
 		return this.sleepTime;
 	}
 	
-	//A function to get the rider generation time
+	//Returns the rider generations per minute
 	public String getRidersPerMinute() {
 		return this.ridersPerMinute;
 	}
 	
-	//A function to get duration of the simulation
+	//Returns duration of the simulation
 	public String getDuration() {
 		return this.duration;
 	}

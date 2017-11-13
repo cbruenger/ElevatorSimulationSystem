@@ -5,12 +5,8 @@ import enumerators.MyDirection;
 import errors.*;
 
 public interface FloorInterface {
-	
 	public int getFloorNumber();
-//	public ArrayList<RiderInterface> getRiders(); //Only for testing temporarily in our main
-	public void removeRider(RiderInterface rider) throws CannotRemoveException;
-	public void addRider(RiderInterface rider) throws AlreadyExistsException;
-	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException;
-	public void addRiderToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException;
-	//public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException;
+	public void addWaitingPerson(RiderInterface rider) throws AlreadyExistsException;
+	public ArrayList<RiderInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException;
+	public void addPersonToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException;
 }

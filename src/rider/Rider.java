@@ -8,21 +8,21 @@ public class Rider implements RiderInterface {
 
 	private RiderInterface delegate;
 	
-	////////////////////////
-	//				      //
-	//    Constructor     //
-	//				      //
-	////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 				Constructor 				*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	public Rider(String id, int startFloor, int destinationFloor) {
 		this.setDelegate(id, startFloor, destinationFloor);
 	}
 	
-	/////////////////////////////
-	//				           //
-	//    Interface Methods    //
-	//				           //
-	/////////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Interface Methods 			*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	@Override
 	public String getId() {
@@ -64,11 +64,11 @@ public class Rider implements RiderInterface {
 		this.delegate.exitElevator();
 	}
 	
-	//////////////////////////
-	//				        //
-	//    Other Methods     //
-	//				        //
-	//////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Delegation Setter  			*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	private void setDelegate(String id, int startFloor, int destinationFloor) {
 		this.delegate = RiderFactory.build(id, startFloor, destinationFloor);

@@ -11,64 +11,48 @@ public class Floor implements FloorInterface {
 	
 	private FloorInterface delegate; 
 	
-	////////////////////////
-	//				      //
-	//    Constructor     //
-	//				      //
-	////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 				Constructor 				*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	public Floor(int floorNumber){
 		this.setDelegate(floorNumber);
 	}
 	
-	/////////////////////////////
-	//				           //
-	//    Interface Methods    //
-	//				           //
-	/////////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Interface Methods 			*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	@Override
 	public int getFloorNumber() {
 		return delegate.getFloorNumber();
 	}
-
-//	//Only for testing temporarily in our main
-//	@Override
-//	public ArrayList<RiderInterface> getRiders() {
-//		return delegate.getRiders();
-//	}
 	
 	@Override
-	public void addRider(RiderInterface rider) throws AlreadyExistsException {
-		delegate.addRider(rider);
+	public void addWaitingPerson(RiderInterface rider) throws AlreadyExistsException {
+		delegate.addWaitingPerson(rider);
 	}
 	
 	@Override
-	public void removeRider(RiderInterface rider) throws CannotRemoveException {
-		delegate.removeRider(rider);
+	public ArrayList<RiderInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
+		return delegate.getWaitersByDirection(direction, availableCapacity);
 	}
 	
 	@Override
-	public ArrayList<RiderInterface> getRidersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
-		return delegate.getRidersByDirection(direction, availableCapacity);
-	}
-	
-	@Override
-	public void addRiderToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
-		delegate.addRiderToDecommissionedList(id);
+	public void addPersonToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
+		delegate.addPersonToDecommissionedList(id);
 	}
 
-	
-//	@Override
-//	public boolean waitersLeftBehind(int floorNum, MyDirection direction) throws InvalidArgumentException {
-//		return delegate.waitersLeftBehind(floorNum, direction);
-//	}
 
-	/////////////////////////////
-	//				           //
-	//    All other methods    //
-	//				           //
-	/////////////////////////////
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Delegation Setter  			*
+	 * 										*
+	 *////////////////////////////////////////
 	
 	private void setDelegate(int floorNumber) {
 		this.delegate = FloorFactory.build(floorNumber);

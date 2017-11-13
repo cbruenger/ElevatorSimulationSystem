@@ -14,6 +14,12 @@ public class ButtonImpl implements ButtonInterface {
 	private MyDirection direction;
 	private int floorNumber;
 	private boolean currentlyPushed;
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 				Constructor 				*
+	 * 										*
+	 *////////////////////////////////////////
 
 	public ButtonImpl(MyDirection direction, int floorNum) {
 		try {
@@ -30,6 +36,44 @@ public class ButtonImpl implements ButtonInterface {
 			System.exit(-1);
 		}
 	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 			Interface Methods 			*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	@Override
+	public void push() {
+		try {
+			if (!this.currentlyPushed) {
+				ElevatorController.getInstance().pickupRequest(this.floorNumber, this.direction);
+				this.currentlyPushed = true;
+			}
+		} catch (InvalidArgumentException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (UnexpectedNullException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
+	@Override
+	public void reset() throws AlreadyExistsException {
+		if (!this.currentlyPushed) {
+			throw new AlreadyExistsException("Reset called on unpushed " + this.direction + " button on floor " + this.floorNumber + "\n");
+		}
+		this.currentlyPushed = false;
+	}
+	
+	/*////////////////////////////////////////////////////
+	 * 													*
+	 * 		Setter Methods called by the Constructor		*
+	 * 													*
+	 *////////////////////////////////////////////////////
 	
 	private void assignDirection(MyDirection directionIn) throws InvalidArgumentException {
 		if (directionIn == null) {
@@ -51,32 +95,4 @@ public class ButtonImpl implements ButtonInterface {
 	        throw new BadInputDataException("ButtonImpl received null from DataStore for numFloors value\n"); 
 	    }
 	}
-	
-	@Override
-	public void push() {
-		try {
-			if (!this.currentlyPushed) {
-				ElevatorController.getInstance().pickupRequest(this.floorNumber, this.direction);
-				this.currentlyPushed = true;
-			}
-		} catch (InvalidArgumentException e1) {
-			System.out.println(e1.getMessage());
-			e1.printStackTrace();
-			System.exit(-1);
-		} catch (UnexpectedNullException e2) {
-			System.out.println(e2.getMessage());
-			e2.printStackTrace();
-			System.exit(-1);
-		}
-		
-	}
-	
-	@Override
-	public void reset() throws AlreadyExistsException {
-		if (!this.currentlyPushed) {
-			throw new AlreadyExistsException("Reset called on unpushed " + this.direction + " button on floor " + this.floorNumber + "\n");
-		}
-		this.currentlyPushed = false;
-	}
-	
 }
