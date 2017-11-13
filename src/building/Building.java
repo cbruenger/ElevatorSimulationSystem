@@ -307,21 +307,22 @@ public final class Building {
 	public void reportData() {
 		try {
 			this.waitTimes();
+			HashMap<String, ArrayList<Long>> rideTimes = this.getRideTimesHashSet();
+			this.averageRideTimes(rideTimes);
+			this.maxRideTimes(rideTimes);
+			this.minRideTimes(rideTimes);
 
 		} catch (UnexpectedNullException e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
-	private void waitTimes() throws UnexpectedNullException {
+	// Wait times
+	private void waitTimes() throws UnexpectedNullException{
 		if (this.decommissionedRiders == null) {
 			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
 		}
 		HashMap<Integer, ArrayList<Long>> floorWaitTimes = new HashMap<Integer, ArrayList<Long>>();
-//		long maxWaitTime;
-//		long minWaitTime;
-//		double averageWaitTime;
-		
 		for (RiderInterface rider : this.decommissionedRiders) {
 			if (!floorWaitTimes.containsKey(rider.getStartFloor())) {
 				ArrayList<Long> waitTimesList = new ArrayList<Long>();
@@ -331,27 +332,178 @@ public final class Building {
 				floorWaitTimes.get(rider.getStartFloor()).add(rider.getWaitTime());
 			}
 		}
-		System.out.println("\n");
+		System.out.println("");
 		System.out.printf("%-20s %-20s %-20s %-20s\n", "Start Floor","Average Wait Time","Min Wait Time","Max Wait Time");
 		for (int i = 1; i <= this.numFloors; i++) {
 			if (!floorWaitTimes.containsKey(i)) {
 				System.out.printf("%-20s %-20s %-20s %-20s\n", "Floor "+i, "NA", "NA", "NA");
 			} else {
-				long max1 = Long.MIN_VALUE;
-				long min1 = Long.MAX_VALUE;
+				long max = Long.MIN_VALUE;
+				long min = Long.MAX_VALUE;
 				long sum = 0;
 				for (long j : floorWaitTimes.get(i)) {
-					if (j > max1) max1 = j;
-					if (j < min1) min1 = j;
+					if (j > max) max = j;
+					if (j < min) min = j;
 					sum += j;
 				}
-				long max2 = max1/1000;
-				long min2 = min1/1000;
-				long average = (sum / floorWaitTimes.get(i).size())/1000;
-				System.out.printf("%-20s %-20s %-20s %-20s\n", "Floor "+i, average+" seconds", min2+" seconds", max2+" seconds");
-
+				long maxWaitTime = max/1000;
+				long minWaitTime = min/1000;
+				long averageWaitTime = (sum / floorWaitTimes.get(i).size())/1000;
+				System.out.printf("%-20s %-20s %-20s %-20s\n", "Floor "+i, averageWaitTime+" seconds", minWaitTime+" seconds", maxWaitTime+" seconds");
 			}
-		}		
+		}	
 	}
+	
+	
+	private HashMap<String, ArrayList<Long>> getRideTimesHashSet() throws UnexpectedNullException{
+		if (this.decommissionedRiders == null) {
+			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+		}
+		HashMap<String, ArrayList<Long>> rideTimes = new HashMap<String, ArrayList<Long>>();
+		for (RiderInterface rider : this.decommissionedRiders) {
+			if (!rideTimes.containsKey(rider.getStartFloor()+"-"+rider.getDestinationFloor())) {
+				ArrayList<Long> rideTimesList = new ArrayList<Long>();
+				rideTimesList.add(rider.getRideTime());
+				rideTimes.put(rider.getStartFloor()+"-"+rider.getDestinationFloor(), rideTimesList);
+			} else {
+				rideTimes.get(rider.getStartFloor()+"-"+rider.getDestinationFloor()).add(rider.getRideTime());
+			}
+		}
+		return rideTimes;
+	}
+	
+	// Average ride times
+	private void averageRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
+		//// Printing average ride times
+		System.out.println("************ Average Rider Times By Floor ************");
+		//Print column names
+		System.out.println("");
+		System.out.printf("%-5s", "Floor");
+		for (int floor=1; floor<=this.numFloors; floor++) {
+			System.out.printf("%-5s", floor);
+		}
+		System.out.printf("\n");
+		
+		for (int i = 1; i <= this.numFloors; i++) {
+			System.out.printf("%-5s", i);
+			for (int j = 1; j <= this.numFloors; j++) {
+				if (i < j) {
+					if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
+					else {
+						long sum = 0;
+						for (long k : rideTimes.get(i+"-"+j)) {
+							sum += k;
+						}
+						long averageRideTime = (sum / rideTimes.get(i+"-"+j).size())/1000;
+						System.out.printf("%-5d", averageRideTime);
+					}
+				}
+				
+				else if (i == j) System.out.printf("%-5s", "X");
+				
+				else if(i > j) {
+					if (!rideTimes.containsKey(j+"-"+i)) System.out.printf("%-5s", "0");
+					else {
+						long sum = 0;
+						for (long k : rideTimes.get(j+"-"+i)) {
+							sum += k;
+						}
+						long averageRideTime = (sum / rideTimes.get(j+"-"+i).size())/1000;
+						System.out.printf("%-5d", averageRideTime);
+					}
+				}
+			}
+			System.out.printf("\n");
+		}
+	}
+	
+	// Max ride times
+		private void maxRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
+			//// Printing Max ride times
+			System.out.println("************ Maximum Rider Times By Floor ************");
+			//Print column names
+			System.out.println("");
+			System.out.printf("%-5s", "Floor");
+			for (int floor=1; floor<=this.numFloors; floor++) {
+				System.out.printf("%-5s", floor);
+			}
+			System.out.printf("\n");
+			
+			for (int i = 1; i <= this.numFloors; i++) {
+				System.out.printf("%-5s", i);
+				for (int j = 1; j <= this.numFloors; j++) {
+					if (i < j) {
+						if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
+						else {
+							long max = Long.MIN_VALUE;
+							for (long k : rideTimes.get(i+"-"+j)) {
+								if (k > max) max = k;
+							}
+							long maxRideTime = max/1000;
+							System.out.printf("%-5d", maxRideTime);
+						}
+					}
+					
+					else if (i == j) System.out.printf("%-5s", "X");
+					
+					else if(i > j) {
+						if (!rideTimes.containsKey(j+"-"+i)) System.out.printf("%-5s", "0");
+						else {
+							long max = Long.MIN_VALUE;
+							for (long k : rideTimes.get(j+"-"+i)) {
+								if (k > max) max = k;
+							}
+							long maxRideTime = max/1000;
+							System.out.printf("%-5d", maxRideTime);}
+					}
+				}
+				System.out.printf("\n");
+			}
+		}
+	
+		// Min ride times
+	private void minRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
+		//// Printing Max ride times
+		System.out.println("************ Minimum Rider Times By Floor ************");
+		//Print column names
+		System.out.println("");
+		System.out.printf("%-5s", "Floor");
+		for (int floor=1; floor<=this.numFloors; floor++) {
+			System.out.printf("%-5s", floor);
+		}
+		System.out.printf("\n");
+		
+		for (int i = 1; i <= this.numFloors; i++) {
+			System.out.printf("%-5s", i);
+			for (int j = 1; j <= this.numFloors; j++) {
+				if (i < j) {
+					if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
+					else {
+						long min = Long.MAX_VALUE;
+						for (long k : rideTimes.get(i+"-"+j)) {
+							if (k < min) min = k;
+						}
+						long minRideTime = min/1000;
+						System.out.printf("%-5d", minRideTime);
+					}
+				}
+				
+				else if (i == j) System.out.printf("%-5s", "X");
+				
+				else if(i > j) {
+					if (!rideTimes.containsKey(j+"-"+i)) System.out.printf("%-5s", "0");
+					else {
+						long min = Long.MAX_VALUE;
+						for (long k : rideTimes.get(j+"-"+i)) {
+							if (k < min) min = k;
+						}
+						long minRideTime = min/1000;
+						System.out.printf("%-5d", minRideTime);}
+				}
+			}
+			System.out.printf("\n");
+		}
+	}
+
 	
 }
