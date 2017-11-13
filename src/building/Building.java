@@ -305,8 +305,53 @@ public final class Building {
 	
 	//A function for printing the average wait/ride times for riders and end of simulation
 	public void reportData() {
-		// TODO 
+		try {
+			this.waitTimes();
+
+		} catch (UnexpectedNullException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
+	private void waitTimes() throws UnexpectedNullException {
+		if (this.decommissionedRiders == null) {
+			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+		}
+		HashMap<Integer, ArrayList<Long>> floorWaitTimes = new HashMap<Integer, ArrayList<Long>>();
+//		long maxWaitTime;
+//		long minWaitTime;
+//		double averageWaitTime;
+		
+		for (RiderInterface rider : this.decommissionedRiders) {
+			if (!floorWaitTimes.containsKey(rider.getStartFloor())) {
+				ArrayList<Long> waitTimesList = new ArrayList<Long>();
+				waitTimesList.add(rider.getWaitTime());
+				floorWaitTimes.put(rider.getStartFloor(), waitTimesList);
+			} else {
+				floorWaitTimes.get(rider.getStartFloor()).add(rider.getWaitTime());
+			}
+		}
+		System.out.println("\n");
+		System.out.printf("%-20s %-20s %-20s %-20s\n", "Start Floor","Average Wait Time","Min Wait Time","Max Wait Time");
+		for (int i = 1; i <= this.numFloors; i++) {
+			if (!floorWaitTimes.containsKey(i)) {
+				System.out.printf("%-20s %-20s %-20s %-20s\n", "Floor "+i, "NA", "NA", "NA");
+			} else {
+				long max1 = Long.MIN_VALUE;
+				long min1 = Long.MAX_VALUE;
+				long sum = 0;
+				for (long j : floorWaitTimes.get(i)) {
+					if (j > max1) max1 = j;
+					if (j < min1) min1 = j;
+					sum += j;
+				}
+				long max2 = max1/1000;
+				long min2 = min1/1000;
+				long average = (sum / floorWaitTimes.get(i).size())/1000;
+				System.out.printf("%-20s %-20s %-20s %-20s\n", "Floor "+i, average+" seconds", min2+" seconds", max2+" seconds");
+
+			}
+		}		
+	}
 	
 }
