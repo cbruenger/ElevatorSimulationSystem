@@ -1,6 +1,7 @@
 package controller;
 
 import building.Building;
+import java.util.HashMap;
 import elevator.ElevatorDTO;
 import dataStore.DataStore;
 import enumerators.MyDirection;
@@ -12,11 +13,19 @@ import java.util.ArrayList;
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 
+/* The ElevatorController class assigns elevator requests made on
+ * the floors of the building. Retrieves DTOs for the elevators
+ * from the building and attempts to assign the request. Keeps 
+ * a list of pending requests from previous cycles. Also called
+ * by the TimeProcessor during every cycle to attempt assigning
+ * pending requests.
+ */
 public class ElevatorController {
 	
+	//Class variables, pending requests data structure, static instance
 	private int numFloors;
 	private int numElevators;
-	private int defaultElevatorIncrementer;
+	private ArrayList<HashMap<Integer, MyDirection>> pendingRequests;
 	private static ElevatorController instance;
 	
 	/*////////////////////////////////////////////////////
@@ -25,19 +34,24 @@ public class ElevatorController {
 	 * 													*
 	 *////////////////////////////////////////////////////
 	
+	//Constructor, initializes necessary components
 	private ElevatorController(){
 		try {
 			this.setNumFloors();
 			this.setNumElevators();
-			this.defaultElevatorIncrementer = 1;
-		}
-		catch(BadInputDataException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			this.createPendingRequestsArrayList();
+		} catch (BadInputDataException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (AlreadyExistsException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
 			System.exit(-1);
 		}
 	}
 	
+	//Returns the instance of this class, initializes if 1st time called
 	public static ElevatorController getInstance() {
 		if (instance == null) instance = new ElevatorController();
 		return instance;
@@ -49,6 +63,7 @@ public class ElevatorController {
 	 * 												*
 	 *////////////////////////////////////////////////
 	
+	//Accesses DataStore and parses the number of floors to an int, checks validity and assigns class variable
 	private void setNumFloors() throws BadInputDataException {
 		try { 
 			int temp = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
@@ -63,6 +78,7 @@ public class ElevatorController {
 	    }
 	}
 	
+	//Accesses DataStore and parses the number of elevators to an int, checks validity and assigns class variable
 	private void setNumElevators() throws BadInputDataException {
 		try { 
 			int temp = Integer.parseInt(DataStore.getInstance().getNumElevators());
@@ -77,12 +93,21 @@ public class ElevatorController {
 	    }
 	}
 	
+	//Creates the ArrayList to contain pending elevator requests that weren't assigned in the previous cycle(s)
+	private void createPendingRequestsArrayList() throws AlreadyExistsException {
+		if (this.pendingRequests != null) {
+			throw new AlreadyExistsException("The pendingRequests ArrayList has already been created in ElevatorController\n");
+		}
+		this.pendingRequests = new ArrayList<HashMap<Integer, MyDirection>>();
+	}
+	
 	/*////////////////////////////////////////////////////////////
 	 * 															*
 	 * 		Elevator Request and Assignment Handler Methods		*
 	 * 															*
 	 *////////////////////////////////////////////////////////////
 	
+	//Builds and returns an ArrayList of ElevatorDTO objects retrieved from the building
 	private ArrayList<ElevatorDTO> getElevatorDTOs() throws UnexpectedNullException {
 		try {
 			ArrayList<ElevatorDTO> elevatorDTOs = new ArrayList<ElevatorDTO>();
@@ -103,6 +128,9 @@ public class ElevatorController {
 		return null;
 	}
 	
+	/* Called when a button is pushed from a given floor for a given direction
+	 * Also called every wake cycle for every pending request that wasn't assigned
+	 * during the previous attempt */
 	public void pickupRequest(int floor, MyDirection direction) throws InvalidArgumentException, UnexpectedNullException {
 			
 		//Throw error if floor is invalid
@@ -121,43 +149,144 @@ public class ElevatorController {
 			throw new UnexpectedNullException("ElevatorController's pickupRequest cannot use null elevatorDTOs object\n");
 		}
 		
-		// Check for Idle Elevators
+		/* Check If any elevator is traveling the same direction or if elevator is empty with no pending direction,
+		 *  assign the closest one that isn't already on the current floor */
+		int elevatorToAssignIndex = -1;
+		for (int i = 0; i < this.numElevators; i++) {
+			
+			//If elevator is either traveling in the same direction or is empty with a pending direction of IDLE
+			if ((elevatorDTOs.get(i).getDirection() == direction && elevatorDTOs.get(i).getPendingDirection() == direction)
+					|| ((elevatorDTOs.get(i).getCurrentCapacity() == 0) && elevatorDTOs.get(i).getPendingDirection() == IDLE)) {
+				
+				//Check UP
+				if (direction == UP) {
+					
+					//Check if elevator's floor is less than current floor
+					if (elevatorDTOs.get(i).getCurrentFloor() < floor) { 
+						
+						//Check if no satisfying elevator has been found yet and update the elevatorToAssignIndex
+						if (elevatorToAssignIndex == -1) {
+							elevatorToAssignIndex = i;
+							System.out.println("FOUND AN ELEVATOR WHEN CHECKING FOR AN UP REQUEST");
+							
+						//Otherwise check if this elevator is closer than the elevatorToAssignIndex
+						} else {
+							if (floor - elevatorDTOs.get(i).getCurrentFloor() < floor - elevatorDTOs.get(elevatorToAssignIndex).getCurrentFloor()) {
+								System.out.println("FOUND A CLOSER ELEVATOR WHEN CHECKING FOR AN UP REQUEST");
+								
+								//If it isn't already on the current floor send it the request
+								if (elevatorDTOs.get(i).getCurrentFloor() != floor) {
+									elevatorToAssignIndex = i;
+									
+									//Just some printing for testing
+									if (((elevatorDTOs.get(i).getCurrentCapacity() == 0) && elevatorDTOs.get(i).getPendingDirection() == IDLE)) {
+										System.out.println("FOUND A CLOSER ELEVATOR FOR AN UP REQUEST THATS EMPTY AND ISN'T ALREADY ON CURRENT FLOOR");
+									} else {
+										System.out.println("FOUND A CLOSER ELEVATOR ALREADY GOING UP THAT ISN'T ALREADY ON CURRENT FLOOR");
+									}
+									
+								//Just some printing for testing	
+								} else {
+									if (((elevatorDTOs.get(i).getCurrentCapacity() == 0) && elevatorDTOs.get(i).getPendingDirection() == IDLE)) {
+										System.out.println("DIDNT ASSIGN FOR UP REQUEST BECAUSE CLOSEST ELEVATOR WAS EMPTY AND IDLE BUT ON SAME FLOOR");
+									} else {
+										System.out.println("DIDNT ASSIGN FOR UP REQUEST BECAUSE CLOSEST ELEVATOR GOING UP IS ALREADY ON CURRENT FLOOR");
+									}
+								}
+							}
+						}
+					}
+					
+				//Check DOWN
+				} else if (direction == DOWN) {
+					
+					//Check if elevator's floor is greater than current floor
+					if (elevatorDTOs.get(i).getCurrentFloor() > floor) { 
+						
+						//Check if no satisfying elevator has been found yet and update the elevatorToAssignIndex
+						if (elevatorToAssignIndex == -1) {
+							elevatorToAssignIndex = i;
+							System.out.println("FOUND AN ELEVATOR WHEN CHECKING FOR A DOWN REQUEST");
+						
+						//Otherwise check if this elevator is closer than the elevatorToAssignIndex
+						} else {
+							if (elevatorDTOs.get(i).getCurrentFloor() - floor < elevatorDTOs.get(elevatorToAssignIndex).getCurrentFloor() - floor) {
+								System.out.println("FOUND A CLOSER ELEVATOR WHEN CHECKING FOR AN UP REQUEST");
+								
+								//If it isn't already on the current floor send it the request
+								if (elevatorDTOs.get(i).getCurrentFloor() != floor) {
+									elevatorToAssignIndex = i;
+									
+									//Just some printing for testing
+									if (((elevatorDTOs.get(i).getCurrentCapacity() == 0) && elevatorDTOs.get(i).getPendingDirection() == IDLE)) {
+										System.out.println("FOUND A CLOSER ELEVATOR FOR A DOWN REQUEST THATS EMPTY AND ISN'T ALREADY ON CURRENT FLOOR");
+									} else {
+										System.out.println("FOUND A CLOSER ELEVATOR ALREADY GOING DOWN THAT ISN'T ALREADY ON CURRENT FLOOR");
+									}
+									
+								//Just some printing for testing	
+								} else {
+									if (((elevatorDTOs.get(i).getCurrentCapacity() == 0) && elevatorDTOs.get(i).getPendingDirection() == IDLE)) {
+										System.out.println("DIDNT ASSIGN FOR DOWN REQUEST BECAUSE CLOSEST ELEVATOR WAS EMPTY AND IDLE BUT ON SAME FLOOR");
+									} else {
+										System.out.println("DIDNT ASSIGN FOR DOWN REQUESTBECAUSE CLOSEST ELEVATOR GOING UP IS ALREADY ON CURRENT FLOOR");
+									}								
+								}
+							}
+						}	
+					}
+				}
+			}
+		}
+		
+		//If an elevator was found that fit the previous description assign it the request
+		if (elevatorToAssignIndex != -1) {
+			System.out.println("ASSIGNING AN ELEVATOR BY FIRST METHOD USING DIRECTION OR EMPTY AND PENDING IDLE");
+			Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(elevatorToAssignIndex).getElevatorNumber());
+			return;
+		}
+		
+		
+		
+		//If no elevator was found during the previous method, check if any elevators' current and pending directions are idle
 		for (int i = 0; i < this.numElevators; i++) {
 			if (elevatorDTOs.get(i).getDirection() == IDLE && elevatorDTOs.get(i).getPendingDirection() == IDLE) {
+				System.out.println("ASSIGNING AN ELEVATOR BECAUSE IT'S IDLE");
 				Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
 				return;
 			}
 		}
 		
-		// Check If any elevator is nearby in same direction 
-		for (int i = 0; i < this.numElevators; i++) {
-			if (elevatorDTOs.get(i).getDirection() == direction && elevatorDTOs.get(i).getPendingDirection() == direction) {
-				if (direction == UP) {
-					if (elevatorDTOs.get(i).getCurrentFloor() < floor) { 
-						Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
-						System.out.println("HERE IS A NEW CONTROLLER CHECK FOR up WAS CALLED");
-						return;
-						}
-					}
-				else if (direction == DOWN) {
-					if (elevatorDTOs.get(i).getCurrentFloor() > floor) { 
-						Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
-						System.out.println("HERE IS A NEW CONTROLLER CHECK FOR down WAS CALLED");
-						return;
-						}
-				}
-			}
-		}
+		//Otherwise add this request to the pending requests
+		HashMap<Integer, MyDirection> pendingRequest = new HashMap<Integer, MyDirection>();
+		pendingRequest.put(floor, direction);
+		this.pendingRequests.add(pendingRequest);
 		
-		Building.getInstance().assignElevatorForPickup(floor, direction, this.getDefaultElevator());
 	}
 	
-	private int getDefaultElevator() {
-		if (this.defaultElevatorIncrementer < 1) {
-			this.defaultElevatorIncrementer = this.numElevators;
-			return this.defaultElevatorIncrementer;
-		} else {
-			return this.defaultElevatorIncrementer--;
+	/* Called by the TimeProcessor during every wake cycle to try assigning pending requests
+	 * Makes a copy of the pendingRequests ArrayList to iterate through and deletes them
+	 * from the original pendingRequests list (at index 0) before trying the request again */
+	public void tryPendingRequests() throws UnexpectedNullException {
+		if (this.pendingRequests == null)
+			throw new UnexpectedNullException("ElevatorController's pendingRequests ArrayList is null when tryPendingRequests method called\n");
+		try {
+			ArrayList<HashMap<Integer, MyDirection>> pendingRequestsCopy = new ArrayList<HashMap<Integer, MyDirection>>(this.pendingRequests);
+			for (int i = 0; i < pendingRequestsCopy.size(); i++) {
+				System.out.println("TRYING A PENDING REQUEST");
+				for (int elevatorNumber : pendingRequestsCopy.get(i).keySet()) {
+					this.pendingRequests.remove(0);
+					this.pickupRequest(elevatorNumber, pendingRequestsCopy.get(i).get(elevatorNumber));
+				}
+			}
+		} catch (InvalidArgumentException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (UnexpectedNullException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
+			System.exit(-1);
 		}
 	}
 }

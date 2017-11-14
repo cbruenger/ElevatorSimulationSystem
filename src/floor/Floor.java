@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import enumerators.MyDirection;
 import factories.FloorFactory;
 import interfaces.FloorInterface;
-import interfaces.RiderInterface;
+import interfaces.PersonInterface;
 
 public class Floor implements FloorInterface {
 	
@@ -33,12 +33,12 @@ public class Floor implements FloorInterface {
 	}
 	
 	@Override
-	public void addWaitingPerson(RiderInterface rider) throws AlreadyExistsException {
+	public void addWaitingPerson(PersonInterface rider) throws AlreadyExistsException {
 		delegate.addWaitingPerson(rider);
 	}
 	
 	@Override
-	public ArrayList<RiderInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
+	public ArrayList<PersonInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
 		return delegate.getWaitersByDirection(direction, availableCapacity);
 	}
 	

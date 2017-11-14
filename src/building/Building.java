@@ -13,18 +13,25 @@ import floor.Floor;
 import gui.ElevatorDisplay;
 import interfaces.ElevatorInterface;
 import interfaces.FloorInterface;
-import interfaces.RiderInterface;
+import interfaces.PersonInterface;
 
-
+/* The Building class is called in the main and handles the creation
+ * of elevators and floors and handles the passing of people between
+ * them. Receives update notification from TimeProcessor and forwards
+ * notification to elevators. Forwards DTOs from elevators to controller
+ * and elevator requests from controller to elevators. Contains people
+ * who have exited elevators in "decommissionedPeople". Initializes GUI.
+ * Prints data report after completion of simulation.
+ */
 public class Building {
 	
-	//Class variables and data structures
-	private static Building building;
+	//Class variables, data structures, static instance
+	private static Building instance;
 	private int numFloors;
 	private int numElevators;
 	private HashMap<Integer, FloorInterface> floors;
 	private HashMap<Integer,ElevatorInterface> elevators;
-	private ArrayList<RiderInterface> decommissionedPeople;
+	private ArrayList<PersonInterface> decommissionedPeople;
 	
 	/*////////////////////////////////////////////////////
 	 * 													*
@@ -54,8 +61,8 @@ public class Building {
 	
 	//Returns the instance of this class, initializes if 1st time called
 	public static Building getInstance() {
-		if (building == null) building = new Building();
-		return building;
+		if (instance == null) instance = new Building();
+		return instance;
 	}
 	
 	/*////////////////////////////////////////////////
@@ -116,7 +123,7 @@ public class Building {
 	private void initializeDecommissionedPeopleArrayList() throws AlreadyExistsException {
 		if (this.decommissionedPeople != null)
 			throw new AlreadyExistsException("The decommissionedPeople ArrayList has already been created in building\n");
-		this.decommissionedPeople = new ArrayList<RiderInterface>();
+		this.decommissionedPeople = new ArrayList<PersonInterface>();
 	}
 	
 	//Initializes GUI with the designated number of floors and elevators, puts all elevators IDLE on floor 1
@@ -177,7 +184,7 @@ public class Building {
 	 *////////////////////////////////////
 	
 	//Called by the TimeProcessor, puts a given person onto their given start floor
-	public void addPersonToFloor(RiderInterface person, int startFloor) throws InvalidArgumentException, AlreadyExistsException {
+	public void addPersonToFloor(PersonInterface person, int startFloor) throws InvalidArgumentException, AlreadyExistsException {
 		if (startFloor < 1 || startFloor > this.numFloors)
 			throw new InvalidArgumentException("Building's addPersonToFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
 		if (person == null) {
@@ -189,7 +196,7 @@ public class Building {
 	
 	/* Called by elevators, forwards an ArrayList from a given floor to the calling elevator. The ArrayList
 	 * contains a given amount of people (availableCapacity) who are going in a given direction */
-	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction, int availableCapacity) throws InvalidArgumentException, BadInputDataException, UnexpectedNullException {
+	public ArrayList<PersonInterface> getWaitersFromFloor(int floor, MyDirection direction, int availableCapacity) throws InvalidArgumentException, BadInputDataException, UnexpectedNullException {
 		try {
 			//Retrieve the total capacity of an elevator from the DataStore and parse to an int
 			int totalCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity());
@@ -204,9 +211,9 @@ public class Building {
 			}
 			
 			//Retrieve people from floor, validate and return
-			ArrayList<RiderInterface> peopleToTransfer = this.floors.get(floor).getWaitersByDirection(direction, availableCapacity);
+			ArrayList<PersonInterface> peopleToTransfer = this.floors.get(floor).getWaitersByDirection(direction, availableCapacity);
 			if (peopleToTransfer == null)
-				throw new UnexpectedNullException("Building's getWaitersFromFloor method received null value when retreiving riders from floor\n");
+				throw new UnexpectedNullException("Building's getWaitersFromFloor method received null value when retreiving people from floor\n");
 			return peopleToTransfer;
 			
 		} catch (NumberFormatException e) { 
@@ -223,20 +230,20 @@ public class Building {
 	 *////////////////////////////////////////////////
 	
 	//Called by elevators, a method for receiving an ArrayList of people exiting, adds all people to the decommissionedPeople ArrayList
-	public void decommissionPeople(ArrayList<RiderInterface> people) throws InvalidArgumentException, AlreadyExistsException {
+	public void decommissionPeople(ArrayList<PersonInterface> people) throws InvalidArgumentException, AlreadyExistsException {
 		
 		//Validate people arg
 		if (people == null)
 			throw new InvalidArgumentException("Building's decommissionPeople method cannot accept null for people arg\n");
-		for (RiderInterface person : people) {
+		for (PersonInterface person : people) {
 			if (this.decommissionedPeople.contains(person))
 				throw new AlreadyExistsException("Person already exists in building's decommissionedPeople ArrayList\n");
 		}
 		
-		//Add people decommissionedRiders ArrayList
-		for (RiderInterface rider: people) {
-			this.decommissionedPeople.add(rider);
-			this.floors.get(rider.getDestinationFloor()).addPersonToDecommissionedList(rider.getId());
+		//Add people decommissionedPeople ArrayList
+		for (PersonInterface person: people) {
+			this.decommissionedPeople.add(person);
+			this.floors.get(person.getDestinationFloor()).addPersonToDecommissionedList(person.getId());
 		}
 	}
 	
@@ -270,9 +277,9 @@ public class Building {
 	//Builds and returns a HashMap containing all decommissioned people's ride times
 	private HashMap<String, ArrayList<Long>> getRideTimesHashSet() throws UnexpectedNullException {
 		if (this.decommissionedPeople == null)
-			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+			throw new UnexpectedNullException("Building's decommissionedPeople ArrayList is null when reporting data\n");
 		HashMap<String, ArrayList<Long>> rideTimes = new HashMap<String, ArrayList<Long>>();
-		for (RiderInterface person : this.decommissionedPeople) {
+		for (PersonInterface person : this.decommissionedPeople) {
 			if (!rideTimes.containsKey(person.getStartFloor()+"-"+person.getDestinationFloor())) {
 				ArrayList<Long> rideTimesList = new ArrayList<Long>();
 				rideTimesList.add(person.getRideTime());
@@ -287,9 +294,9 @@ public class Building {
 	//Prints the average/min/max wait times of decommissioned people by floor
 	private void waitTimes() throws UnexpectedNullException {
 		if (this.decommissionedPeople == null)
-			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+			throw new UnexpectedNullException("Building's decommissionedPeople ArrayList is null when reporting data\n");
 		HashMap<Integer, ArrayList<Long>> floorWaitTimes = new HashMap<Integer, ArrayList<Long>>();
-		for (RiderInterface person : this.decommissionedPeople) {
+		for (PersonInterface person : this.decommissionedPeople) {
 			if (!floorWaitTimes.containsKey(person.getStartFloor())) {
 				ArrayList<Long> waitTimesList = new ArrayList<Long>();
 				waitTimesList.add(person.getWaitTime());
@@ -423,13 +430,13 @@ public class Building {
 	//Prints wait/ride/total time by person
 	private void peopleTimes() throws UnexpectedNullException{
 		if (this.decommissionedPeople == null) {
-			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+			throw new UnexpectedNullException("Building's decommissionedPeople ArrayList is null when reporting data\n");
 		}
-		HashMap<Integer, ArrayList<RiderInterface>> peoplesTimes = new HashMap<Integer, ArrayList<RiderInterface>>();
-		for (RiderInterface person : this.decommissionedPeople) {
+		HashMap<Integer, ArrayList<PersonInterface>> peoplesTimes = new HashMap<Integer, ArrayList<PersonInterface>>();
+		for (PersonInterface person : this.decommissionedPeople) {
 			Integer personID = Integer.parseInt(person.getId().substring(1));
 			if (!peoplesTimes.containsKey(personID)) {
-				ArrayList<RiderInterface> peopleList = new ArrayList<RiderInterface>();
+				ArrayList<PersonInterface> peopleList = new ArrayList<PersonInterface>();
 				peopleList.add(person);
 				peoplesTimes.put(personID, peopleList);
 			} else {
@@ -444,7 +451,7 @@ public class Building {
 			if (!peoplesTimes.containsKey(i)) {
 				System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person "+i, "NA", "NA", "NA", "NA", "NA");
 			} else {
-				RiderInterface person = peoplesTimes.get(i).get(0);
+				PersonInterface person = peoplesTimes.get(i).get(0);
 				long rideTime = person.getRideTime()/1000;
 				long waitTime = person.getWaitTime()/1000;
 				long totalTime = rideTime+waitTime;

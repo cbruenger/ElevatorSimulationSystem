@@ -2,7 +2,7 @@ package interfaces;
 
 import enumerators.MyDirection;
 
-public interface RiderInterface {
+public interface PersonInterface {
 	public String getId();
 	public int getStartFloor();
 	public int getDestinationFloor();

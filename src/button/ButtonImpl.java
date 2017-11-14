@@ -9,8 +9,16 @@ import errors.InvalidArgumentException;
 import errors.UnexpectedNullException;
 import errors.AlreadyExistsException;
 
+/* The ButtonImpl is an implementation of a button that is given 
+ * a direction and floor number upon creation. It forwards elevator
+ * requests from the floor to the elevator controller and maintains
+ * a boolean so the controller is only notified once for any number
+ * of requests. It is reset when an elevator has arrived to the floor
+ * and is then available to be pushed again.
+ */
 public class ButtonImpl implements ButtonInterface {
 	
+	//Class variables
 	private MyDirection direction;
 	private int floorNumber;
 	private boolean currentlyPushed;
@@ -21,6 +29,7 @@ public class ButtonImpl implements ButtonInterface {
 	 * 										*
 	 *////////////////////////////////////////
 
+	//Constructor, initializes necessary components
 	public ButtonImpl(MyDirection direction, int floorNum) {
 		try {
 			this.assignDirection(direction);
@@ -43,6 +52,12 @@ public class ButtonImpl implements ButtonInterface {
 	 * 										*
 	 *////////////////////////////////////////
 	
+	/* Called by the floor when a person makes an elevator request.
+	 * Forwards the request to the controller and updates the boolean.
+	 * When currentlyPushed is true, it can still be pushed for a request by 
+	 * other people, but only the first will notify the controller of the request
+	 * since only one elevator is needed.
+	 */
 	@Override
 	public void push() {
 		try {
@@ -61,6 +76,11 @@ public class ButtonImpl implements ButtonInterface {
 		}
 	}
 	
+	/* Called by the floor when people are being transfered to the 
+	 * elevator when it arrives for the request, and also when people
+	 *  are being left on the floor due to an elevator at capacity so
+	 *  they can request again.
+	 */
 	@Override
 	public void reset() throws AlreadyExistsException {
 		if (!this.currentlyPushed) {
@@ -75,13 +95,15 @@ public class ButtonImpl implements ButtonInterface {
 	 * 													*
 	 *////////////////////////////////////////////////////
 	
-	private void assignDirection(MyDirection directionIn) throws InvalidArgumentException {
-		if (directionIn == null) {
-			throw new InvalidArgumentException("ButtonImpl cannot accept null for directionIn arg during initialization\n");
+	//Assigns the direction variable
+	private void assignDirection(MyDirection direction) throws InvalidArgumentException {
+		if (direction == null) {
+			throw new InvalidArgumentException("ButtonImpl cannot accept null for direction arg during initialization\n");
 		}
-		this.direction = directionIn;
+		this.direction = direction;
 	}
 	
+	//Assigns the floorNumber variable
 	private void assignFloorNumber(int floorNum) throws InvalidArgumentException, BadInputDataException {
 		try {
 			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors());

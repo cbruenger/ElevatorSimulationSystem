@@ -8,18 +8,19 @@ import enumerators.MyDirection;
 import static enumerators.MyDirection.*;
 import errors.*;
 import interfaces.FloorInterface;
-import interfaces.RiderInterface;
+import interfaces.PersonInterface;
 import timeProcessor.TimeProcessor;
 import interfaces.ButtonInterface;
 import button.Button;
 
 public class FloorImpl implements FloorInterface{
 
+	//Class variables
 	private int floorNumber;
 	private ButtonInterface upButton;
 	private ButtonInterface downButton;
-	private ArrayList<RiderInterface> peopleWaiting;
-	private ArrayList<String> peopleDecommissioned;
+	private ArrayList<PersonInterface> peopleWaiting;
+	private ArrayList<String> peopleDecommissionedIds;
 	
 	/*////////////////////////////////////////
 	 * 										*
@@ -90,17 +91,17 @@ public class FloorImpl implements FloorInterface{
 			throw new AlreadyExistsException("The peopleWaiting ArrayList has already been created in FloorImpl\n");
 		}
 		
-		this.peopleWaiting = new ArrayList<RiderInterface>();
+		this.peopleWaiting = new ArrayList<PersonInterface>();
 	}
 	
 	private void peopleDecommissionedArrayList() throws AlreadyExistsException {
 		
 		//Throw error if elevators have already been created
-		if (this.peopleDecommissioned != null) {
+		if (this.peopleDecommissionedIds != null) {
 			throw new AlreadyExistsException("The peopleDecommissioned ArrayList has already been created in FloorImpl\n");
 		}
 		
-		this.peopleDecommissioned = new ArrayList<String>();
+		this.peopleDecommissionedIds = new ArrayList<String>();
 	}
 	
 	
@@ -160,15 +161,15 @@ public class FloorImpl implements FloorInterface{
 	}
 	
 	@Override
-	public void addWaitingPerson(RiderInterface rider) throws AlreadyExistsException {
-		if (this.peopleWaiting.contains(rider)) {
-			throw new AlreadyExistsException("Rider " + rider.getId() + " is already on floor " + this.floorNumber);
+	public void addWaitingPerson(PersonInterface person) throws AlreadyExistsException {
+		if (this.peopleWaiting.contains(person)) {
+			throw new AlreadyExistsException("Person " + person.getId() + " is already on floor " + this.floorNumber);
 		}
 		try {
-			System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " created on Floor " + rider.getStartFloor() + ", wants to go " + rider.getDirection() + " to Floor " + rider.getDestinationFloor());
-			System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " presses " + rider.getDirection() + " on Floor " + rider.getStartFloor());
-			this.pushButton(rider.getDirection());
-			this.peopleWaiting.add(rider);
+			System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + person.getId() + " created on Floor " + person.getStartFloor() + ", wants to go " + person.getDirection() + " to Floor " + person.getDestinationFloor());
+			System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + person.getId() + " presses " + person.getDirection() + " on Floor " + person.getStartFloor());
+			this.pushButton(person.getDirection());
+			this.peopleWaiting.add(person);
 		} catch (InvalidArgumentException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -178,20 +179,20 @@ public class FloorImpl implements FloorInterface{
 	}
 	
 	@Override
-	public ArrayList<RiderInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
+	public ArrayList<PersonInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
 		try {
 			int maxCapacity = this.getMaxElevatorCapacity();
 			if (availableCapacity < 0 || availableCapacity > maxCapacity)
 				throw new InvalidArgumentException("FloorImpl cannot accept number less than 0 or greater than " + maxCapacity + " for availableCapacity arg\n");
 			
 			//Find out how any people are going the same direction, maintain a separate list for people to remove from floor
-			ArrayList<RiderInterface> peopleToDeleteFromFloor = new ArrayList<>();
-			ArrayList<RiderInterface> peopleAvailableForTransfer = new ArrayList<>(this.peopleWaiting);
-			for (RiderInterface rider: this.peopleWaiting) {
-				if (rider.getDirection() == direction)
-					peopleToDeleteFromFloor.add(rider);
+			ArrayList<PersonInterface> peopleToDeleteFromFloor = new ArrayList<>();
+			ArrayList<PersonInterface> peopleAvailableForTransfer = new ArrayList<>(this.peopleWaiting);
+			for (PersonInterface person : this.peopleWaiting) {
+				if (person.getDirection() == direction)
+					peopleToDeleteFromFloor.add(person);
 				else
-					peopleAvailableForTransfer.remove(rider);
+					peopleAvailableForTransfer.remove(person);
 			}
 			
 			//Find out how many people need to wait for another elevator if the capacity is met
@@ -218,12 +219,12 @@ public class FloorImpl implements FloorInterface{
 				this.resetButton(direction);
 			}
 			
-			//If people are needing to request again, print capacity notification and have riders make new requests
+			//If people are needing to request again, print capacity notification and have people make new requests
 			if (printCapacityNotification) {
 				System.out.println(TimeProcessor.getInstance().getTimeString() + "Elevator at capacity, " + peopleAvailableForTransfer.size() + " person(s) will enter, " + numToLeaveBehind + " person(s) will request again");
-				for (RiderInterface rider : this.peopleWaiting) {
-					if (rider.getDirection() == direction) {
-						System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + rider.getId() + " presses " + rider.getDirection() + " on Floor " + rider.getStartFloor());
+				for (PersonInterface person : this.peopleWaiting) {
+					if (person.getDirection() == direction) {
+						System.out.println(TimeProcessor.getInstance().getTimeString() + "Person " + person.getId() + " presses " + person.getDirection() + " on Floor " + person.getStartFloor());
 						this.pushButton(direction);
 					}
 				}
@@ -233,10 +234,10 @@ public class FloorImpl implements FloorInterface{
 			 * so we have a list to iterate through and a separate list to delete from when printing the current Floor People
 			 */
 			ArrayList<String> transfersTemp = new ArrayList<String>();
-			for (RiderInterface person : peopleAvailableForTransfer) {
+			for (PersonInterface person : peopleAvailableForTransfer) {
 				transfersTemp.add(person.getId());
 			}
-			for (RiderInterface personLeaving : peopleAvailableForTransfer) {
+			for (PersonInterface personLeaving : peopleAvailableForTransfer) {
 				System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + personLeaving.getId()  + " has left Floor " + this.floorNumber + " ");
 				transfersTemp.remove(personLeaving.getId());
 				this.printFloorPeople(transfersTemp);
@@ -256,10 +257,10 @@ public class FloorImpl implements FloorInterface{
 	@Override
 	public void addPersonToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
 		if (id == null || id.isEmpty())
-			throw new InvalidArgumentException("FloorImpl's addRiderToDecommissionedList method cannot accept null or empty string for id arg\n");
-		if (this.peopleDecommissioned.contains(id))
+			throw new InvalidArgumentException("FloorImpl's addPersonToDecommissionedList method cannot accept null or empty string for id arg\n");
+		if (this.peopleDecommissionedIds.contains(id))
 			throw new AlreadyExistsException("FloorImpl's peopleDecommissioned arrayList already contains id " + id + "\n");
-		this.peopleDecommissioned.add(id);
+		this.peopleDecommissionedIds.add(id);
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Person " + id  + " entered Floor " + this.floorNumber + " ");
 		this.printFloorPeople(null);
 	}
@@ -272,10 +273,10 @@ public class FloorImpl implements FloorInterface{
 	
 	private void printFloorPeople(ArrayList<String> transferringPeople) {
 		System.out.print("[Floor People:");
-		if (!this.peopleWaiting.isEmpty() || !this.peopleDecommissioned.isEmpty()) {
-			for (RiderInterface personWaiting : this.peopleWaiting)
+		if (!this.peopleWaiting.isEmpty() || !this.peopleDecommissionedIds.isEmpty()) {
+			for (PersonInterface personWaiting : this.peopleWaiting)
 				System.out.print(" " + personWaiting.getId());
-			for (String personDecommissioned : this.peopleDecommissioned)
+			for (String personDecommissioned : this.peopleDecommissionedIds)
 				System.out.print(" " + personDecommissioned);
 		} else {
 			if (transferringPeople != null) {

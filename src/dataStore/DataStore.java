@@ -2,7 +2,6 @@ package dataStore;
 
 import errors.*;
 import java.io.IOException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,13 +12,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/* The DataStore class retrieves data from an XML input file and
+ * saves the parsed data as strings in the class variables. Sets 
+ * and verifies that all necessary data was retrieved. Contains
+ * getters for other classes to retrieve the data.
+ */
 public final class DataStore {
 
+	//Class variables
 	private static DataStore instance;
 	private String numFloors;
 	private String numElevators;
 	private String elevatorCapacity;
-	private String speed;
+	private String elevatorFloorSpeed;
 	private String doorsOpenTime;
 	private String idleTime;
 	private String sleepTime;
@@ -32,6 +37,7 @@ public final class DataStore {
 	 * 													*
 	 *////////////////////////////////////////////////////
 	
+	//Constructor, initializes necessary components
 	private DataStore() {
 		try {
 			this.initializeVariables();
@@ -45,6 +51,7 @@ public final class DataStore {
 		
 	}
 	
+	//Returns the instance of this class, initializes if 1st time called
 	public static DataStore getInstance() {
 		if (instance == null) instance = new DataStore();
 		return instance;
@@ -56,11 +63,12 @@ public final class DataStore {
 	 * 												*
 	 *////////////////////////////////////////////////
 	
+	//Initializes all class variables to null
 	public void initializeVariables() {
 		this.numFloors = null;
 		this.numElevators = null;
 		this.elevatorCapacity = null;
-		this.speed = null;
+		this.elevatorFloorSpeed = null;
 		this.doorsOpenTime = null;
 		this.idleTime = null;
 		this.sleepTime = null;
@@ -68,6 +76,7 @@ public final class DataStore {
 		this.duration = null;
 	}
 	
+	//Parses the input file and calls setters for assigning class variables
 	public void parseInputFile() throws InputParsingException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
@@ -91,7 +100,7 @@ public final class DataStore {
 										break;
 									case "elevatorCapacity": this.setElevatorCapacity(dataName.getTextContent());
 										break;
-									case "floorSpeed": this.setSpeed(dataName.getTextContent());
+									case "elevatorFloorSpeed": this.setElevatorFloorSpeed(dataName.getTextContent());
 										break;
 									case "doorsOpenTime": this.setDoorsOpenTime(dataName.getTextContent());
 										break;
@@ -116,11 +125,12 @@ public final class DataStore {
 		}
 	}
 	
+	//Verifies that all necessary data was retrieved from input file
 	public void sufficientDataCheck() throws InsufficientInputException {
 		if (this.numFloors == null) throw new InsufficientInputException("numFloors not acquired from parsing XML file\n");
 		if (this.numElevators == null) throw new InsufficientInputException("numElevators not acquired from parsing XML file\n");
 		if (this.elevatorCapacity == null) throw new InsufficientInputException("elevatorCapacity not acquired from parsing XML file\n");
-		if (this.speed == null) throw new InsufficientInputException("speed not acquired from parsing XML file\n");
+		if (this.elevatorFloorSpeed == null) throw new InsufficientInputException("elevatorFloorSpeed not acquired from parsing XML file\n");
 		if (this.doorsOpenTime == null) throw new InsufficientInputException("doorsOpenTime not acquired from parsing XML file\n");
 		if (this.idleTime == null) throw new InsufficientInputException("idleTime not acquired from parsing XML file\n");
 		if (this.sleepTime == null) throw new InsufficientInputException("sleepTime not acquired from parsing XML file\n");
@@ -134,7 +144,7 @@ public final class DataStore {
 	 * 															*
 	 *////////////////////////////////////////////////////////////
 	
-	//Sets the number of floors in the building
+	//Assigns the numFloors variable
 	private void setNumFloors(String numFloors) throws InputParsingException {
 		if (numFloors == null || numFloors.isEmpty()) {
 			throw new InputParsingException("Could not set numFloors due to null or empty value in XML file\n");
@@ -142,7 +152,7 @@ public final class DataStore {
 		this.numFloors = numFloors;
 	}
 	
-	//Sets the number of elevators in the building
+	//Assigns the numElevators variable
 	private void setNumElevators(String numElevators) throws InputParsingException {
 		if (numElevators == null || numElevators.isEmpty()) {
 			throw new InputParsingException("Could not set numElevators due to null or empty value in XML file\n");
@@ -150,7 +160,7 @@ public final class DataStore {
 		this.numElevators = numElevators;
 	}
 	
-	//Sets the capacity of elevators
+	//Assigns the elevatorCapacity variable
 	private void setElevatorCapacity(String capacity) throws InputParsingException {
 		if (capacity == null || capacity.isEmpty()) {
 			throw new InputParsingException("Could not set capacity due to null or empty value in XML file\n");
@@ -158,15 +168,15 @@ public final class DataStore {
 		this.elevatorCapacity = capacity;
 	}
 	
-	//Sets the speed at which an elevator moves between floors
-	private void setSpeed(String speed) throws InputParsingException {
+	//Assigns the elevatorFloorSpeed variable
+	private void setElevatorFloorSpeed(String speed) throws InputParsingException {
 		if (speed == null || speed.isEmpty()) {
-			throw new InputParsingException("Could not set speed due to null or empty value in XML file\n");
+			throw new InputParsingException("Could not set elevatorFloorSpeed due to null or empty value in XML file\n");
 		}
-		this.speed = speed;
+		this.elevatorFloorSpeed = speed;
 	}
 	
-	//Sets the amount of time an elevator's doors stay open
+	//Assigns the doorsOpenTime variable
 	private void setDoorsOpenTime(String doorsOpenTime) throws InputParsingException {
 		if (doorsOpenTime == null || doorsOpenTime.isEmpty()) {
 			throw new InputParsingException("Could not set doorsOpenTime due to null or empty value in XML file\n");
@@ -174,7 +184,7 @@ public final class DataStore {
 		this.doorsOpenTime = doorsOpenTime;
 	}
 		
-	//Sets the amount of time an elevator stays idle until returning to floor 1
+	//Assigns the idleTime variable
 	private void setIdleTime(String idleTime) throws InputParsingException {
 		if (idleTime == null || idleTime.isEmpty()) {
 			throw new InputParsingException("Could not set idleTime due to null or empty value in XML file\n");
@@ -182,7 +192,7 @@ public final class DataStore {
 		this.idleTime = idleTime;
 	}
 	
-	//Sets the sleep time 
+	//Assigns the sleepTime variable
 	private void setSleepTime(String sleepTime) throws InputParsingException {
 		if (sleepTime == null || sleepTime.isEmpty()) {
 			throw new InputParsingException("Could not set sleepTime due to null or empty value in XML file\n");
@@ -190,7 +200,7 @@ public final class DataStore {
 		this.sleepTime = sleepTime;
 	}
 	
-	//Sets the rider generation time 
+	//Assigns the peoplePerMinute variable
 	private void setPeoplePerMinute(String peoplePerMinute) throws InputParsingException {
 		if (peoplePerMinute == null || peoplePerMinute.isEmpty()) {
 			throw new InputParsingException("Could not set peoplePerMinute due to null or empty value in XML file\n");
@@ -198,7 +208,7 @@ public final class DataStore {
 		this.peoplePerMinute = peoplePerMinute;
 	}
 	
-	//Sets the duration of the simulation
+	//Assigns the duration variable
 	private void setDuration(String duration) throws InputParsingException {
 		if (duration == null || duration.isEmpty()) {
 			throw new InputParsingException("Could not set duration due to null or empty value in XML file\n");
@@ -228,8 +238,8 @@ public final class DataStore {
 	}
 	
 	//Returns the speed an elevator travels between floors
-	public String getSpeed() {
-		return this.speed;
+	public String getElevatorFloorSpeed() {
+		return this.elevatorFloorSpeed;
 	}
 	
 	//Returns the amount of time an elevators doors stay open for
@@ -256,5 +266,4 @@ public final class DataStore {
 	public String getDuration() {
 		return this.duration;
 	}
-	
 }

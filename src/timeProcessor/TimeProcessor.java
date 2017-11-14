@@ -1,11 +1,12 @@
 package timeProcessor;
 
 import building.Building;
+import controller.ElevatorController;
 import dataStore.DataStore;
 //import controller.ElevatorController;
 import gui.ElevatorDisplay;
-import interfaces.RiderInterface;
-import rider.Rider;
+import interfaces.PersonInterface;
+import person.Person;
 import errors.*;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -131,6 +132,9 @@ public class TimeProcessor {
 					
 				try {
 					
+					//Notify the elevator controller to check if any pending requests can now be assigned
+					ElevatorController.getInstance().tryPendingRequests();
+					
 					//Notify building to update elevator activity
 					Building.getInstance().update();
 				
@@ -152,9 +156,13 @@ public class TimeProcessor {
 			ElevatorDisplay.getInstance().shutdown();
 			System.exit(0);
 			
-		} catch (BadInputDataException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+		} catch (BadInputDataException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (UnexpectedNullException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
 			System.exit(-1);
 		}
 	}
@@ -175,7 +183,7 @@ public class TimeProcessor {
 			
 			//Creates person and passes to building
 			if (randomInt <= personGenerationChancePerCycle) {
-				RiderInterface rider = this.generateRandomPerson();
+				PersonInterface rider = this.generateRandomPerson();
 				this.passPersonToBuilding(rider, rider.getStartFloor());
 			}
 		} catch (BadInputDataException e2) {
@@ -186,7 +194,7 @@ public class TimeProcessor {
 	}
 	
 	//Returns a person with random start/destination floors
-	private RiderInterface generateRandomPerson() throws BadInputDataException {
+	private PersonInterface generateRandomPerson() throws BadInputDataException {
 		try {
 			//Variables required for creating a person
 			int numFloors = this.getNumFloors();
@@ -199,7 +207,7 @@ public class TimeProcessor {
 			} 
 			
 			//Create return person
-			RiderInterface person = new Rider(generatePersonId(), randomStart, randomDestination);
+			PersonInterface person = new Person(generatePersonId(), randomStart, randomDestination);
 			return person;
 			
 		} catch (BadInputDataException e) {
@@ -215,7 +223,7 @@ public class TimeProcessor {
 	}
 	
 	//Passes the building a person to put on the person's start floor
-	private void passPersonToBuilding(RiderInterface person, int floor) {
+	private void passPersonToBuilding(PersonInterface person, int floor) {
 		try {
 			Building.getInstance().addPersonToFloor(person, floor);
 		} catch (InvalidArgumentException e1) {
@@ -342,6 +350,10 @@ public class TimeProcessor {
 		long minutes = seconds / 60;
 		seconds -= minutes * 60;
 		return String.format("%d:%02d:%02d  ", hours, minutes, seconds);
+	}
+	
+	public long getCurrentTimeMillis() {
+		return this.currentTimeMillis;
 	}
 	
 	/*////////////////////////////////////////

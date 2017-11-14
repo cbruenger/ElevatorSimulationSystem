@@ -1,12 +1,12 @@
-package rider;
+package person;
 
 import enumerators.MyDirection;
-import factories.RiderFactory;
-import interfaces.RiderInterface;
+import factories.PersonFactory;
+import interfaces.PersonInterface;
 
-public class Rider implements RiderInterface {
+public class Person implements PersonInterface {
 
-	private RiderInterface delegate;
+	private PersonInterface delegate;
 	
 	/*////////////////////////////////////////
 	 * 										*
@@ -14,7 +14,7 @@ public class Rider implements RiderInterface {
 	 * 										*
 	 *////////////////////////////////////////
 	
-	public Rider(String id, int startFloor, int destinationFloor) {
+	public Person(String id, int startFloor, int destinationFloor) {
 		this.setDelegate(id, startFloor, destinationFloor);
 	}
 	
@@ -71,7 +71,7 @@ public class Rider implements RiderInterface {
 	 *////////////////////////////////////////
 	
 	private void setDelegate(String id, int startFloor, int destinationFloor) {
-		this.delegate = RiderFactory.build(id, startFloor, destinationFloor);
+		this.delegate = PersonFactory.build(id, startFloor, destinationFloor);
 	}
 
 }

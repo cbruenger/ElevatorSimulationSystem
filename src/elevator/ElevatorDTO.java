@@ -12,6 +12,7 @@ public class ElevatorDTO {
 	
 	private int elevatorNumber;
 	private int currentFloor;
+	private int currentCapacity;
 	private MyDirection direction;
 	private MyDirection pendingDirection;
 	private ArrayList<Integer> upPickups;
@@ -24,10 +25,11 @@ public class ElevatorDTO {
 	 * 										*
 	 *////////////////////////////////////////
 	
-	public ElevatorDTO(int elevatorNumber, int currentFloor, MyDirection direction, MyDirection pendingDirection, ArrayList<Integer> upPickups, ArrayList<Integer> downPickups, ArrayList<Integer> dropOffs){
+	public ElevatorDTO(int elevatorNumber, int currentFloor, int currentCapacity, MyDirection direction, MyDirection pendingDirection, ArrayList<Integer> upPickups, ArrayList<Integer> downPickups, ArrayList<Integer> dropOffs){
 		try {
 			this.setElevatorNumber(elevatorNumber); 
 			this.setCurrentFloor(currentFloor);
+			this.setCurrentCapacity(currentCapacity);
 			this.setDirection(direction);
 			this.setPendingDirection(pendingDirection);
 			this.setUpPickups(upPickups);
@@ -69,6 +71,22 @@ public class ElevatorDTO {
 				throw new InvalidArgumentException("ElevatorDTO cannot accept number less than 1 or greater than " + numFloors + " for currentFloor arg\n");
 			} else {
 				this.currentFloor = currentFloor;
+
+			}
+		} catch (BadInputDataException e) {
+			System.out.println(e);
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
+	private void setCurrentCapacity(int currentCapacity) throws InvalidArgumentException {
+		try {
+			int maxCapacity = this.getMaxCapacity();
+			if (currentCapacity < 0 || currentCapacity > maxCapacity) {
+				throw new InvalidArgumentException("ElevatorDTO cannot accept number less than 0 or greater than " + maxCapacity + " for currentCapacity arg\n");
+			} else {
+				this.currentCapacity = currentCapacity;
 
 			}
 		} catch (BadInputDataException e) {
@@ -127,6 +145,10 @@ public class ElevatorDTO {
 		return currentFloor;
 	}
 	
+	public int getCurrentCapacity() {
+		return currentCapacity;
+	}
+	
 	public MyDirection getDirection() {
 		return direction;
 	}
@@ -181,6 +203,22 @@ public class ElevatorDTO {
 	        throw new BadInputDataException("ElevatorDTO could not parse DataStore's numElevators value to int\n"); 
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorDTO received null from DataStore for numElevators\n"); 
+	    }
+		
+	}
+	
+private int getMaxCapacity() throws BadInputDataException {
+		
+		try { 
+			int maxCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity()); 
+			if (maxCapacity > 0)
+				return maxCapacity;
+			else
+				throw new BadInputDataException("ElevatorDTO received a value less than 1 for elevatorCapacity from DataStore\n");
+	    } catch (NumberFormatException e) { 
+	        throw new BadInputDataException("ElevatorDTO could not parse DataStore's elevatorCapacity value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("ElevatorDTO received null from DataStore for elevatorCapacity\n"); 
 	    }
 		
 	}
