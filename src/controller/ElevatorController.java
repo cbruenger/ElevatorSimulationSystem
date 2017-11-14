@@ -7,9 +7,7 @@ import dataStore.DataStore;
 import enumerators.MyDirection;
 import static enumerators.MyDirection.*;
 import errors.*;
-
 import java.util.ArrayList;
-
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 
@@ -154,9 +152,19 @@ public class ElevatorController {
 		int elevatorToAssignIndex = -1;
 		for (int i = 0; i < this.numElevators; i++) {
 			
-			//If elevator is either traveling in the same direction or is empty with a pending direction of IDLE
-			if ((elevatorDTOs.get(i).getDirection() == direction && elevatorDTOs.get(i).getPendingDirection() == direction)
-					|| (elevatorDTOs.get(i).getPendingDirection() == IDLE)) {
+			//Boolean true if elevator's direction and pending direction are the same as passed direction arg
+			boolean directionsMatch = (elevatorDTOs.get(i).getDirection() == direction) && (elevatorDTOs.get(i).getPendingDirection() == direction);
+			
+			//Boolean true if the elevator has no pickUps or dropOffs in any direction
+			boolean nothingToDo = elevatorDTOs.get(i).getUpPickups().isEmpty() 
+									&& elevatorDTOs.get(i).getDownPickups().isEmpty()
+									&& elevatorDTOs.get(i).getDropOffs().isEmpty();
+			
+			//Boolean true if elevator's current direction and pending direction are both IDLE
+			boolean idleIdle = (elevatorDTOs.get(i).getDirection() == IDLE) && (elevatorDTOs.get(i).getPendingDirection() == IDLE);
+			
+			//If elevator is either traveling in the same direction or has no pickUps/DropOffs
+			if (directionsMatch || nothingToDo || idleIdle) {
 				
 				//Check UP
 				if (direction == UP) {
@@ -167,14 +175,51 @@ public class ElevatorController {
 						//Check if no satisfying elevator has been found yet and update the elevatorToAssignIndex
 						if (elevatorToAssignIndex == -1) {
 							elevatorToAssignIndex = i;
+							System.out.println("FOUND AN ELEVATOR WHEN CHECKING FOR AN UP REQUEST");
 							
 						//Otherwise check if this elevator is closer than the elevatorToAssignIndex
 						} else {
 							if (floor - elevatorDTOs.get(i).getCurrentFloor() < floor - elevatorDTOs.get(elevatorToAssignIndex).getCurrentFloor()) {
-								//If it isn't already on the current floor send it the request
-								if (elevatorDTOs.get(i).getCurrentFloor() != floor) {
-									elevatorToAssignIndex = i;	
-								} 
+								System.out.println("FOUND A CLOSER ELEVATOR WHEN CHECKING FOR AN UP REQUEST");
+								
+								//If the elevator is on the current floor and has not requests or has current/pending directions IDLE update the elevatorToAssignIndex
+								if (elevatorDTOs.get(i).getCurrentFloor() == floor) {
+									System.out.println("FOUND AN ELEVATOR ON THE CURRENT FLOOR");
+									if (nothingToDo || idleIdle) {
+										elevatorToAssignIndex = i;
+										if (nothingToDo)
+											System.out.println("FOUND AN ELEVATOR ON THE CURRENT FLOOR WITH NOTHING TO DO");
+										else if (idleIdle)
+											System.out.println("FOUND AN ELEVATOR ON THE CURRENT FLOOR WITH CURRENT/PENDING DIRECTIONS IDLE");
+									}
+									
+								//Otherwise it's not on the current floor, update the elevatorToAssignIndex
+								} else if (elevatorDTOs.get(i).getCurrentFloor() != floor) {
+									System.out.println("FOUND ELEVATOR THAT ISN'T ON THE CURRENT FLOOR");
+									elevatorToAssignIndex = i;
+									
+									//Just some printing for testing
+									if (nothingToDo) {
+										System.out.println("FOUND A CLOSER ELEVATOR FOR AN UP REQUEST THAT HAS NOTHING TO DO AND ISN'T ALREADY ON CURRENT FLOOR");
+									} else if (directionsMatch) {
+										System.out.println("FOUND A CLOSER ELEVATOR ALREADY GOING UP THAT ISN'T ALREADY ON CURRENT FLOOR");
+									} else if (idleIdle) {
+										System.out.println("FOUND A CLOSER ELEVATOR WITH CURRENT/PENDING DIRECTIONS IDLE THAT ISN'T ALREADY ON CURRENT FLOOR");
+									} else {
+										System.out.println("FOUND AN IDLE ELEVATOR THAT ISNT ON THE CURRENT FLOOR");
+									}
+								}
+								
+//								//Just some printing for testing	
+//								} else {
+//									if (nothingToDo) {
+//										System.out.println("DIDNT ASSIGN FOR UP REQUEST BECAUSE CLOSEST ELEVATOR HAD NOTHING TO DO BUT ON SAME FLOOR");
+//									} else if (directionsMatch) {
+//										System.out.println("DIDNT ASSIGN FOR UP REQUEST BECAUSE CLOSEST ELEVATOR GOING UP IS ALREADY ON CURRENT FLOOR");
+//									} else {
+//										System.out.println("DIDNT ASSIGN FOR UP REQUEST BECAUSE CLOSEST ELEVATOR IS IDLE AND ALREADY ON CURRENT FLOOR");
+//									}
+//								} 
 							}
 						}
 					}
@@ -188,14 +233,52 @@ public class ElevatorController {
 						//Check if no satisfying elevator has been found yet and update the elevatorToAssignIndex
 						if (elevatorToAssignIndex == -1) {
 							elevatorToAssignIndex = i;
+							System.out.println("FOUND AN ELEVATOR WHEN CHECKING FOR A DOWN REQUEST");
+
 						
 						//Otherwise check if this elevator is closer than the elevatorToAssignIndex
 						} else {
 							if (elevatorDTOs.get(i).getCurrentFloor() - floor < elevatorDTOs.get(elevatorToAssignIndex).getCurrentFloor() - floor) {
-								//If it isn't already on the current floor send it the request
-								if (elevatorDTOs.get(i).getCurrentFloor() != floor) {
+								System.out.println("FOUND A CLOSER ELEVATOR WHEN CHECKING FOR A DOWN REQUEST");
+
+								//If the elevator is on the current floor and has not requests or has current/pending directions IDLE update the elevatorToAssignIndex
+								if (elevatorDTOs.get(i).getCurrentFloor() == floor) {
+									System.out.println("FOUND AN ELEVATOR ON THE CURRENT FLOOR");
+									if (nothingToDo || idleIdle) {
+										elevatorToAssignIndex = i;
+										if (nothingToDo)
+											System.out.println("FOUND AN ELEVATOR ON THE CURRENT FLOOR WITH NOTHING TO DO");
+										else if (idleIdle)
+											System.out.println("FOUND AN ELEVATOR ON THE CURRENT FLOOR WITH CURRENT/PENDING DIRECTIONS IDLE");
+									}
+									
+								//Otherwise it's not on the current floor, update the elevatorToAssignIndex
+								} else if (elevatorDTOs.get(i).getCurrentFloor() != floor) {
+									System.out.println("FOUND ELEVATOR THAT ISN'T ON THE CURRENT FLOOR");
 									elevatorToAssignIndex = i;
-								}
+									
+									//Just some printing for testing
+									if (nothingToDo) {
+										System.out.println("FOUND A CLOSER ELEVATOR FOR DOWN REQUEST THAT HAS NOTHING TO DO AND ISN'T ALREADY ON CURRENT FLOOR");
+									} else if (directionsMatch) {
+										System.out.println("FOUND A CLOSER ELEVATOR ALREADY GOING DOWN THAT ISN'T ALREADY ON CURRENT FLOOR");
+									} else if (idleIdle) {
+										System.out.println("FOUND A CLOSER ELEVATOR WITH CURRENT/PENDING DIRECTIONS IDLE THAT ISN'T ALREADY ON CURRENT FLOOR");
+									} else {
+										System.out.println("FOUND AN IDLE ELEVATOR THAT ISNT ON THE CURRENT FLOOR");
+									}
+								}	
+									
+								//Just some printing for testing	
+//								} else {
+//									if (nothingToDo) {
+//										System.out.println("DIDNT ASSIGN FOR DOWN REQUEST BECAUSE CLOSEST ELEVATOR HAD NOTHING TO DO BUT ON SAME FLOOR");
+//									} else if (directionsMatch) {
+//										System.out.println("DIDNT ASSIGN FOR DOWN REQUEST BECAUSE CLOSEST ELEVATOR GOING UP IS ALREADY ON CURRENT FLOOR");
+//									} else {
+//										System.out.println("DIDNT ASSIGN FOR DOWN REQUEST BECAUSE CLOSEST ELEVATOR IS IDLE AND ALREADY ON CURRENT FLOOR");
+//									}
+//								} 
 							}
 						}	
 					}
@@ -205,6 +288,7 @@ public class ElevatorController {
 		
 		//If an elevator was found that fit the previous description assign it the request
 		if (elevatorToAssignIndex != -1) {
+			System.out.println("ASSIGNING AN ELEVATOR BY FIRST METHOD USING DIRECTION OR NOTHING TO DO");
 			Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(elevatorToAssignIndex).getElevatorNumber());
 			return;
 		}
@@ -214,6 +298,7 @@ public class ElevatorController {
 		//If no elevator was found during the previous method, check if any elevators' current and pending directions are idle
 		for (int i = 0; i < this.numElevators; i++) {
 			if (elevatorDTOs.get(i).getDirection() == IDLE && elevatorDTOs.get(i).getPendingDirection() == IDLE) {
+				System.out.println("ASSIGNING AN ELEVATOR BECAUSE IT'S IDLE");
 				Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
 				return;
 			}
@@ -235,6 +320,7 @@ public class ElevatorController {
 		try {
 			ArrayList<HashMap<Integer, MyDirection>> pendingRequestsCopy = new ArrayList<HashMap<Integer, MyDirection>>(this.pendingRequests);
 			for (int i = 0; i < pendingRequestsCopy.size(); i++) {
+				System.out.println("TRYING A PENDING REQUEST");
 				for (int elevatorNumber : pendingRequestsCopy.get(i).keySet()) {
 					this.pendingRequests.remove(0);
 					this.pickupRequest(elevatorNumber, pendingRequestsCopy.get(i).get(elevatorNumber));

@@ -8,5 +8,5 @@
 	<idleTime>5</idleTime>
 	<sleepTime>1</sleepTime>
 	<peoplePerMinute>20</peoplePerMinute>
-	<duration>180</duration>
+	<duration>900</duration>
 </data>

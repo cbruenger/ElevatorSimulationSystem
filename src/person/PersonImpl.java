@@ -28,7 +28,7 @@ public class PersonImpl implements PersonInterface {
 	
 	/*////////////////////////////////////////
 	 * 										*
-	 * 				Constructor 			*
+	 * 				Constructor 				*
 	 * 										*
 	 *////////////////////////////////////////
 	

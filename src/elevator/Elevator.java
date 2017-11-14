@@ -6,6 +6,9 @@ import enumerators.MyDirection;
 import factories.ElevatorFactory;
 import interfaces.ElevatorInterface;
 
+/* The implementation of this class is delegated to the
+ * ElevatorImpl class. See ElevatorImpl for notes.
+ */
 public class Elevator implements ElevatorInterface{
 	
 	private ElevatorInterface delegate;

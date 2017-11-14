@@ -7,9 +7,13 @@ import enumerators.MyDirection;
 import errors.BadInputDataException;
 import errors.InvalidArgumentException;
 
-
+/* The ElevatorDTO class is called by an elevator, which builds it
+ * and returns it to the building for forwarding to the elevator
+ * controller. Contains necessary data for controller decision making. 
+ */
 public class ElevatorDTO {
 	
+	//Class variables, data structures
 	private int elevatorNumber;
 	private int currentFloor;
 	private MyDirection direction;
@@ -20,7 +24,7 @@ public class ElevatorDTO {
 	
 	/*////////////////////////////////////////
 	 * 										*
-	 * 				Constructor 			*
+	 * 				Constructor 				*
 	 * 										*
 	 *////////////////////////////////////////
 	
@@ -81,6 +85,7 @@ public class ElevatorDTO {
 		}
 	}
 
+	//Assigns direction variable
 	private void setDirection(MyDirection direction) throws InvalidArgumentException {
 		if (direction == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setDirection method cannot accept null for direction arg\n");
@@ -88,6 +93,7 @@ public class ElevatorDTO {
 		this.direction = direction;
 	}
 	
+	//Assigns pendingDirection variable
 	private void setPendingDirection(MyDirection pendingDirection) throws InvalidArgumentException {
 		if (pendingDirection == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setPendingDirection method cannot accept null for pendingDirection arg\n");
@@ -95,6 +101,7 @@ public class ElevatorDTO {
 		this.pendingDirection = pendingDirection;
 	}
 
+	//Assigns upPickups ArrayList
 	private void setUpPickups(ArrayList<Integer> upPickups) throws InvalidArgumentException {
 		if (upPickups == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setUpPickups method cannot accept null for upPickups arg\n");
@@ -102,6 +109,7 @@ public class ElevatorDTO {
 		this.upPickups = upPickups;
 	}
 
+	//Assigns downPickups ArrayList
 	private void setDownPickups(ArrayList<Integer> downPickups) throws InvalidArgumentException {
 		if (downPickups == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setDownPickups method cannot accept null for downPickups arg\n");
@@ -109,6 +117,7 @@ public class ElevatorDTO {
 		this.downPickups = downPickups;
 	}
 
+	//Assigns dropOffs ArrayList
 	private void setDropOffs(ArrayList<Integer> dropOffs) throws InvalidArgumentException {
 		if (dropOffs == null) {
 			throw new InvalidArgumentException("ElevatorDTO's setDropOffs method cannot accept null for dropOffs arg\n");
@@ -122,30 +131,37 @@ public class ElevatorDTO {
 	 * 							*
 	 *////////////////////////////
 	
+	//Returns elevator number
 	public int getElevatorNumber() {
 		return elevatorNumber;
 	}
 	
+	//Returns current floor
 	public int getCurrentFloor() {
 		return currentFloor;
 	}
 	
+	//Returns direction
 	public MyDirection getDirection() {
 		return direction;
 	}
 	
+	//Returns pending direction
 	public MyDirection getPendingDirection() {
 		return pendingDirection;
 	}
 	
+	//Returns upPickups ArrayList
 	public ArrayList<Integer> getUpPickups() {
 		return upPickups;
 	}
 	
+	//Returns downPickups ArrayList
 	public ArrayList<Integer> getDownPickups() throws InvalidArgumentException {
 		return downPickups;
 	}
 	
+	//Returns dropOffs ArrayList
 	public ArrayList<Integer> getDropOffs() {
 		return dropOffs;
 	}
@@ -156,8 +172,8 @@ public class ElevatorDTO {
 	 * 										*
 	 *////////////////////////////////////////
 	
+	//Accesses DataStore and parses the number of floors to an int, checks validity and returns it
 	private int getNumFloors() throws BadInputDataException {
-		
 		try { 
 			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
 			if (numFloors > 1)
@@ -169,11 +185,10 @@ public class ElevatorDTO {
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorDTO received null from DataStore for numFloors\n"); 
 	    }
-		
 	}
 	
+	//Accesses DataStore and parses the number of elevators to an int, checks validity and returns it
 	private int getNumElevators() throws BadInputDataException {
-		
 		try { 
 			int numElevators = Integer.parseInt(DataStore.getInstance().getNumElevators()); 
 			if (numElevators > 0)
@@ -185,22 +200,5 @@ public class ElevatorDTO {
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("ElevatorDTO received null from DataStore for numElevators\n"); 
 	    }
-		
-	}
-	
-private int getMaxCapacity() throws BadInputDataException {
-		
-		try { 
-			int maxCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity()); 
-			if (maxCapacity > 0)
-				return maxCapacity;
-			else
-				throw new BadInputDataException("ElevatorDTO received a value less than 1 for elevatorCapacity from DataStore\n");
-	    } catch (NumberFormatException e) { 
-	        throw new BadInputDataException("ElevatorDTO could not parse DataStore's elevatorCapacity value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("ElevatorDTO received null from DataStore for elevatorCapacity\n"); 
-	    }
-		
 	}
 }

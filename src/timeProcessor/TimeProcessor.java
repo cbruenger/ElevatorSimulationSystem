@@ -126,14 +126,14 @@ public class TimeProcessor {
 			
 			//Runs the simulation for the designated amount of time
 			while (this.currentTimeMillis <= this.getDurationMillis()) {
-						
-				//If needed, create people and pass them to the building
-				peopleSimWork();
 					
 				try {
 					
 					//Notify the elevator controller to check if any pending requests can now be assigned
 					ElevatorController.getInstance().tryPendingRequests();
+					
+					//If needed, create people and pass them to the building
+					peopleSimWork();
 					
 					//Notify building to update elevator activity
 					Building.getInstance().update();

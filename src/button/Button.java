@@ -5,6 +5,9 @@ import enumerators.*;
 import errors.AlreadyExistsException;
 import factories.ButtonFactory;
 
+/* The implementation of this class is delegated to the
+ * ButtonImpl class. See ButtonImpl for notes.
+ */
 public class Button implements ButtonInterface {
 	
 	private ButtonInterface delegate;

@@ -7,6 +7,9 @@ import factories.FloorFactory;
 import interfaces.FloorInterface;
 import interfaces.PersonInterface;
 
+/* The implementation of this class is delegated to the
+ * FloorImpl class. See FloorImpl for notes.
+ */
 public class Floor implements FloorInterface {
 	
 	private FloorInterface delegate; 

@@ -4,6 +4,9 @@ import enumerators.MyDirection;
 import factories.PersonFactory;
 import interfaces.PersonInterface;
 
+/* The implementation of this class is delegated to the
+ * PersonImpl class. See PersonImpl for notes.
+ */
 public class Person implements PersonInterface {
 
 	private PersonInterface delegate;

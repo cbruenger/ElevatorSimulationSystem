@@ -13,6 +13,14 @@ import timeProcessor.TimeProcessor;
 import interfaces.ButtonInterface;
 import button.Button;
 
+/* The FloorImpl class is an implementation of a floor that is
+ * created by the building. Receives people from the time processor
+ * and manages all person activity while on the floor. Contains 
+ * buttons which are pushed when people make requests for elevators.
+ * Passes People from the floor to the building which forwards to the
+ * elevator. Contains people IDs who have exited on this floor for
+ * printing Floor People purposes.
+ */
 public class FloorImpl implements FloorInterface{
 
 	//Class variables
@@ -28,13 +36,14 @@ public class FloorImpl implements FloorInterface{
 	 * 										*
 	 *////////////////////////////////////////
 	
+	//Constructor, initializes necessary components
 	public FloorImpl(int floorNumber) {
 		try {
 			this.setFloorNumber(floorNumber);			
 			this.createUpButton();
 			this.createDownButton();
 			this.createPeopleWaitingArrayList();
-			this.peopleDecommissionedArrayList();	
+			this.createPeopleDecommissionedArrayList();	
 		} catch (AlreadyExistsException e2) {
 			System.out.println(e2.getMessage());
 			e2.printStackTrace();
@@ -52,114 +61,16 @@ public class FloorImpl implements FloorInterface{
 	 * 										*
 	 *////////////////////////////////////////
 	
-	
-	
-	/////////////////////////////
-	//						  //
-	//    Setters/Private     //
-	//				  		 //
-	///////////////////////////
-	
-	private void setFloorNumber(int floorNumber) throws InvalidArgumentException {
-		
-		try {
-			int numFloors = this.getNumFloors();
-			if (floorNumber < 1 || floorNumber > numFloors) {
-				throw new InvalidArgumentException("FloorImpl cannot accept a number less than 1 or greater than " + numFloors + "\n");
-			}
-			this.floorNumber = floorNumber;
-		} catch (BadInputDataException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-	}
-	
-	private void createUpButton() {
-		this.upButton = new Button(UP, this.floorNumber);
-	}
-	
-	private void createDownButton() {
-		this.downButton = new Button(DOWN, this.floorNumber);
-	}
-	
-	private void createPeopleWaitingArrayList() throws AlreadyExistsException {
-		
-		//Throw error if elevators have already been created
-		if (this.peopleWaiting != null) {
-			throw new AlreadyExistsException("The peopleWaiting ArrayList has already been created in FloorImpl\n");
-		}
-		
-		this.peopleWaiting = new ArrayList<PersonInterface>();
-	}
-	
-	private void peopleDecommissionedArrayList() throws AlreadyExistsException {
-		
-		//Throw error if elevators have already been created
-		if (this.peopleDecommissionedIds != null) {
-			throw new AlreadyExistsException("The peopleDecommissioned ArrayList has already been created in FloorImpl\n");
-		}
-		
-		this.peopleDecommissionedIds = new ArrayList<String>();
-	}
-	
-	
-	
-	private int getMaxElevatorCapacity() throws BadInputDataException {
-		
-		try { 
-			int maxElevatorCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity()); 
-			if (maxElevatorCapacity > 0)
-				return maxElevatorCapacity;
-			else
-				throw new BadInputDataException("FloorImpl received a value less than 1 for maxElevatorCapacity from DataStore\n");
-	    } catch (NumberFormatException e) { 
-	        throw new BadInputDataException("FloorImpl could not parse DataStore's maxElevatorCapacity value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("FloorImpl received null from DataStore for maxElevatorCapacity value\n"); 
-	    }
-		
-	}
-	
-	private void pushButton(MyDirection direction) throws InvalidArgumentException {
-		if (direction == null) {
-			throw new InvalidArgumentException("FloorImpl's pushButton method cannot accept null for direction arg\n");
-		}
-		if (direction == UP) {
-			this.upButton.push();
-		} else if (direction == DOWN) {
-			this.downButton.push();
-		}
-	}
-	
-	private void resetButton(MyDirection direction) throws InvalidArgumentException {
-		if (direction == null || direction == IDLE) {
-			throw new InvalidArgumentException("FloorImpl's resetButton cannot accept null or IDLE for direction arg\n");
-		}
-		try {
-			if (direction == UP) {
-				this.upButton.reset();
-			} else if (direction == DOWN) {
-				this.downButton.reset();
-			}
-		} catch (AlreadyExistsException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-	
-	/////////////////////////////
-	//				           //
-	//    Interface Methods    //
-	//				           //
-	/////////////////////////////
-	
+	//Returns the floor number
 	@Override
 	public int getFloorNumber() {
 		return this.floorNumber;
 	}
 	
+	/* Called by the building when it receives a person from the TimeProcessor. 
+	 * Accepts a person, adds it to the floor and pushes the button corresponding to
+	 * the person's direction for requesting an elevator.
+	 */
 	@Override
 	public void addWaitingPerson(PersonInterface person) throws AlreadyExistsException {
 		if (this.peopleWaiting.contains(person)) {
@@ -178,6 +89,11 @@ public class FloorImpl implements FloorInterface{
 		
 	}
 	
+	/* Called by the building when an elevator arrives for a pickUp. Args represent
+	 * the direction of the pickUp and the available capacity in the elevator. 
+	 * If some people cannot fit in the elevator, they make another request.
+	 * Returns an ArrayList of people who will enter the elevator.
+	 */
 	@Override
 	public ArrayList<PersonInterface> getWaitersByDirection(MyDirection direction, int availableCapacity) throws InvalidArgumentException {
 		try {
@@ -243,7 +159,7 @@ public class FloorImpl implements FloorInterface{
 				this.printFloorPeople(transfersTemp);
 			}
 			
-			//Return the people transfering into the elevator
+			//Return the people transferring into the elevator
 			return peopleAvailableForTransfer;
 			
 		} catch (BadInputDataException e) {
@@ -254,6 +170,10 @@ public class FloorImpl implements FloorInterface{
 		return null;
 	}
 	
+	/* Called by the building when a person exits an elevator. The person is
+	 * stored in the building, but their ID is passed here as an arg for 
+	 * Floor People printing purposes.
+	 */
 	@Override
 	public void addPersonToDecommissionedList(String id) throws InvalidArgumentException, AlreadyExistsException {
 		if (id == null || id.isEmpty())
@@ -265,12 +185,95 @@ public class FloorImpl implements FloorInterface{
 		this.printFloorPeople(null);
 	}
 	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Methods called by the Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
+	
+	//Assigns the floorNumber variable
+	private void setFloorNumber(int floorNumber) throws InvalidArgumentException {
+		try {
+			int numFloors = this.getNumFloors();
+			if (floorNumber < 1 || floorNumber > numFloors) {
+				throw new InvalidArgumentException("FloorImpl cannot accept a number less than 1 or greater than " + numFloors + "\n");
+			}
+			this.floorNumber = floorNumber;
+		} catch (BadInputDataException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
+	//Creates and assigns a Button with UP direction and current floor number
+	private void createUpButton() {
+		this.upButton = new Button(UP, this.floorNumber);
+	}
+	
+	//Creates and assigns a Button with DOWN direction and current floor number
+	private void createDownButton() {
+		this.downButton = new Button(DOWN, this.floorNumber);
+	}
+	
+	//Creates an ArrayList to contain the people on the floor waiting for elevators
+	private void createPeopleWaitingArrayList() throws AlreadyExistsException {
+		if (this.peopleWaiting != null)
+			throw new AlreadyExistsException("The peopleWaiting ArrayList has already been created in FloorImpl\n");
+		this.peopleWaiting = new ArrayList<PersonInterface>();
+	}
+	
+	//Creates an ArrayList to contain the people on the floor waiting for elevators
+	private void createPeopleDecommissionedArrayList() throws AlreadyExistsException {
+		if (this.peopleDecommissionedIds != null)
+			throw new AlreadyExistsException("The peopleDecommissioned ArrayList has already been created in FloorImpl\n");
+		this.peopleDecommissionedIds = new ArrayList<String>();
+	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		   Button Handling Methods		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	//Called when a person makes a request for an elevator for a given direction
+	private void pushButton(MyDirection direction) throws InvalidArgumentException {
+		if (direction == null) {
+			throw new InvalidArgumentException("FloorImpl's pushButton method cannot accept null for direction arg\n");
+		}
+		if (direction == UP) {
+			this.upButton.push();
+		} else if (direction == DOWN) {
+			this.downButton.push();
+		}
+	}
+	
+	//Called when the elevator arrives to the floor to make the button able to be pushed for another request
+	private void resetButton(MyDirection direction) throws InvalidArgumentException {
+		if (direction == null || direction == IDLE) {
+			throw new InvalidArgumentException("FloorImpl's resetButton cannot accept null or IDLE for direction arg\n");
+		}
+		try {
+			if (direction == UP) {
+				this.upButton.reset();
+			} else if (direction == DOWN) {
+				this.downButton.reset();
+			}
+		} catch (AlreadyExistsException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
 	/*////////////////////////////////////////
 	 * 										*
 	 * 		   Printing Helper Methods		*
 	 * 										*
 	 *////////////////////////////////////////
 	
+	/* Called when narration of events is needed and prints the list of people on the floor as well
+	 * as the people in the transferringPeople arg
+	 */
 	private void printFloorPeople(ArrayList<String> transferringPeople) {
 		System.out.print("[Floor People:");
 		if (!this.peopleWaiting.isEmpty() || !this.peopleDecommissionedIds.isEmpty()) {
@@ -299,6 +302,7 @@ public class FloorImpl implements FloorInterface{
 	 * 										*
 	 *////////////////////////////////////////
 	
+	//Accesses DataStore and parses the number of floors to an int, checks validity and returns it
 	private int getNumFloors() throws BadInputDataException {
 		try { 
 			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
@@ -311,5 +315,20 @@ public class FloorImpl implements FloorInterface{
 	    } catch(NullPointerException e) {
 	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value during floorNumber assignment check\n"); 
 	    }
-	}	
+	}
+	
+	//Accesses DataStore and parses the elevator capacity to an int, checks validity and returns it
+	private int getMaxElevatorCapacity() throws BadInputDataException {
+		try { 
+			int maxElevatorCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity()); 
+			if (maxElevatorCapacity > 0)
+				return maxElevatorCapacity;
+			else
+				throw new BadInputDataException("FloorImpl received a value less than 1 for maxElevatorCapacity from DataStore\n");
+	    } catch (NumberFormatException e) { 
+	        throw new BadInputDataException("FloorImpl could not parse DataStore's maxElevatorCapacity value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("FloorImpl received null from DataStore for maxElevatorCapacity value\n"); 
+	    }
+	}
 }
