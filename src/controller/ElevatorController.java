@@ -121,11 +121,31 @@ public class ElevatorController {
 			throw new UnexpectedNullException("ElevatorController's pickupRequest cannot use null elevatorDTOs object\n");
 		}
 		
-		//check if any elevator is idle first
+		// Check for Idle Elevators
 		for (int i = 0; i < this.numElevators; i++) {
 			if (elevatorDTOs.get(i).getDirection() == IDLE && elevatorDTOs.get(i).getPendingDirection() == IDLE) {
 				Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
 				return;
+			}
+		}
+		
+		// Check If any elevator is nearby in same direction 
+		for (int i = 0; i < this.numElevators; i++) {
+			if (elevatorDTOs.get(i).getDirection() == direction && elevatorDTOs.get(i).getPendingDirection() == direction) {
+				if (direction == UP) {
+					if (elevatorDTOs.get(i).getCurrentFloor() < floor) { 
+						Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
+						System.out.println("HERE IS A NEW CONTROLLER CHECK FOR up WAS CALLED");
+						return;
+						}
+					}
+				else if (direction == DOWN) {
+					if (elevatorDTOs.get(i).getCurrentFloor() > floor) { 
+						Building.getInstance().assignElevatorForPickup(floor, direction, elevatorDTOs.get(i).getElevatorNumber());
+						System.out.println("HERE IS A NEW CONTROLLER CHECK FOR down WAS CALLED");
+						return;
+						}
+				}
 			}
 		}
 		

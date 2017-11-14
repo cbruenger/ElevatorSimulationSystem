@@ -7,6 +7,6 @@
 	<doorsOpenTime>3</doorsOpenTime>
 	<idleTime>5</idleTime>
 	<sleepTime>1</sleepTime>
-	<ridersPerMinute>3</ridersPerMinute>
+	<ridersPerMinute>15</ridersPerMinute>
 	<duration>180</duration>
 </data>
