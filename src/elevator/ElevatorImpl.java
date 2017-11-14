@@ -30,10 +30,11 @@ public class ElevatorImpl implements ElevatorInterface{
 	
 	/*////////////////////////////////////////
 	 * 										*
-	 * 				Constructor 				*
+	 * 				Constructor 			*
 	 * 										*
 	 *////////////////////////////////////////
 	
+	//Constructor, initializes necessary components
 	public ElevatorImpl(int elevatorNumber) {
 		
 		try {
@@ -153,7 +154,7 @@ public class ElevatorImpl implements ElevatorInterface{
 			ArrayList<Integer> mergedDropOffs = this.getMergedDropOffs();
 			ArrayList<Integer> upPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(UP));
 			ArrayList<Integer> downPickUpsCopy = new ArrayList<Integer>(this.pickUps.get(DOWN));
-			ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.people.size(), this.direction, this.pendingDirection, upPickUpsCopy, downPickUpsCopy, mergedDropOffs);
+			ElevatorDTO DTO = new ElevatorDTO(this.elevatorNumber, this.currentFloor, this.direction, this.pendingDirection, upPickUpsCopy, downPickUpsCopy, mergedDropOffs);
 			return DTO;
 		} catch (UnexpectedNullException e) {
 			System.out.println(e.getMessage());
@@ -170,6 +171,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	 * 														*
 	 *////////////////////////////////////////////////////////
 	
+	// Generates Array of type PersonInterface
 	private void createPeopleArray() throws AlreadyExistsException {
 		if (this.people != null) {
 			throw new AlreadyExistsException("The people ArrayList has already been created in ElevatorImpl\n");
@@ -177,6 +179,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.people = new ArrayList<PersonInterface>();
 	}
 	
+	// Generates Pickups Hashmap with keys of UP, DOWN, and IDLE which are mapped to Integer Arraylists
 	private void createPickUpsMap() throws AlreadyExistsException {
 		if (this.pickUps != null) {
 			throw new AlreadyExistsException("The pickUps HashMap has already been created in ElevatorImpl\n");
@@ -190,6 +193,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.pickUps.put(IDLE, pickUpsIdleList);
 	}
 	
+	// Generates Pickups Hashmap with keys of UP, DOWN, and IDLE which are mapped to Integer Arraylists
 	private void createDropOffsMap() throws AlreadyExistsException {
 		if (this.dropOffs != null) {
 			throw new AlreadyExistsException("The dropOffs HashMap has already been created in ElevatorImpl\n");
@@ -203,6 +207,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.dropOffs.put(IDLE, dropOffsIdleList);
 	}
 	
+	//Assigns elevatorNumber variable
 	private void setElevatorNumber(int elevatorNumber) throws InvalidArgumentException {
 		if (elevatorNumber < 1) {
 			throw new InvalidArgumentException("ElevatorImpl can't accept a number less than 1 during elevatorNumber assignment\n");
@@ -210,6 +215,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.elevatorNumber = elevatorNumber;
 	}
 	
+	//Assigns direction variable
 	private void setDirection(MyDirection direction) throws InvalidArgumentException {
 		if (direction == null) {
 			throw new InvalidArgumentException("ElevatorImpl can't accept null during direction assignment\n");
@@ -217,6 +223,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.direction = direction;
 	}
 	
+	//Assigns pendingDirection variable
 	private void setPendingDirection(MyDirection direction ) throws InvalidArgumentException {
 		if (direction == null) {
 			throw new InvalidArgumentException("ElevatorImpl can't accept null during pendingDirection assignment\n");
@@ -224,6 +231,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		this.pendingDirection = direction;
 	}
 	
+	//Assigns currentFloor variable
 	private void setCurrentFloor(int floor) throws InvalidArgumentException {
 		try {
 			int numFloors = this.getNumFloors();
@@ -239,6 +247,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		}
 	}
 	
+	//Assigns maxCapacity variable
 	private void setMaxCapacity() throws BadInputDataException {
 		try {
 			int maxCapacityTemp = Integer.parseInt(DataStore.getInstance().getElevatorCapacity());
@@ -259,6 +268,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	 * 										*
 	 *////////////////////////////////////////
 	
+	//Re-assigns doorOpen variable to true
 	private void openDoors() throws AlreadyExistsException {
 		if (this.doorOpen) {
 			throw new AlreadyExistsException("ElevatorImpl's door status is already open when openDoors method called\n");
@@ -268,6 +278,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " Doors Open\n");
 	}
 	
+	//re-assigns doorOpen variable to false
 	private void closeDoors() throws AlreadyExistsException {
 		if (!this.doorOpen) {
 			throw new AlreadyExistsException("ElevatorImpl's door status is already closed when closeDoors method called\n");
@@ -291,6 +302,7 @@ public class ElevatorImpl implements ElevatorInterface{
 	 * 										*
 	 *////////////////////////////////////////
 	
+	// Added an array of people to riders array
 	private void addPeople(ArrayList<PersonInterface> incomingPeople) throws InvalidArgumentException {
 		if (incomingPeople == null) {
 			throw new InvalidArgumentException("ElevatorImpl's addPeople method cannot accept null for incomingPeople arg\n");

@@ -12,7 +12,6 @@ public class ElevatorDTO {
 	
 	private int elevatorNumber;
 	private int currentFloor;
-	private int currentCapacity;
 	private MyDirection direction;
 	private MyDirection pendingDirection;
 	private ArrayList<Integer> upPickups;
@@ -21,15 +20,15 @@ public class ElevatorDTO {
 	
 	/*////////////////////////////////////////
 	 * 										*
-	 * 				Constructor 				*
+	 * 				Constructor 			*
 	 * 										*
 	 *////////////////////////////////////////
 	
-	public ElevatorDTO(int elevatorNumber, int currentFloor, int currentCapacity, MyDirection direction, MyDirection pendingDirection, ArrayList<Integer> upPickups, ArrayList<Integer> downPickups, ArrayList<Integer> dropOffs){
+	//Constructor, initializes necessary components
+	public ElevatorDTO(int elevatorNumber, int currentFloor, MyDirection direction, MyDirection pendingDirection, ArrayList<Integer> upPickups, ArrayList<Integer> downPickups, ArrayList<Integer> dropOffs){
 		try {
 			this.setElevatorNumber(elevatorNumber); 
 			this.setCurrentFloor(currentFloor);
-			this.setCurrentCapacity(currentCapacity);
 			this.setDirection(direction);
 			this.setPendingDirection(pendingDirection);
 			this.setUpPickups(upPickups);
@@ -44,10 +43,11 @@ public class ElevatorDTO {
 	
 	/*////////////////////////////////////////////////
 	 * 												*
-	 * 		Setter Methods Called by Constructor		*
+	 * 		Setter Methods Called by Constructor	*
 	 * 												*
 	 *////////////////////////////////////////////////
 
+	//Assigns elevatorNumber variable
 	private void setElevatorNumber(int elevatorNumber) throws InvalidArgumentException {
 		try {
 			int numElevators = this.getNumElevators();
@@ -64,6 +64,7 @@ public class ElevatorDTO {
 		}
 	}
 
+	//Assigns currentFloor variable
 	private void setCurrentFloor(int currentFloor) throws InvalidArgumentException {
 		try {
 			int numFloors = this.getNumFloors();
@@ -71,22 +72,6 @@ public class ElevatorDTO {
 				throw new InvalidArgumentException("ElevatorDTO cannot accept number less than 1 or greater than " + numFloors + " for currentFloor arg\n");
 			} else {
 				this.currentFloor = currentFloor;
-
-			}
-		} catch (BadInputDataException e) {
-			System.out.println(e);
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-	
-	private void setCurrentCapacity(int currentCapacity) throws InvalidArgumentException {
-		try {
-			int maxCapacity = this.getMaxCapacity();
-			if (currentCapacity < 0 || currentCapacity > maxCapacity) {
-				throw new InvalidArgumentException("ElevatorDTO cannot accept number less than 0 or greater than " + maxCapacity + " for currentCapacity arg\n");
-			} else {
-				this.currentCapacity = currentCapacity;
 
 			}
 		} catch (BadInputDataException e) {
@@ -143,10 +128,6 @@ public class ElevatorDTO {
 	
 	public int getCurrentFloor() {
 		return currentFloor;
-	}
-	
-	public int getCurrentCapacity() {
-		return currentCapacity;
 	}
 	
 	public MyDirection getDirection() {
