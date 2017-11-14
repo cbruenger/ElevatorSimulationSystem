@@ -3,7 +3,7 @@
 	<numFloors>10</numFloors>
 	<numElevators>4</numElevators>
 	<elevatorCapacity>10</elevatorCapacity>
-	<floorSpeed>2</floorSpeed>
+	<floorSpeed>1</floorSpeed>
 	<doorsOpenTime>3</doorsOpenTime>
 	<idleTime>5</idleTime>
 	<sleepTime>1</sleepTime>

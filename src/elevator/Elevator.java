@@ -27,8 +27,8 @@ public class Elevator implements ElevatorInterface{
 	 *////////////////////////////////////////
 	
 	@Override
-	public void update(long time) throws InvalidArgumentException {
-		this.delegate.update(time);
+	public void update() {
+		this.delegate.update();
 	}
 	
 	@Override

@@ -12,6 +12,6 @@ public class MainAC {
 		
 		Building.getInstance();		
 		
-		TimeProcessor.getInstance().begin();
+		TimeProcessor.getInstance().runSimulation();
 	}
 }

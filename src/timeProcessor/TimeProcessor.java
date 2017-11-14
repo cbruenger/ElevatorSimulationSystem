@@ -10,25 +10,32 @@ import errors.*;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+/* The TimeProcessor class is called in the main and handles the
+ * statistical creation of people, the time management of all
+ * elevators actions, and the simulation of the entire program
+ */
+public class TimeProcessor {
 
-public final class TimeProcessor {
-
+	//Class variables and data structures
 	private static TimeProcessor instance;
 	private long currentTimeMillis;
 	private HashMap<Integer, Long> idleTimes;
 	private HashMap<Integer, Long> doorOpenTimes;
 	private HashMap<Integer, Long> floorMovementTimes;
-	private int riderIdIncrementer; //I stashed the rider generator stuff here for now and trashed the facade
-	//private int numFloors; //Might not need this
+	private int personIdIncrementer;
 	
+	/*////////////////////////////////////////////////////
+	 * 													*
+	 * 		Constructor and Singleton Instance Getter	*
+	 * 													*
+	 *////////////////////////////////////////////////////
+	
+	//Constructor, initializes necessary components
 	private TimeProcessor() {
-		
 		try {
-			
 			this.createIdleTimesHashMap();
 			this.createDoorOpenTimesHashMap();
 			this.createFloorMovementTimesHashMap();
-			
 		} catch (AlreadyExistsException e1) {
 			System.out.println(e1.getMessage());
 			e1.printStackTrace();
@@ -40,161 +47,74 @@ public final class TimeProcessor {
 		}
 	}
 	
-	private void createIdleTimesHashMap() throws AlreadyExistsException, BadInputDataException {
-		
-		if (this.idleTimes != null) {
-			throw new AlreadyExistsException("The idleTimes HashMap has already been created in TimeProcessor\n");
-		}
-		try {
-			int numElevators = this.getNumElevators();
-			this.idleTimes = new HashMap<Integer, Long>();
-			for (int i = 1; i <= numElevators; i++) {
-				idleTimes.put(i, (long) 0);
-			}
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
-	    }
-	}
-	
-	private void createDoorOpenTimesHashMap() throws AlreadyExistsException, BadInputDataException {
-		
-		if (this.doorOpenTimes != null) {
-			throw new AlreadyExistsException("The doorOpenTimes HashMap has already been created in TimeProcessor\n");
-		}
-		try {
-			int numElevators = this.getNumElevators();
-			this.doorOpenTimes = new HashMap<Integer, Long>();
-			for (int i = 1; i <= numElevators; i++) {
-				doorOpenTimes.put(i, (long) 0);
-			}
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
-	    }
-		
-	}
-	
-private void createFloorMovementTimesHashMap() throws AlreadyExistsException, BadInputDataException {
-		
-		if (this.floorMovementTimes != null) {
-			throw new AlreadyExistsException("The floorMovementTimes HashMap has already been created in TimeProcessor\n");
-		}
-		try {
-			int numElevators = this.getNumElevators();
-			this.floorMovementTimes = new HashMap<Integer, Long>();
-			for (int i = 1; i <= numElevators; i++) {
-				floorMovementTimes.put(i, (long) 0);
-			}
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
-	    }
-		
-	}
-	
-	private int getNumElevators() throws BadInputDataException {
-		
-		try { 
-			int numElevators = Integer.parseInt(DataStore.getInstance().getNumElevators()); 
-			if (numElevators > 0)
-				return numElevators;
-			else
-				throw new BadInputDataException("TimeProcessor received a value less than 1 for numElevators from DataStore\n");
-	    } catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
-	    }
-	}
-	
-//	private void setNumFloors() throws BadInputDataException {
-//		
-//		try { 
-//			int numFloorsTemp = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
-//			if (numFloorsTemp > 1)
-//				this.numFloors = numFloorsTemp;
-//			else
-//				throw new BadInputDataException("TimeProcessor received a value less than 2 for numFloors from DataStore\n");
-//	    } catch (NumberFormatException e) { 
-//	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numFloors value to int\n"); 
-//	    } catch(NullPointerException e) {
-//	        throw new BadInputDataException("TimeProcessor received null from DataStore for numFloors value\n"); 
-//	    }
-//		
-//	}
-	
-	private int getNumFloors() throws BadInputDataException {
-		
-		try { 
-			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
-			if (numFloors > 1)
-				return numFloors;
-			else
-				throw new BadInputDataException("TimeProcessor received a value less than 2 for numFloors from DataStore\n");
-	    } catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numFloors value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value\n"); 
-	    }
-		
-	}
-	
-	private int getRidersPerMinute() throws BadInputDataException {
-		try {
-			int ridersPerMinute = Integer.parseInt(DataStore.getInstance().getRidersPerMinute());
-			if (ridersPerMinute > 0)
-				return ridersPerMinute;
-			else
-				throw new BadInputDataException("TimeProcessor cannot accept number less than 1 for ridersPerMinute from DataStore\n");
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's ridersPerMinute value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for ridersPerMinute value\n"); 
-	    }
-	}
-	
-	private long getSleepTime() throws BadInputDataException {
-		
-		try {
-			long sleepTime = Integer.parseInt(DataStore.getInstance().getSleepTime()) * 1000;
-			if (sleepTime >= 0)
-				return sleepTime;
-			else
-				throw new BadInputDataException("TimeProcessor received a negative value for sleepTime from DataStore\n");
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's sleepTime value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for sleepTime value\n"); 
-	    }
-	}
-	
-	private long getDurationMillis() throws BadInputDataException {
-		
-		try {
-			long durationMillis = Integer.parseInt(DataStore.getInstance().getDuration()) * 1000;
-			if (durationMillis > 0)
-				return durationMillis;
-			else
-				throw new BadInputDataException("TimeProcessor received a value less than or equal to 0 for duration from DataStore\n");
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's duration value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for duration value\n"); 
-	    }
-	}
-	
-	//A function to get an instance of the class. Initializes instance if needed
+	//Returns the instance of this class, initializes if 1st time called
 	public static TimeProcessor getInstance() {
 		if (instance == null) instance = new TimeProcessor();
 		return instance;
 	}
 	
-	//Function called in the main to initiate the simulation
-	public void begin() {
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Methods called by the Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
+	
+	//Creates the HashMap used for managing the times elevators remain IDLE before returning to floor 1
+	private void createIdleTimesHashMap() throws AlreadyExistsException, BadInputDataException {
+		if (this.idleTimes != null)
+			throw new AlreadyExistsException("The idleTimes HashMap has already been created in TimeProcessor\n");
+		try {
+			int numElevators = this.getNumElevators();
+			this.idleTimes = new HashMap<Integer, Long>();
+			for (int i = 1; i <= numElevators; i++)
+				idleTimes.put(i, (long) 0);
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
+	    }
+	}
+	
+	//Creates the HashMap used for managing the times elevators' doors are open
+	private void createDoorOpenTimesHashMap() throws AlreadyExistsException, BadInputDataException {
+		if (this.doorOpenTimes != null)
+			throw new AlreadyExistsException("The doorOpenTimes HashMap has already been created in TimeProcessor\n");
+		try {
+			int numElevators = this.getNumElevators();
+			this.doorOpenTimes = new HashMap<Integer, Long>();
+			for (int i = 1; i <= numElevators; i++)
+				doorOpenTimes.put(i, (long) 0);
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
+	    }
+	}
+	
+	//Creates the HashMap used for managing the times elevators move from one floor to another
+	private void createFloorMovementTimesHashMap() throws AlreadyExistsException, BadInputDataException {
+		if (this.floorMovementTimes != null)
+			throw new AlreadyExistsException("The floorMovementTimes HashMap has already been created in TimeProcessor\n");
+		try {
+			int numElevators = this.getNumElevators();
+			this.floorMovementTimes = new HashMap<Integer, Long>();
+			for (int i = 1; i <= numElevators; i++)
+				floorMovementTimes.put(i, (long) 0);
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
+	    }
+	}
+	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		Simulation Running Method		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	//Function called in the main to initiate the simulation and report data
+	public void runSimulation() {
 		
 		try {
 			//Store the amount of time that the simulation should sleep for between action cycles
@@ -206,24 +126,24 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 			//Runs the simulation for the designated amount of time
 			while (this.currentTimeMillis <= this.getDurationMillis()) {
 						
-				//If needed, create riders, add to their start floor, and make floor request
-				riderSimWork();
+				//If needed, create people and pass them to the building
+				peopleSimWork();
 					
 				try {
 					
 					//Notify building to update elevator activity
-					Building.getInstance().update(sleepTime);
+					Building.getInstance().update();
 				
 					//Simulation sleeps for designated amount of time
 					Thread.sleep(sleepTime);
 				
-				} catch (InvalidArgumentException e1) {
-					System.out.println(e1.getMessage());
-				} catch (InterruptedException e2) {
-					e2.printStackTrace();
+				} catch (InterruptedException e) {
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+					System.exit(-1);
 				}
 					
-				//Increment the current time by the designated amount
+				//Increment the current time by the designated sleep time
 				this.currentTimeMillis += sleepTime;
 			}
 			
@@ -239,199 +159,25 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		}
 	}
 	
-	//Generates riders, adds them to a floor, and notifies the building of a floor request
-	private void riderSimWork() {
-		
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		People Handling Methods  		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	//Generates people according to statistical chance, adds them to a floor
+	private void peopleSimWork() {
 		try {
-			
-			int ridersPerMinute = this.getRidersPerMinute();
-			int riderGenerationChancePerCycle = (int) Math.ceil(((float)ridersPerMinute/60) * 100);
+			//Variables required for statistical person creation
+			int peoplePerMinute = this.getRidersPerMinute();
+			int personGenerationChancePerCycle = (int) Math.ceil(((float)peoplePerMinute/60) * 100);
 			int randomInt = (int) Math.ceil(Math.random() * 100);
 			
-			if (randomInt <= riderGenerationChancePerCycle) {
-				RiderInterface rider = this.generateRandomRider();
-				this.addRiderToFloor(rider, rider.getStartFloor());
-				//replace this line with controller call taking startFloor/direction
-				//Controller will be the one to call this next line. Rename it to 
-				//ElevatorController.getInstance().pickupRequest(rider.getStartFloor(), rider.getDirection());
+			//Creates person and passes to building
+			if (randomInt <= personGenerationChancePerCycle) {
+				RiderInterface rider = this.generateRandomPerson();
+				this.passPersonToBuilding(rider, rider.getStartFloor());
 			}
-		
-			//if (DataStore.getInstance().getTestNumber() == 1) {
-				
-				//Generate people with requests according to Test 1 from project description
-//				if (this.getCurrentTimeMillis() == 0) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 4000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 2);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 8000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 3);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 12000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 4);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 16000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 20000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 2);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 24000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 3);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 28000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 4);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 32000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 36000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 2);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 40000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 3);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 44000) {
-//					RiderInterface rider = this.generateRandomRider();
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					//replace this line with controller call taking startFloor/direction
-//					//Controller will be the one to call this next line. Rename it to 
-//					Building.getInstance().assignElevatorForPickup(rider.getStartFloor(), rider.getDirection(), 4);
-//				}
-				
-				
-//			} else if (DataStore.getInstance().getTestNumber() == 2) {
-//				
-//				//Generate people with requests according to Test 2 from project description
-//				if (this.getCurrentTimeMillis() == 0) {
-//					RiderInterface rider = this.generateRider(1, 20);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 12000) {
-//					RiderInterface rider = this.generateRider(15, 19);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				
-//			} else if (DataStore.getInstance().getTestNumber() == 3) {
-//				
-//				//Generate people with requests according to Test 3 from project description
-//				if (this.getCurrentTimeMillis() == 0) {
-//					RiderInterface rider = this.generateRider(1, 20);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 3000) {
-//					RiderInterface rider = this.generateRider(1, 10);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
-//				}
-//				
-//			} else if (DataStore.getInstance().getTestNumber() == 4) {
-//				
-//				//Generate people with requests according to Test 4 from project description
-//				if (this.getCurrentTimeMillis() == 0) {
-//					RiderInterface rider = this.generateRider(1, 20);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 1000) {
-//					RiderInterface rider = this.generateRider(1, 20);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 2);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 2000) {
-//					RiderInterface rider = this.generateRider(1, 20);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 3);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 3000) {
-//					RiderInterface rider = this.generateRider(1, 20);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 4);
-//				}
-//				
-//				if (this.getCurrentTimeMillis() == 6000) {
-//					RiderInterface rider = this.generateRider(1, 10);
-//					this.addRiderToFloor(rider, rider.getStartFloor());
-//					Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection(), 1);
-//				}
-//				
-//			}
-			
-			//Generates first rider at start of simulation, and also at a designated recurrence time
-	//		if (this.currentTimeMillis == 0 || this.currentTimeMillis % DataStore.getInstance().getRiderGenerationTime() == 0) {
-	//			RiderInterface rider = this.generateRandomRider();
-	//			this.addRiderToFloor(rider);
-	//			Building.getInstance().elevatorRequested(rider.getStartFloor(), rider.getDirection());
-	//		}
-//		} catch (InvalidArgumentException e1) {
-//			System.out.println(e1.getMessage());
-//			e1.printStackTrace();
-//			System.exit(-1);
 		} catch (BadInputDataException e2) {
 			System.out.println(e2.getMessage());
 			e2.printStackTrace();
@@ -439,13 +185,11 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		}
 	}
 	
-	
-	
-	//Returns a rider with random start/destination floors
-	private RiderInterface generateRandomRider() throws BadInputDataException {
+	//Returns a person with random start/destination floors
+	private RiderInterface generateRandomPerson() throws BadInputDataException {
 		try {
+			//Variables required for creating a person
 			int numFloors = this.getNumFloors();
-			//Get start/destination floors
 			int randomStart = ThreadLocalRandom.current().nextInt(1, numFloors + 1);
 			int randomDestination = ThreadLocalRandom.current().nextInt(1, numFloors + 1);
 			
@@ -454,36 +198,26 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 				randomDestination = ThreadLocalRandom.current().nextInt(1, numFloors + 1);
 			} 
 			
-			//Create, print and return rider
-			RiderInterface newRider = new Rider(generateRiderId(), randomStart, randomDestination);
-			return newRider;
+			//Create return person
+			RiderInterface person = new Rider(generatePersonId(), randomStart, randomDestination);
+			return person;
+			
 		} catch (BadInputDataException e) {
 			throw e;
 		}
 	}
-
-	//This isn't being used in riderSimWork but kept it here just in case
-//	private RiderInterface generateRider(int startFloor, int destinationFloor) {
-//		
-//		//Create, print, and return rider
-//		RiderInterface newRider = new Rider(generateRiderId(), startFloor, destinationFloor);
-//		System.out.println(this.getTimeString() + "Person " + newRider.getId() + " created on Floor " + newRider.getStartFloor() + ", wants to go " + newRider.getDirection() + " to Floor " + newRider.getDestinationFloor());
-//		return newRider;
-//		
-//	}
 	
-	//Generates rider IDs using an incrementer starting at 1
-	private String generateRiderId() {
-		this.riderIdIncrementer++;
-		String id = "P" + this.riderIdIncrementer;
+	//Generates people IDs using an incrementer starting at 1
+	private String generatePersonId() {
+		this.personIdIncrementer++;
+		String id = "P" + this.personIdIncrementer;
 		return id;
 	}
 	
-	//Passes the building a rider to add to the rider's current floor
-	//Maybe move the rider generation and all rider functions into the building???
-	private void addRiderToFloor(RiderInterface rider, int floor) {
+	//Passes the building a person to put on the person's start floor
+	private void passPersonToBuilding(RiderInterface person, int floor) {
 		try {
-			Building.getInstance().addRiderToFloor(rider, floor);
+			Building.getInstance().addRiderToFloor(person, floor);
 		} catch (InvalidArgumentException e1) {
 			System.out.println(e1.getMessage());
 			e1.printStackTrace();
@@ -495,12 +229,13 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		}
 	}
 	
-	//Returns the current time
-	public long getCurrentTimeMillis() {
-		return this.currentTimeMillis;
-	}
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Elevator Time Management Methods 		*
+	 * 												*
+	 *////////////////////////////////////////////////
 	
-	//Idle time managing functions
+	//Returns the amount of time an elevator has been IDLE
 	public long getIdleTime(int elevatorNumber) throws InvalidArgumentException {
 		if (!this.idleTimes.containsKey(elevatorNumber)) {
 			throw new InvalidArgumentException("TimeProcessor's idleTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for get\n");
@@ -508,6 +243,7 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		return this.idleTimes.get(elevatorNumber);
 	}
 	
+	//Updates the amount of time an elevator has been IDLE by the designated sleep time
 	public void updateIdleTime(int elevatorNumber) throws InvalidArgumentException {
 		if (!this.idleTimes.containsKey(elevatorNumber)) {
 			throw new InvalidArgumentException("TimeProcessor's idleTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for update\n");
@@ -522,6 +258,7 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		}
 	}
 	
+	//Resets the amount of time an elevator has been IDLE to 0
 	public void resetIdleTime(int elevatorNumber) throws InvalidArgumentException {
 		if (!this.idleTimes.containsKey(elevatorNumber)) {
 			throw new InvalidArgumentException("TimeProcessor's idleTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for reset\n");
@@ -529,7 +266,7 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		this.idleTimes.put(elevatorNumber, (long) 0);
 	}
 	
-	//Door open time managing functions
+	//Returns the amount of time an elevator's doors have been open
 	public long getDoorOpenTime(int elevatorNumber) throws InvalidArgumentException {
 		if (!this.doorOpenTimes.containsKey(elevatorNumber)) {
 			throw new InvalidArgumentException("TimeProcessor's doorOpenTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for get\n");
@@ -537,6 +274,7 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		return this.doorOpenTimes.get(elevatorNumber);
 	}
 	
+	//Updates the amount of time an elevator's doors have been open by the designated sleep time
 	public void updateDoorOpenTime(int elevatorNumber) throws InvalidArgumentException {
 		if (!this.doorOpenTimes.containsKey(elevatorNumber)) {
 			throw new InvalidArgumentException("TimeProcessor's doorOpenTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for update\n");
@@ -551,6 +289,7 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		}
 	}
 	
+	//Resets the amount of time an elevator's doors have been open to 0
 	public void resetDoorOpenTime(int elevatorNumber) throws InvalidArgumentException {
 		if (!this.doorOpenTimes.containsKey(elevatorNumber)) {
 			throw new InvalidArgumentException("TimeProcessor's doorOpenTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for reset\n");
@@ -558,47 +297,131 @@ private void createFloorMovementTimesHashMap() throws AlreadyExistsException, Ba
 		this.doorOpenTimes.put(elevatorNumber, (long) 0);
 	}
 	
-	//Door floor movement managing functions
-		public double getFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
-			if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
-				throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for get\n");
-			}
-			return this.floorMovementTimes.get(elevatorNumber);
+	//Returns the amount of time an elevator has been moving from one floor to another
+	public long getFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
+		if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
+			throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for get\n");
 		}
-		
-		public void updateFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
-			if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
-				throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for update\n");
-			}
-			try {
-				long sleepTime = this.getSleepTime();
-				this.floorMovementTimes.put(elevatorNumber, this.floorMovementTimes.get(elevatorNumber) + sleepTime);
-			} catch (BadInputDataException e) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-		
-		public void resetFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
-			if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
-				throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for reset\n");
-			}
-			this.floorMovementTimes.put(elevatorNumber, (long) 0);
-		}
-		
+		return this.floorMovementTimes.get(elevatorNumber);
+	}
 	
-	//Prints the formatted current time string
-	public String getTimeString() {
+	//Updates the amount of time an elevator has been moving from one floor to another by the designated sleep time
+	public void updateFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
+		if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
+			throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for update\n");
+		}
+		try {
+			long sleepTime = this.getSleepTime();
+			this.floorMovementTimes.put(elevatorNumber, this.floorMovementTimes.get(elevatorNumber) + sleepTime);
+		} catch (BadInputDataException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
+	//Resets the amount of time an elevator has been moving from one floor to another to 0
+	public void resetFloorMovementTime(int elevatorNumber) throws InvalidArgumentException {
+		if (!this.floorMovementTimes.containsKey(elevatorNumber)) {
+			throw new InvalidArgumentException("TimeProcessor's floorMovementTimes HashMap doesn't contain elevatorNumber " + elevatorNumber + " for reset\n");
+		}
+		this.floorMovementTimes.put(elevatorNumber, (long) 0);
+	}
 		
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		Time Stamp Printing Method		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	//Called by various classes for narration of events
+	public String getTimeString() {
 		long seconds = this.currentTimeMillis / 1000;
 		long hours = seconds / 3600;
 		seconds -= hours * 3600;
 		long minutes = seconds / 60;
 		seconds -= minutes * 60;
-		
 		return String.format("%d:%02d:%02d  ", hours, minutes, seconds);
-		
 	}
 	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		DataStore Retrieval Methods		*
+	 * 										*
+	 *////////////////////////////////////////
+	
+	//Accesses DataStore and parses the number of elevators to an int, checks validity and returns it
+	private int getNumElevators() throws BadInputDataException {
+		try { 
+			int numElevators = Integer.parseInt(DataStore.getInstance().getNumElevators()); 
+			if (numElevators > 0)
+				return numElevators;
+			else
+				throw new BadInputDataException("TimeProcessor received a value less than 1 for numElevators from DataStore\n");
+	    } catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numElevators value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for numElevators value\n"); 
+	    }
+	}
+	
+	//Accesses DataStore and parses the number of floors to an int, checks validity and returns it
+	private int getNumFloors() throws BadInputDataException {
+		try { 
+			int numFloors = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
+			if (numFloors > 1)
+				return numFloors;
+			else
+				throw new BadInputDataException("TimeProcessor received a value less than 2 for numFloors from DataStore\n");
+	    } catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's numFloors value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("FloorImpl received null from DataStore for numFloors value\n"); 
+	    }
+	}
+	
+	//Accesses DataStore and parses the number of people to generate per minute to an int, checks validity and returns it
+	private int getRidersPerMinute() throws BadInputDataException {
+		try {
+			int ridersPerMinute = Integer.parseInt(DataStore.getInstance().getRidersPerMinute());
+			if (ridersPerMinute > 0)
+				return ridersPerMinute;
+			else
+				throw new BadInputDataException("TimeProcessor cannot accept number less than 1 for ridersPerMinute from DataStore\n");
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's ridersPerMinute value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for ridersPerMinute value\n"); 
+	    }
+	}
+	
+	//Accesses DataStore and parses the sleep time to a long, checks validity and returns it
+	private long getSleepTime() throws BadInputDataException {
+		try {
+			long sleepTime = Integer.parseInt(DataStore.getInstance().getSleepTime()) * 1000;
+			if (sleepTime >= 0)
+				return sleepTime;
+			else
+				throw new BadInputDataException("TimeProcessor received a negative value for sleepTime from DataStore\n");
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's sleepTime value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for sleepTime value\n"); 
+	    }
+	}
+	
+	//Accesses DataStore and parses the duration to a long, checks validity and returns it
+	private long getDurationMillis() throws BadInputDataException {
+		try {
+			long durationMillis = Integer.parseInt(DataStore.getInstance().getDuration()) * 1000;
+			if (durationMillis > 0)
+				return durationMillis;
+			else
+				throw new BadInputDataException("TimeProcessor received a value less than or equal to 0 for duration from DataStore\n");
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's duration value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for duration value\n"); 
+	    }
+	}
 }

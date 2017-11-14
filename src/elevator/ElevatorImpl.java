@@ -73,13 +73,11 @@ public class ElevatorImpl implements ElevatorInterface{
 	 *////////////////////////////////////////
 	
 	@Override
-	public void update(long sleepTime) throws InvalidArgumentException {
-		if (sleepTime <= 0) 
-			throw new InvalidArgumentException("ElevatorImpl's update method cannot accept number less than or equal to 0 for time arg\n");
+	public void update() {
 		try {
 			long doorsOpenTimeRequired = getDoorsOpenTime();
 			if (!this.doorOpen) {
-				this.move(sleepTime);
+				this.move();
 				if ((this.currentFloor % 1 == 0) 
 						&& ((this.pickUps.get(this.pendingDirection).contains(this.currentFloor)) 
 								|| (this.dropOffs.get(this.pendingDirection).contains(this.currentFloor))
@@ -397,12 +395,9 @@ public class ElevatorImpl implements ElevatorInterface{
 	 *////////////////////////////////////////////////////
 	
 	
-	private void move(long time) throws InvalidArgumentException {
-		
-		if (time < 0) {
-			throw new InvalidArgumentException("ElevatorImpl's move method cannot accept negative value for time parameter\n");
-		}
-		
+	private void move() throws InvalidArgumentException {
+//		if (time < 0)
+//			throw new InvalidArgumentException("ElevatorImpl's move method cannot accept negative value for time parameter\n");
 		try {
 			
 			long speed = this.getSpeed();

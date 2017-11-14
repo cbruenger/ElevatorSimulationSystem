@@ -16,7 +16,7 @@ import interfaces.FloorInterface;
 import interfaces.RiderInterface;
 //import timeProcessor.TimeProcessor;
 
-public final class Building {
+public class Building {
 	
 	//Class Variables
 	private static Building building;
@@ -149,16 +149,11 @@ public final class Building {
 	
 	
 	//Function called by TimeProcessor for updating the elevator activity
-	public void update(long sleepTime) throws InvalidArgumentException {
-		
-		//Throw error if sleepTime is not a positive value
-		if (sleepTime < 0) {
-			throw new InvalidArgumentException("Building update cannot accept a negative value for sleepTime\n");
-		}
-		
+	public void update() {
+				
 		//Notify each elevator 
 		for (int elevatorNumber : this.elevators.keySet()) {
-			this.elevators.get(elevatorNumber).update(sleepTime);
+			this.elevators.get(elevatorNumber).update();
 		}
 	}
 	
