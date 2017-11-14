@@ -416,6 +416,8 @@ public class ElevatorImpl implements ElevatorInterface{
 						
 						TimeProcessor.getInstance().updateFloorMovementTime(this.elevatorNumber);
 						if (TimeProcessor.getInstance().getFloorMovementTime(this.elevatorNumber) >= speed) {
+							System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving UP from Floor " + (this.currentFloor) + " to Floor " + (this.currentFloor+1) + " ");
+							this.printRequests();
 							this.currentFloor += 1;
 							TimeProcessor.getInstance().resetFloorMovementTime(this.elevatorNumber);
 							ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
@@ -432,6 +434,8 @@ public class ElevatorImpl implements ElevatorInterface{
 						TimeProcessor.getInstance().updateFloorMovementTime(this.elevatorNumber);
 
 						if (TimeProcessor.getInstance().getFloorMovementTime(this.elevatorNumber) >= speed) {
+							System.out.print(TimeProcessor.getInstance().getTimeString() + "Elevator " + this.elevatorNumber + " moving DOWN from Floor " + (this.currentFloor) + " to Floor " + (this.currentFloor-1) + " ");
+							this.printRequests();
 							this.currentFloor -= 1;
 							TimeProcessor.getInstance().resetFloorMovementTime(this.elevatorNumber);
 							ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
