@@ -331,7 +331,7 @@ public class ElevatorImpl implements ElevatorInterface{
 		try {
 			if (this.direction == DOWN) ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.DOWN);
 			else ElevatorDisplay.getInstance().updateElevator(this.elevatorNumber, this.currentFloor, this.riders.size(), Direction.UP);
-			Building.getInstance().decommissionRiders(exitingRiders);
+			Building.getInstance().decommissionPeople(exitingRiders);
 		} catch (InvalidArgumentException e1) {
 			System.out.println(e1.getMessage());
 		} catch (AlreadyExistsException e2) {

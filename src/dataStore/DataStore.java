@@ -23,7 +23,7 @@ public final class DataStore {
 	private String doorsOpenTime;
 	private String idleTime;
 	private String sleepTime;
-	private String ridersPerMinute;
+	private String peoplePerMinute;
 	private String duration;
 	
 	/*////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ public final class DataStore {
 		this.doorsOpenTime = null;
 		this.idleTime = null;
 		this.sleepTime = null;
-		this.ridersPerMinute = null;
+		this.peoplePerMinute = null;
 		this.duration = null;
 	}
 	
@@ -99,7 +99,7 @@ public final class DataStore {
 										break;
 									case "sleepTime": this.setSleepTime(dataName.getTextContent());
 										break;
-									case "ridersPerMinute": this.setRidersPerMinute(dataName.getTextContent());
+									case "peoplePerMinute": this.setPeoplePerMinute(dataName.getTextContent());
 										break;
 									case "duration":  this.setDuration(dataName.getTextContent());
 										break;
@@ -124,13 +124,13 @@ public final class DataStore {
 		if (this.doorsOpenTime == null) throw new InsufficientInputException("doorsOpenTime not acquired from parsing XML file\n");
 		if (this.idleTime == null) throw new InsufficientInputException("idleTime not acquired from parsing XML file\n");
 		if (this.sleepTime == null) throw new InsufficientInputException("sleepTime not acquired from parsing XML file\n");
-		if (this.ridersPerMinute == null) throw new InsufficientInputException("ridersPerMinute not acquired from parsing XML file\n");
+		if (this.peoplePerMinute == null) throw new InsufficientInputException("peoplePerMinute not acquired from parsing XML file\n");
 		if (this.duration == null) throw new InsufficientInputException("duration not acquired from parsing XML file\n");
 	}
 	
 	/*////////////////////////////////////////////////////////////
 	 * 															*
-	 * 		Methods for assigning parsed data into vaiables		*
+	 * 		Methods for assigning parsed data into variables		*
 	 * 															*
 	 *////////////////////////////////////////////////////////////
 	
@@ -191,11 +191,11 @@ public final class DataStore {
 	}
 	
 	//Sets the rider generation time 
-	private void setRidersPerMinute(String ridersPerMinute) throws InputParsingException {
-		if (ridersPerMinute == null || ridersPerMinute.isEmpty()) {
-			throw new InputParsingException("Could not set ridersPerMinute due to null or empty value in XML file\n");
+	private void setPeoplePerMinute(String peoplePerMinute) throws InputParsingException {
+		if (peoplePerMinute == null || peoplePerMinute.isEmpty()) {
+			throw new InputParsingException("Could not set peoplePerMinute due to null or empty value in XML file\n");
 		}
-		this.ridersPerMinute = ridersPerMinute;
+		this.peoplePerMinute = peoplePerMinute;
 	}
 	
 	//Sets the duration of the simulation
@@ -247,9 +247,9 @@ public final class DataStore {
 		return this.sleepTime;
 	}
 	
-	//Returns the rider generations per minute
-	public String getRidersPerMinute() {
-		return this.ridersPerMinute;
+	//Returns the number of people to generate per minute
+	public String getPeoplePerMinute() {
+		return this.peoplePerMinute;
 	}
 	
 	//Returns duration of the simulation

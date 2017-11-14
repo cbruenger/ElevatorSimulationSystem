@@ -169,7 +169,7 @@ public class TimeProcessor {
 	private void peopleSimWork() {
 		try {
 			//Variables required for statistical person creation
-			int peoplePerMinute = this.getRidersPerMinute();
+			int peoplePerMinute = this.getPeoplePerMinute();
 			int personGenerationChancePerCycle = (int) Math.ceil(((float)peoplePerMinute/60) * 100);
 			int randomInt = (int) Math.ceil(Math.random() * 100);
 			
@@ -217,7 +217,7 @@ public class TimeProcessor {
 	//Passes the building a person to put on the person's start floor
 	private void passPersonToBuilding(RiderInterface person, int floor) {
 		try {
-			Building.getInstance().addRiderToFloor(person, floor);
+			Building.getInstance().addPersonToFloor(person, floor);
 		} catch (InvalidArgumentException e1) {
 			System.out.println(e1.getMessage());
 			e1.printStackTrace();
@@ -381,17 +381,17 @@ public class TimeProcessor {
 	}
 	
 	//Accesses DataStore and parses the number of people to generate per minute to an int, checks validity and returns it
-	private int getRidersPerMinute() throws BadInputDataException {
+	private int getPeoplePerMinute() throws BadInputDataException {
 		try {
-			int ridersPerMinute = Integer.parseInt(DataStore.getInstance().getRidersPerMinute());
+			int ridersPerMinute = Integer.parseInt(DataStore.getInstance().getPeoplePerMinute());
 			if (ridersPerMinute > 0)
 				return ridersPerMinute;
 			else
-				throw new BadInputDataException("TimeProcessor cannot accept number less than 1 for ridersPerMinute from DataStore\n");
+				throw new BadInputDataException("TimeProcessor cannot accept number less than 1 for getPeoplePerMinute from DataStore\n");
 		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("TimeProcessor could not parse DataStore's ridersPerMinute value to int\n"); 
+	        throw new BadInputDataException("TimeProcessor could not parse DataStore's getPeoplePerMinute value to int\n"); 
 	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("TimeProcessor received null from DataStore for ridersPerMinute value\n"); 
+	        throw new BadInputDataException("TimeProcessor received null from DataStore for getPeoplePerMinute value\n"); 
 	    }
 	}
 	

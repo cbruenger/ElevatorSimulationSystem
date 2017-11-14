@@ -14,33 +14,32 @@ import gui.ElevatorDisplay;
 import interfaces.ElevatorInterface;
 import interfaces.FloorInterface;
 import interfaces.RiderInterface;
-//import timeProcessor.TimeProcessor;
+
 
 public class Building {
 	
-	//Class Variables
+	//Class variables and data structures
 	private static Building building;
 	private int numFloors;
 	private int numElevators;
 	private HashMap<Integer, FloorInterface> floors;
 	private HashMap<Integer,ElevatorInterface> elevators;
-	private ArrayList<RiderInterface> decommissionedRiders;
-	//private int elevatorToAssign; //This elevator assignment var is just for the first phase
+	private ArrayList<RiderInterface> decommissionedPeople;
 	
-	////////////////////////
-	//				      //
-	//    Constructor     //
-	//				      //
-	////////////////////////
+	/*////////////////////////////////////////////////////
+	 * 													*
+	 * 		Constructor and Singleton Instance Getter	*
+	 * 													*
+	 *////////////////////////////////////////////////////
 	
+	//Constructor, initializes necessary components
 	private Building() {
-		
 		try {
 			this.setNumFloors();
 			this.setNumElevators();
 			this.createFloors();
 			this.createElevators();
-			this.initializeDecommissionedRidersArrayList();
+			this.initializeDecommissionedPeopleArrayList();
 			this.initializeGui();
 		} catch (BadInputDataException e1) {
 			System.out.println(e1.getMessage());
@@ -53,12 +52,19 @@ public class Building {
 		}
 	}
 	
-	//A function to get an instance of the class. Initializes instance if needed
+	//Returns the instance of this class, initializes if 1st time called
 	public static Building getInstance() {
 		if (building == null) building = new Building();
 		return building;
 	}
 	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Methods called by the Constructor		*
+	 * 												*
+	 *////////////////////////////////////////////////
+	
+	//Accesses DataStore and parses the number of floors to an int, checks validity and assigns class variable
 	private void setNumFloors() throws BadInputDataException {
 		try { 
 			int temp = Integer.parseInt(DataStore.getInstance().getNumFloors()); 
@@ -73,6 +79,7 @@ public class Building {
 	    }
 	}
 	
+	//Accesses DataStore and parses the number of elevators to an int, checks validity and assigns class variable
 	private void setNumElevators() throws BadInputDataException {
 		try { 
 			int temp = Integer.parseInt(DataStore.getInstance().getNumElevators());
@@ -87,58 +94,32 @@ public class Building {
 	    }
 	}
 	
-	//Initializes the Elevators
+	//Creates the HashMap to contain elevators, creates elevators and adds them to the HashMap 
 	private void createElevators() throws AlreadyExistsException {
-		
-		//Throw error if elevators have already been created
-		if (this.elevators != null) {
-			throw new AlreadyExistsException("The elevators HashMap has already been created in building\n");
-		}
-		
-		//Initialize the ArrayList for elevators to be stored
+		if (this.elevators != null)
+			throw new AlreadyExistsException("The elevators HashMap has already been created in building\n");		
 		this.elevators = new HashMap<Integer,ElevatorInterface>();
-		
-		//Create the chosen number of elevators
-		for (int i = 1; i <= this.numElevators; i++) {
+		for (int i = 1; i <= this.numElevators; i++)
 			this.elevators.put(i, new Elevator(i));
-		}
 	}
 	
-	//Initializes ArrayList and adds floors
+	//Creates the HashMap to contain floors, creates floors and adds them to the HashMap 
 	private void createFloors() throws AlreadyExistsException {
-		
-		//Throw error if elevators have already been created
-		if (this.floors != null) {
+		if (this.floors != null)
 			throw new AlreadyExistsException("The floors HashMap has already been created in building\n");
-		}
-		
-		//Initialize the HashMap for floors to be stored
 		this.floors = new HashMap<Integer,FloorInterface>();
-		
-		//Creates the chosen number of floors
-		for (int i = 1; i <= this.numFloors; i++) {
+		for (int i = 1; i <= this.numFloors; i++)
 			this.floors.put(i, new Floor(i));
-			}
 		}
 	
-	private void initializeDecommissionedRidersArrayList() throws AlreadyExistsException {
-		
-		//Throw error if list has already been created
-		if (this.decommissionedRiders != null) {
-			throw new AlreadyExistsException("The decommissionedRiders ArrayList has already been created in building\n");
-		}
-		
-		//Initialize ArrayList for past riders to be stored
-		this.decommissionedRiders = new ArrayList<RiderInterface>();
+	//Creates the ArrayList which will contain people exiting elevators
+	private void initializeDecommissionedPeopleArrayList() throws AlreadyExistsException {
+		if (this.decommissionedPeople != null)
+			throw new AlreadyExistsException("The decommissionedPeople ArrayList has already been created in building\n");
+		this.decommissionedPeople = new ArrayList<RiderInterface>();
 	}
 	
-	//Initializes the first elevator to be assigned as the first in the list
-//	private void initializeElevatorToAssign() {
-//		// TODO Delete this method once assignment logic works in the elevatorController
-//		this.elevatorToAssign = 1;
-//	}
-	
-	//Initializes GUI with numFloors, numElevators and all elevators IDLE on floor 1
+	//Initializes GUI with the designated number of floors and elevators, puts all elevators IDLE on floor 1
 	private void initializeGui() {
 		ElevatorDisplay.getInstance().initialize(this.numFloors);
 		for (int i = 1; i <= this.numElevators; i++) {
@@ -147,101 +128,40 @@ public class Building {
 		}
 	}
 	
+	/*////////////////////////////////////////
+	 * 										*
+	 * 		Elevator Managing Methods		*
+	 * 										*
+	 *////////////////////////////////////////
 	
-	//Function called by TimeProcessor for updating the elevator activity
-	public void update() {
-				
-		//Notify each elevator 
+	//Notifies floors to update their activity, called once per wake cycle
+	public void update() { 
 		for (int elevatorNumber : this.elevators.keySet()) {
 			this.elevators.get(elevatorNumber).update();
 		}
 	}
 	
-	
-	public void decommissionRiders(ArrayList<RiderInterface> riders) throws InvalidArgumentException, AlreadyExistsException {
-		
-		//Check if riders ArrayList is null
-		if (riders == null) {
-			throw new InvalidArgumentException("Building's decommissionRiders method cannot accept a null parameter\n");
-		}
-		//Check if any riders in the ArrayList already exist in the building's decommissionedRiders ArrayList
-		for (RiderInterface rider: riders) {
-			if (this.decommissionedRiders.contains(rider)) {
-				throw new AlreadyExistsException("Rider already exists in building's decommissionedRiders ArrayList\n");
-			}
-		}
-		
-		//Add riders to the building's decommissionedRiders ArrayList
-		for (RiderInterface rider: riders) {
-			this.decommissionedRiders.add(rider);
-			this.floors.get(rider.getDestinationFloor()).addPersonToDecommissionedList(rider.getId());
-		}
-	}
-	
-	
+	//Called by the elevator controller to assign a pickup for a given direction on a given floor to a given elevator
 	public void assignElevatorForPickup(int floor, MyDirection direction, int elevatorNumber) throws InvalidArgumentException {
-		
-		//Throw error if floor is invalid
-		if (floor < 1 || floor > this.numFloors) {
+		if (floor < 1 || floor > this.numFloors)
 			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
-		}
-		
-		//Throw error if direction is null or IDLE
-		if (direction == null || direction == IDLE) {
+		if (direction == null || direction == IDLE)
 			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept null or IDLE for direction parameter\n");
-		}
-		
-		//Throw error if elevatorNumber is invalid
-		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
+		if (elevatorNumber < 1 || elevatorNumber > this.numElevators)
 			throw new InvalidArgumentException("Building's elevatorRequested method cannot accept elevatorNumber less than 1 or greater than " + DataStore.getInstance().getNumElevators() + "\n");
-		}
 		this.elevators.get(elevatorNumber).addPickupRequest(direction, floor);
 	}
 	
-	
-	public void addRiderToFloor(RiderInterface rider, int startFloor) throws InvalidArgumentException, AlreadyExistsException {
-		if (startFloor < 1 || startFloor > this.numFloors) {
-			throw new InvalidArgumentException("Building's addRiderToFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
-		}
-		FloorInterface floor = floors.get(startFloor);
-		floor.addWaitingPerson(rider);
-		
-	}
-	
-	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction, int availableCapacity) throws InvalidArgumentException, BadInputDataException, UnexpectedNullException {
-		try {
-			int totalCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity());
-			if (floor < 1 || floor > this.numFloors) {
-				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
-			}
-			if (direction == null) {
-				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept null value for direction\n");
-			}
-			if (availableCapacity < 0 || availableCapacity > totalCapacity) {
-				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept number less than 0 or greater than " + totalCapacity + " for availableCapacity\n");
-			}
-			ArrayList<RiderInterface> ridersToTransfer = this.floors.get(floor).getWaitersByDirection(direction, availableCapacity);
-			if (ridersToTransfer == null)
-				throw new UnexpectedNullException("Building's getWaitersFromFloor method received null value when retreiving riders from floor\n");
-			return ridersToTransfer;
-		} catch (NumberFormatException e) { 
-	        throw new BadInputDataException("Building could not parse DataStore's elevatorCapacity value to int\n"); 
-	    } catch(NullPointerException e) {
-	        throw new BadInputDataException("Building received null from DataStore for elevatorCapacity value\n"); 
-	    }
-	}
-	
+	//Called by elevator controller, forwards a Data Transfer Object from a given elevator to the controller
 	public ElevatorDTO getElevatorDTO(int elevatorNumber) throws InvalidArgumentException {
-		if (elevatorNumber < 1 || elevatorNumber > this.numElevators) {
+		if (elevatorNumber < 1 || elevatorNumber > this.numElevators)
 			throw new InvalidArgumentException("Building's getElevatorDTO method cannot accept number less than 1 or greater than " + this.numElevators + " for elevatorNumber arg\n");
-		}
 		try {
 			ElevatorDTO elevatorDTO = this.elevators.get(elevatorNumber).getDTO();
-			if (elevatorDTO == null) {
+			if (elevatorDTO == null)
 				throw new UnexpectedNullException("Building's getElevatorDTO method received null DTO for elevator " + elevatorNumber + "\n");
-			} else {
+			else
 				return elevatorDTO;
-			}
 		} catch (UnexpectedNullException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -250,34 +170,132 @@ public class Building {
 		return null;
 	}
 	
-	//A function for printing the average wait/ride times for riders and end of simulation
+	/*////////////////////////////////////
+	 * 									*
+	 * 		Floor Managing Methods		*
+	 * 									*
+	 *////////////////////////////////////
+	
+	//Called by the TimeProcessor, puts a given person onto their given start floor
+	public void addPersonToFloor(RiderInterface person, int startFloor) throws InvalidArgumentException, AlreadyExistsException {
+		if (startFloor < 1 || startFloor > this.numFloors)
+			throw new InvalidArgumentException("Building's addPersonToFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
+		if (person == null) {
+			throw new InvalidArgumentException("Building's addPersonToFloor method cannot accept null for person arg\n");
+		}
+		FloorInterface floor = floors.get(startFloor);
+		floor.addWaitingPerson(person);	
+	}
+	
+	/* Called by elevators, forwards an ArrayList from a given floor to the calling elevator. The ArrayList
+	 * contains a given amount of people (availableCapacity) who are going in a given direction */
+	public ArrayList<RiderInterface> getWaitersFromFloor(int floor, MyDirection direction, int availableCapacity) throws InvalidArgumentException, BadInputDataException, UnexpectedNullException {
+		try {
+			//Retrieve the total capacity of an elevator from the DataStore and parse to an int
+			int totalCapacity = Integer.parseInt(DataStore.getInstance().getElevatorCapacity());
+			
+			//Validate args 
+			if (floor < 1 || floor > this.numFloors)
+				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept floor numbers less than 1 or greater than " + this.numFloors + "\n");
+			if (direction == null)
+				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept null value for direction\n");
+			if (availableCapacity < 0 || availableCapacity > totalCapacity) {
+				throw new InvalidArgumentException("Building's getWaitersFromFloor method cannot accept number less than 0 or greater than " + totalCapacity + " for availableCapacity\n");
+			}
+			
+			//Retrieve people from floor, validate and return
+			ArrayList<RiderInterface> peopleToTransfer = this.floors.get(floor).getWaitersByDirection(direction, availableCapacity);
+			if (peopleToTransfer == null)
+				throw new UnexpectedNullException("Building's getWaitersFromFloor method received null value when retreiving riders from floor\n");
+			return peopleToTransfer;
+			
+		} catch (NumberFormatException e) { 
+	        throw new BadInputDataException("Building's getWaitersFromFloor method could not parse DataStore's elevatorCapacity value to int\n"); 
+	    } catch(NullPointerException e) {
+	        throw new BadInputDataException("Building's getWaitersFromFloor method received null from DataStore for elevatorCapacity value\n"); 
+	    }
+	}
+	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Exited People Decommissioning Method		*
+	 * 												*
+	 *////////////////////////////////////////////////
+	
+	//Called by elevators, a method for receiving an ArrayList of people exiting, adds all people to the decommissionedPeople ArrayList
+	public void decommissionPeople(ArrayList<RiderInterface> people) throws InvalidArgumentException, AlreadyExistsException {
+		
+		//Validate people arg
+		if (people == null)
+			throw new InvalidArgumentException("Building's decommissionPeople method cannot accept null for people arg\n");
+		for (RiderInterface person : people) {
+			if (this.decommissionedPeople.contains(person))
+				throw new AlreadyExistsException("Person already exists in building's decommissionedPeople ArrayList\n");
+		}
+		
+		//Add people decommissionedRiders ArrayList
+		for (RiderInterface rider: people) {
+			this.decommissionedPeople.add(rider);
+			this.floors.get(rider.getDestinationFloor()).addPersonToDecommissionedList(rider.getId());
+		}
+	}
+	
+	/*////////////////////////////////////////////////
+	 * 												*
+	 * 		Simulation Data Reporting Methods		*
+	 * 												*
+	 *////////////////////////////////////////////////
+	
+	/* Calls a HashSet building method containing all decommissioned people's ride times,
+	 * and then calls methods to print the various calculated data */
 	public void reportData() {
 		try {
-			this.waitTimes();
 			HashMap<String, ArrayList<Long>> rideTimes = this.getRideTimesHashSet();
+			this.waitTimes();
 			this.averageRideTimes(rideTimes);
 			this.maxRideTimes(rideTimes);
 			this.minRideTimes(rideTimes);
-			this.riderTimes();
-
-		} catch (UnexpectedNullException e) {
-			System.out.println(e.getMessage());
+			this.peopleTimes();
+		} catch (UnexpectedNullException e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (InvalidArgumentException e2) {
+			System.out.println(e2.getMessage());
+			e2.printStackTrace();
+			System.exit(-1);
 		}
 	}
-
-	// Wait times
-	private void waitTimes() throws UnexpectedNullException{
-		if (this.decommissionedRiders == null) {
+	
+	//Builds and returns a HashMap containing all decommissioned people's ride times
+	private HashMap<String, ArrayList<Long>> getRideTimesHashSet() throws UnexpectedNullException {
+		if (this.decommissionedPeople == null)
 			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
-		}
-		HashMap<Integer, ArrayList<Long>> floorWaitTimes = new HashMap<Integer, ArrayList<Long>>();
-		for (RiderInterface rider : this.decommissionedRiders) {
-			if (!floorWaitTimes.containsKey(rider.getStartFloor())) {
-				ArrayList<Long> waitTimesList = new ArrayList<Long>();
-				waitTimesList.add(rider.getWaitTime());
-				floorWaitTimes.put(rider.getStartFloor(), waitTimesList);
+		HashMap<String, ArrayList<Long>> rideTimes = new HashMap<String, ArrayList<Long>>();
+		for (RiderInterface person : this.decommissionedPeople) {
+			if (!rideTimes.containsKey(person.getStartFloor()+"-"+person.getDestinationFloor())) {
+				ArrayList<Long> rideTimesList = new ArrayList<Long>();
+				rideTimesList.add(person.getRideTime());
+				rideTimes.put(person.getStartFloor()+"-"+person.getDestinationFloor(), rideTimesList);
 			} else {
-				floorWaitTimes.get(rider.getStartFloor()).add(rider.getWaitTime());
+				rideTimes.get(person.getStartFloor()+"-"+person.getDestinationFloor()).add(person.getRideTime());
+			}
+		}
+		return rideTimes;
+	}
+
+	//Prints the average/min/max wait times of decommissioned people by floor
+	private void waitTimes() throws UnexpectedNullException {
+		if (this.decommissionedPeople == null)
+			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
+		HashMap<Integer, ArrayList<Long>> floorWaitTimes = new HashMap<Integer, ArrayList<Long>>();
+		for (RiderInterface person : this.decommissionedPeople) {
+			if (!floorWaitTimes.containsKey(person.getStartFloor())) {
+				ArrayList<Long> waitTimesList = new ArrayList<Long>();
+				waitTimesList.add(person.getWaitTime());
+				floorWaitTimes.put(person.getStartFloor(), waitTimesList);
+			} else {
+				floorWaitTimes.get(person.getStartFloor()).add(person.getWaitTime());
 			}
 		}
 		System.out.println("");
@@ -303,30 +321,12 @@ public class Building {
 		}	
 	}
 	
-	
-	private HashMap<String, ArrayList<Long>> getRideTimesHashSet() throws UnexpectedNullException{
-		if (this.decommissionedRiders == null) {
-			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
-		}
-		HashMap<String, ArrayList<Long>> rideTimes = new HashMap<String, ArrayList<Long>>();
-		for (RiderInterface rider : this.decommissionedRiders) {
-			if (!rideTimes.containsKey(rider.getStartFloor()+"-"+rider.getDestinationFloor())) {
-				ArrayList<Long> rideTimesList = new ArrayList<Long>();
-				rideTimesList.add(rider.getRideTime());
-				rideTimes.put(rider.getStartFloor()+"-"+rider.getDestinationFloor(), rideTimesList);
-			} else {
-				rideTimes.get(rider.getStartFloor()+"-"+rider.getDestinationFloor()).add(rider.getRideTime());
-			}
-		}
-		return rideTimes;
-	}
-	
-	// Average ride times
-	private void averageRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
-		//// Printing average ride times
+	//Prints the average ride times by floor
+	private void averageRideTimes(HashMap<String, ArrayList<Long>> rideTimes) throws InvalidArgumentException {
+		if (rideTimes == null)
+			throw new InvalidArgumentException("Building's averageRideTimes method cannot accept null rideTimes arg\n");
 		System.out.println("");
-		System.out.println("************ Average Rider Times By Floor ************");
-		//Print column names
+		System.out.println("************ Average Ride Times By Floor ************");
 		System.out.printf("%-5s", "Floor");
 		for (int floor=1; floor<=this.numFloors; floor++) {
 			System.out.printf("%-5s", floor);
@@ -353,43 +353,46 @@ public class Building {
 		}
 	}
 	
-	// Max ride times
-		private void maxRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
-			//// Printing Max ride times
-			System.out.println("");
-			System.out.println("************ Maximum Rider Times By Floor ************");
-			//Print column names
-			System.out.printf("%-5s", "Floor");
-			for (int floor=1; floor<=this.numFloors; floor++) {
-				System.out.printf("%-5s", floor);
-			}
-			System.out.printf("\n");
-			
-			for (int i = 1; i <= this.numFloors; i++) {
-				System.out.printf("%-5s", i);
-				for (int j = 1; j <= this.numFloors; j++) {
-					if (i == j) System.out.printf("%-5s", "X");
+	//Prints the maximum ride times by floor
+	private void maxRideTimes(HashMap<String, ArrayList<Long>> rideTimes) throws InvalidArgumentException {
+		if (rideTimes == null)
+			throw new InvalidArgumentException("Building's maxRideTimes method cannot accept null rideTimes arg\n");
+		//Printing Min ride times
+		System.out.println("");
+		System.out.println("************ Maximum Ride Times By Floor ************");
+		System.out.printf("%-5s", "Floor");
+		for (int floor=1; floor<=this.numFloors; floor++) {
+			System.out.printf("%-5s", floor);
+		}
+		System.out.printf("\n");
+		
+		for (int i = 1; i <= this.numFloors; i++) {
+			System.out.printf("%-5s", i);
+			for (int j = 1; j <= this.numFloors; j++) {
+				if (i == j) System.out.printf("%-5s", "X");
+				else {
+					if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
 					else {
-						if (!rideTimes.containsKey(i+"-"+j)) System.out.printf("%-5s", "0");
-						else {
-							long max = Long.MIN_VALUE;
-							for (long k : rideTimes.get(i+"-"+j)) {
-								if (k > max) max = k;
-							}
-							long maxRideTime = max/1000;
-							System.out.printf("%-5d", maxRideTime);
+						long max = Long.MIN_VALUE;
+						for (long k : rideTimes.get(i+"-"+j)) {
+							if (k > max) max = k;
 						}
+						long maxRideTime = max/1000;
+						System.out.printf("%-5d", maxRideTime);
 					}
 				}
-				System.out.printf("\n");
 			}
+			System.out.printf("\n");
 		}
+	}
 	
-		// Min ride times
-	private void minRideTimes(HashMap<String, ArrayList<Long>> rideTimes){
-		//// Printing Max ride times
+	//Prints the minimum ride times by floor
+	private void minRideTimes(HashMap<String, ArrayList<Long>> rideTimes) throws InvalidArgumentException {
+		if (rideTimes == null)
+			throw new InvalidArgumentException("Building's minRideTimes method cannot accept null rideTimes arg\n");
+		//Printing Max ride times
 		System.out.println("");
-		System.out.println("************ Minimum Rider Times By Floor ************");
+		System.out.println("************ Minimum Ride Times By Floor ************");
 		//Print column names
 		System.out.printf("%-5s", "Floor");
 		for (int floor=1; floor<=this.numFloors; floor++) {
@@ -417,38 +420,36 @@ public class Building {
 		}
 	}
 	
-	//get info by persons
-	private void riderTimes() throws UnexpectedNullException{
-		if (this.decommissionedRiders == null) {
+	//Prints wait/ride/total time by person
+	private void peopleTimes() throws UnexpectedNullException{
+		if (this.decommissionedPeople == null) {
 			throw new UnexpectedNullException("Building's decommissionedRiders ArrayList is null when reporting data\n");
 		}
-		HashMap<Integer, ArrayList<RiderInterface>> ridersTimes = new HashMap<Integer, ArrayList<RiderInterface>>();
-		for (RiderInterface rider : this.decommissionedRiders) {
-			Integer riderID = Integer.parseInt(rider.getId().substring(1));
-			if (!ridersTimes.containsKey(riderID)) {
-				ArrayList<RiderInterface> ridersList = new ArrayList<RiderInterface>();
-				ridersList.add(rider);
-				ridersTimes.put(riderID, ridersList);
+		HashMap<Integer, ArrayList<RiderInterface>> peoplesTimes = new HashMap<Integer, ArrayList<RiderInterface>>();
+		for (RiderInterface person : this.decommissionedPeople) {
+			Integer personID = Integer.parseInt(person.getId().substring(1));
+			if (!peoplesTimes.containsKey(personID)) {
+				ArrayList<RiderInterface> peopleList = new ArrayList<RiderInterface>();
+				peopleList.add(person);
+				peoplesTimes.put(personID, peopleList);
 			} else {
-				ridersTimes.get(riderID).add(rider);
+				peoplesTimes.get(personID).add(person);
 			}
 		}
-	//// Printing Max ride times
+		//Printing Max ride times
 		System.out.println("");
-		System.out.println("************ Ride Times By Individual Rider ************");
+		System.out.println("************ Ride Times By Individual People ************");
 		System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person","Start Floor", "End Floor", "Wait Time","Ride Time","Total Time");
-		for (int i = 1; i <= Collections.max(ridersTimes.keySet()); i++) {
-			if (!ridersTimes.containsKey(i)) {
+		for (int i = 1; i <= Collections.max(peoplesTimes.keySet()); i++) {
+			if (!peoplesTimes.containsKey(i)) {
 				System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person "+i, "NA", "NA", "NA", "NA", "NA");
 			} else {
-				RiderInterface rider = ridersTimes.get(i).get(0);
-				long rideTime = rider.getRideTime()/1000;
-				long waitTime = rider.getWaitTime()/1000;
+				RiderInterface person = peoplesTimes.get(i).get(0);
+				long rideTime = person.getRideTime()/1000;
+				long waitTime = person.getWaitTime()/1000;
 				long totalTime = rideTime+waitTime;
-				System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person "+i, rider.getStartFloor(), rider.getDestinationFloor(), waitTime+" seconds", rideTime+" seconds", totalTime+" seconds");
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s %-15s\n", "Person "+i, person.getStartFloor(), person.getDestinationFloor(), waitTime+" seconds", rideTime+" seconds", totalTime+" seconds");
 			}
 		}	
 	}
-
-	
 }
